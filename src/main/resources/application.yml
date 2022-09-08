@@ -1,0 +1,38 @@
+debug: false
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+logging:
+  level:
+    com.example.projectboard: debug
+    org.springframework.web.servlet: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
+
+
+spring:
+  datasource:
+    url: jdbc:mariadb://127.0.0.1:3306/board
+    username: boardUser
+    password: boardUserpw0987!#@
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    open-in-view: false
+
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 200
+  sql:
+    init:
+      mode: always
+
+
+
