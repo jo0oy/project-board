@@ -16,9 +16,7 @@ public class ArticleInfo {
     private String title;
     private String content;
     private String hashtag;
-
     private String createdBy;
-
     private LocalDateTime createdAt;
 
     public ArticleInfo(Article entity) {
