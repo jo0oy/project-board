@@ -69,3 +69,6 @@ Temporary Items
 # iCloud generated files
 *.icloud
 
+### Querydsl ###
+src/main/generated
+
