@@ -99,6 +99,8 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
                         return new OrderSpecifier<>(direction, article.title);
                     case "createdBy":
                         return new OrderSpecifier<>(direction, article.createdBy);
+                    case "createdAt":
+                        return new OrderSpecifier<>(direction, article.createdAt);
                 }
             }
         }

@@ -51,7 +51,11 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
     }
 
     private PageRequest getPageRequest(Pageable pageable) {
-        int page = (pageable.getPageNumber() <= 0) ? 0 : pageable.getPageNumber() - 1;
-        return PageRequest.of(page, pageable.getPageSize(), pageable.getSort());
+
+        if(pageable.getPageNumber() < 0) {
+            log.error("IllegalArgumentException. Invalid PageNumber!!");
+            throw new IllegalArgumentException("페이지 번호는 0보다 작을 수 없습니다. 올바른 페이지 번호를 입력하세요.");
+        }
+        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
     }
 }
