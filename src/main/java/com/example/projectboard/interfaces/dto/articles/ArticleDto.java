@@ -1,8 +1,11 @@
 package com.example.projectboard.interfaces.dto.articles;
 
+import com.example.projectboard.domain.articles.SearchType;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,6 +14,7 @@ import java.util.Objects;
 public class ArticleDto {
 
     @Getter
+    @Setter
     @ToString
     @Builder
     public static class RegisterReq {
@@ -20,6 +24,7 @@ public class ArticleDto {
     }
 
     @Getter
+    @Setter
     @ToString
     @Builder
     public static class UpdateReq {
@@ -54,6 +59,20 @@ public class ArticleDto {
                     .createdAt(date)
                     .createdBy(createdBy)
                     .build();
+        }
+
+        public static SearchCondition of(SearchType searchType, String searchValue) {
+
+            if(Objects.isNull(searchType) || !StringUtils.hasText(searchValue)) return SearchCondition.of(null, null, null, null);
+
+            switch (searchType) {
+                case TITLE: return SearchCondition.of(searchValue, null, null, null);
+                case HASHTAG: return SearchCondition.of(null, searchValue, null, null);
+                case CREATED_AT: return SearchCondition.of(null, null, searchValue, null);
+                case CREATED_BY: return SearchCondition.of(null, null, null, searchValue);
+            }
+
+            return SearchCondition.of(null, null, null, null);
         }
     }
 
