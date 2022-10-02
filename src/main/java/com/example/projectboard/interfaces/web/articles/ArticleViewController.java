@@ -39,8 +39,7 @@ public class ArticleViewController {
                            @PageableDefault(size = 15, direction = Sort.Direction.DESC, sort = "createdAt") Pageable pageable) {
 
         var searchCondition = articleDtoMapper.toCommand(ArticleDto.SearchCondition.of(searchType, searchValue));
-        var articles = articleQueryService.articles(searchCondition, pageable);
-//                .map(articleDtoMapper::toDto);
+        var articles = articleQueryService.articles(searchCondition, pageable).map(articleDtoMapper::toDto);
 
         var barNumbers = paginationService.getPaginationBarNumbers(pageable.getPageNumber(), articles.getTotalPages());
         model.addAttribute("articles", articles);
