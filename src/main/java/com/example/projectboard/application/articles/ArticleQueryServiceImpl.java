@@ -23,30 +23,30 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
     private final ArticleRepository articleRepository;
 
     @Override
-    public ArticleInfo getArticle(Long articleId) {
+    public ArticleInfo.MainInfo getArticle(Long articleId) {
         log.info("{}:{}", getClass().getSimpleName(), "getArticle(Long)");
 
         var article = articleRepository.findById(articleId)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() -> {throw new EntityNotFoundException("존재하지 않는 게시글입니다.");});
 
-        return new ArticleInfo(article);
+        return new ArticleInfo.MainInfo(article);
     }
 
     @Override
-    public Page<ArticleInfo> articles(ArticleCommand.SearchCondition condition, Pageable pageable) {
+    public Page<ArticleInfo.MainInfo> articles(ArticleCommand.SearchCondition condition, Pageable pageable) {
         log.info("{}:{}", getClass().getSimpleName(), "articles(ArticleCommand.SearchCondition, Pageable)");
 
         return articleRepository.findAll(condition.toSearchCondition(), getPageRequest(pageable))
-                .map(ArticleInfo::new);
+                .map(ArticleInfo.MainInfo::new);
     }
 
     @Override
-    public List<ArticleInfo> articleList(ArticleCommand.SearchCondition condition) {
+    public List<ArticleInfo.MainInfo> articleList(ArticleCommand.SearchCondition condition) {
         log.info("{}:{}", getClass().getSimpleName(), "articleList(ArticleCommand.SearchCondition)");
 
         return articleRepository.findAll(condition.toSearchCondition())
                 .stream()
-                .map(ArticleInfo::new)
+                .map(ArticleInfo.MainInfo::new)
                 .collect(Collectors.toList());
     }
 

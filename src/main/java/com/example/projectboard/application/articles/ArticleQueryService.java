@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ArticleQueryService {
 
-    ArticleInfo getArticle(Long articleId);
-    Page<ArticleInfo> articles(ArticleCommand.SearchCondition condition, Pageable pageable);
-    List<ArticleInfo> articleList(ArticleCommand.SearchCondition condition);
+    ArticleInfo.MainInfo getArticle(Long articleId);
+    Page<ArticleInfo.MainInfo> articles(ArticleCommand.SearchCondition condition, Pageable pageable);
+    List<ArticleInfo.MainInfo> articleList(ArticleCommand.SearchCondition condition);
 }
