@@ -17,28 +17,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ArticleCommentQueryServiceTest {
 
     @Autowired
-    private ArticleCommentQueryService articleCommentQueryService;
+    private ArticleCommentQueryService sut;
     @Autowired
     private ArticleCommentRepository articleCommentRepository;
 
-    @DisplayName("[성공] 게시글 댓글 단건 조회")
+    @DisplayName("[성공][service] 게시글 댓글 단건 조회")
     @Test
     void givenCommentId_whenGetComment_thenWorksFine() {
         // given
         var commentId = 3L;
 
         // when
-        var result = articleCommentQueryService.getComment(commentId);
-
-        var findComment = articleCommentRepository.findById(commentId).orElse(null);
+        var result = sut.getComment(commentId);
 
         // then
+        var findComment = articleCommentRepository.findById(commentId).orElse(null);
         assertThat(findComment).isNotNull();
         assertThat(result.getContent()).isEqualTo(findComment.getContent());
         assertThat(result.getArticleId()).isEqualTo(findComment.getArticle().getId());
     }
 
-    @DisplayName("[성공] 해당 게시글에 작성된 댓글 리스트 조회 by articleId")
+    @DisplayName("[성공][service] 해당 게시글에 작성된 댓글 리스트 조회 by articleId")
     @Test
     void givenArticleIdAndPageable_whenCommentsByArticleId_thenWorksFine() {
         // given
@@ -47,7 +46,7 @@ class ArticleCommentQueryServiceTest {
         var pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "id"));
 
         // when
-        var result = articleCommentQueryService.commentsByArticleId(articleId, pageable);
+        var result = sut.commentsByArticleId(articleId, pageable);
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(articleCommentsTotal);
@@ -55,7 +54,7 @@ class ArticleCommentQueryServiceTest {
         assertThat(result.getSize()).isEqualTo(20);
     }
 
-    @DisplayName("[성공] 댓글 검색 페이징 결과 조회 - only by 작성일")
+    @DisplayName("[성공][service] 댓글 검색 페이징 결과 조회 - only by 작성일")
     @Test
     void givenCreatedAtAndPageable_whenComments_thenWorksFine() {
         // given
@@ -67,14 +66,14 @@ class ArticleCommentQueryServiceTest {
         var pageable = PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "id"));
 
         // when
-        var result = articleCommentQueryService.comments(condition, pageable);
+        var result = sut.comments(condition, pageable);
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(4);
         assertThat(result.getTotalPages()).isEqualTo(1);
     }
 
-    @DisplayName("[성공] 댓글 검색 페이징 결과 조회 - only by 작성자")
+    @DisplayName("[성공][service] 댓글 검색 페이징 결과 조회 - only by 작성자")
     @Test
     void givenCreatedByAndPageable_whenComments_thenWorksFine() {
         // given
@@ -86,39 +85,38 @@ class ArticleCommentQueryServiceTest {
         var pageable = PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "id"));
 
         // when
-        var result = articleCommentQueryService.comments(condition, pageable);
+        var result = sut.comments(condition, pageable);
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(1);
     }
 
-    @DisplayName("[성공] 댓글 검색(작성일 & 작성자) 페이징 결과 조회")
+    @DisplayName("[성공][service] 댓글 검색(작성일 & 작성자) 페이징 결과 조회")
     @Test
     void givenSearchCondiAndPageable_whenComments_thenWorksFine() {
         // given
         var condition = ArticleCommentCommand.SearchCondition.builder()
                 .createdAt(LocalDateTime.of(2022, 2, 2, 9, 30))
                 .createdBy("Lonnie")
-
                 .build();
 
         var pageSize = 20;
         var pageable = PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "id"));
 
         // when
-        var result = articleCommentQueryService.comments(condition, pageable);
+        var result = sut.comments(condition, pageable);
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(0);
     }
 
-    @DisplayName("[성공] 전체 게시글별 댓글 리스트 조회(group by articleId)")
+    @DisplayName("[성공][service] 전체 게시글별 댓글 리스트 조회(group by articleId)")
     @Test
-    void givenTestData_whenCommentsGroupByArticleId_thenWorksFine() {
+    void givenNothing_whenCommentsGroupByArticleId_thenWorksFine() {
         // given
 
         // when
-        var result = articleCommentQueryService.commentsGroupByArticleId();
+        var result = sut.commentsGroupByArticleId();
 
         // then
         assertThat(result.size()).isEqualTo(200);
