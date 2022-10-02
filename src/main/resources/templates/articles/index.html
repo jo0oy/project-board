@@ -40,8 +40,8 @@
                                 </div>
                                 <div class="col-lg-8 col-md-6 col-sm-12 p-0">
                                     <label for="search-value" hidden>검색어</label>
-                                    <input type="text" placeholder="검색어..." class="form-control" id="search-value"
-                                           name="searchValue" th:value="${param.searchValue}">
+                                    <input type="text" placeholder="검색어... ('작성일'은 'yyyy-MM-dd' 으로 검색)"
+                                           class="form-control" id="search-value" name="searchValue" th:value="${param.searchValue}">
                                 </div>
                                 <div class="col-lg-1 col-md-3 col-sm-12 p-0">
                                     <button type="submit" class="btn btn-base">
@@ -130,7 +130,7 @@
 
     <div class="row">
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-            <a class="btn btn-primary me-md-2" role="button" id="write-article">글쓰기</a>
+            <a class="btn btn-primary me-md-2" role="button" id="write-article" th:href="@{/articles/new}">글쓰기</a>
         </div>
     </div>
 

@@ -21,5 +21,5 @@ public interface ArticleDtoMapper {
     ArticleCommand.SearchCondition toCommand(ArticleDto.SearchCondition req);
 
     // INFO -> DTO
-    ArticleDto.MainInfoResponse toDto(ArticleInfo info);
+    ArticleDto.MainInfoResponse toDto(ArticleInfo.MainInfo info);
 }

@@ -16,14 +16,12 @@ class ArticleCommentCommandServiceTest {
 
     @Autowired
     private EntityManager em;
-
     @Autowired
     private ArticleCommentRepository articleCommentRepository;
-
     @Autowired
-    private ArticleCommentCommandService articleCommentCommandService;
+    private ArticleCommentCommandService sut;
 
-    @DisplayName("[성공] 게시글 댓글 등록 테스트")
+    @DisplayName("[성공][service] 게시글 댓글 등록 테스트")
     @Test
     void givenRegisterReq_WhenRegisterComment_WorksFine() {
         // given
@@ -36,14 +34,14 @@ class ArticleCommentCommandServiceTest {
                 .build();
 
         // when
-        var result = articleCommentCommandService.registerComment(req);
+        var result = sut.registerComment(req);
 
         // then
         assertThat(result.getArticleId()).isEqualTo(articleId);
         assertThat(result.getContent()).isEqualTo(content);
     }
 
-    @DisplayName("[성공] 게시글 댓글 수정 테스트")
+    @DisplayName("[성공][service] 게시글 댓글 수정 테스트")
     @Test
     void givenUpdateReq_WhenUpdate_WorksFine() {
         // given
@@ -55,13 +53,11 @@ class ArticleCommentCommandServiceTest {
                 .build();
 
         // when
-        articleCommentCommandService.update(updateCommentId, req);
-
+        sut.update(updateCommentId, req);
         em.clear();
 
-        var updatedComment = articleCommentRepository.findById(updateCommentId).orElse(null);
-
         // then
+        var updatedComment = articleCommentRepository.findById(updateCommentId).orElse(null);
         assertThat(updatedComment).isNotNull();
         assertThat(updatedComment.getContent()).isEqualTo(updateContent);
     }

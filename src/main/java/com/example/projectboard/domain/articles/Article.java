@@ -56,7 +56,7 @@ public class Article extends JpaAuditingFields {
 
         if(StringUtils.hasText(title)) this.title = title;
         if(StringUtils.hasText(content)) this.content = content;
-        if(StringUtils.hasText(hashtag)) this.hashtag = hashtag;
+        this.hashtag = hashtag;
     }
 
     // equals & hashcode override

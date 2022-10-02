@@ -23,7 +23,7 @@
     </header>
 
     <div class="row g-5 ms-lg-5 mt-4">
-        <section class="col-1 order-md-last ms-3">
+        <section class="col-2 order-md-last ms-3">
             <aside>
                 <p><span id="nickname" th:text="${article.createdBy}">Uno</span></p>
                 <p><a id="email" href="mailto:djkehh@gmail.com">uno@mail.com</a></p>
@@ -33,15 +33,16 @@
         </section>
 
         <article id="article-content" class="col-md-9 col-lg-8 ms-4">
-            <pre th:text="${article.content}">본문</pre>
+            <pre th:utext="${article.content}">본문</pre>
         </article>
     </div>
 
-    <div class="row g-5 ms-lg-5" id="article-buttons">
-        <form id="delete-article-form">
+    <div class="row g-5 ms-lg-5 mt-2" id="article-buttons">
+        <form id="delete-article-form" th:action="@{/articles/{id}(id=${article.articleId})}" th:method="post">
+            <input type="hidden" name="_method" value="delete"/>
             <div class="pb-5 d-grid gap-2 d-md-block ms-4">
-                <a class="btn btn-success me-md-2" role="button" id="update-article">수정</a>
-                <button class="btn btn-danger me-md-2" type="submit">삭제</button>
+                <a class="btn btn-success btn-sm me-md-2" role="button" id="update-article" th:href="@{/articles/{id}/edit(id=${article.articleId})}">수정</a>
+                <button class="btn btn-danger btn-sm me-md-2" type="submit">삭제</button>
             </div>
         </form>
     </div>
