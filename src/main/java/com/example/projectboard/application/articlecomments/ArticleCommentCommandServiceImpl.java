@@ -21,7 +21,7 @@ public class ArticleCommentCommandServiceImpl implements ArticleCommentCommandSe
     @Override
     @Transactional
     public ArticleCommentInfo.MainInfo registerComment(ArticleCommentCommand.RegisterReq command) {
-        log.info("{}:{}", getClass().getSimpleName(), "registerComment");
+        log.info("{}:{}", getClass().getSimpleName(), "registerComment(ArticleCommentCommand.RegisterReq)");
 
         // 게시글 엔티티 조회
         var article = articleRepository.findById(command.getArticleId())
@@ -35,13 +35,26 @@ public class ArticleCommentCommandServiceImpl implements ArticleCommentCommandSe
     @Override
     @Transactional
     public void update(Long commentId, ArticleCommentCommand.UpdateReq command) {
-        log.info("{}:{}", getClass().getSimpleName(), "updateComment");
+        log.info("{}:{}", getClass().getSimpleName(), "update(Long, ArticleCommentCommand.UpdateReq)");
 
         // 업데이트할 엔티티 조회
         var comment = articleCommentRepository.findById(commentId)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 댓글입니다."));
 
         // 댓글 수정
         comment.update(command.getContent());
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long commentId) {
+        log.info("{}:{}", getClass().getSimpleName(), "delete(Long)");
+
+        // 엔티티 조회
+        var comment = articleCommentRepository.findById(commentId)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 댓글입니다."));
+
+        // 댓글 삭제
+        articleCommentRepository.delete(comment);
     }
 }
