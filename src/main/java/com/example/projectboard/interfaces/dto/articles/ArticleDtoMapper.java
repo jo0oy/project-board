@@ -1,5 +1,6 @@
 package com.example.projectboard.interfaces.dto.articles;
 
+import com.example.projectboard.domain.articlecomments.ArticleCommentInfo;
 import com.example.projectboard.domain.articles.ArticleCommand;
 import com.example.projectboard.domain.articles.ArticleInfo;
 import org.mapstruct.InjectionStrategy;
@@ -22,4 +23,6 @@ public interface ArticleDtoMapper {
 
     // INFO -> DTO
     ArticleDto.MainInfoResponse toDto(ArticleInfo.MainInfo info);
+    ArticleDto.CommentInfoResponse toDto(ArticleCommentInfo.SimpleInfo info);
+    ArticleDto.ArticleWithCommentsResponse toDto(ArticleInfo.ArticleWithCommentsInfo info);
 }

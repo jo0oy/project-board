@@ -10,6 +10,9 @@ import java.util.List;
 public interface ArticleQueryService {
 
     ArticleInfo.MainInfo getArticle(Long articleId);
+
+    ArticleInfo.ArticleWithCommentsInfo getArticleWithComments(Long articleId);
     Page<ArticleInfo.MainInfo> articles(ArticleCommand.SearchCondition condition, Pageable pageable);
     List<ArticleInfo.MainInfo> articleList(ArticleCommand.SearchCondition condition);
+    long articleCount();
 }

@@ -7,4 +7,6 @@ public interface ArticleCommentCommandService {
     ArticleCommentInfo.MainInfo registerComment(ArticleCommentCommand.RegisterReq command);
 
     void update(Long commentId, ArticleCommentCommand.UpdateReq command);
+
+    void delete(Long commentId);
 }

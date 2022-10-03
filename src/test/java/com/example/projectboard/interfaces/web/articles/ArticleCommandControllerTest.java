@@ -39,7 +39,7 @@ class ArticleCommandControllerTest {
         var title = "새로운 글 제목";
         var content = "새로운 글 내용입니다.";
         var hashtag = "#newArticle";
-        var requestReq = ArticleDto.RegisterReq.builder()
+        var registerReq = ArticleDto.RegisterReq.builder()
                 .title(title)
                 .content(content)
                 .hashtag(hashtag)
@@ -50,7 +50,7 @@ class ArticleCommandControllerTest {
         //when & then
         mvc.perform(post("/articles")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .content(encoder.encode(requestReq))
+                        .content(encoder.encode(registerReq))
                 ).andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/articles"))
                 .andExpect(view().name("redirect:/articles"));

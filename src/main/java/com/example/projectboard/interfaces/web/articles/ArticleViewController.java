@@ -52,7 +52,7 @@ public class ArticleViewController {
     @GetMapping("/{id}")
     public String articleDetail(@PathVariable Long id, Model model) {
 
-        var article = articleDtoMapper.toDto(articleQueryService.getArticle(id));
+        var article = articleDtoMapper.toDto(articleQueryService.getArticleWithComments(id));
         model.addAttribute("article", article);
         return "articles/detail";
     }
