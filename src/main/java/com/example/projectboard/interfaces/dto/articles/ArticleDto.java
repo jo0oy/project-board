@@ -9,6 +9,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 public class ArticleDto {
@@ -84,6 +85,29 @@ public class ArticleDto {
         private String title;
         private String content;
         private String hashtag;
+        private String createdBy;
+        private LocalDateTime createdAt;
+    }
+
+    @Getter
+    @ToString
+    @Builder
+    public static class ArticleWithCommentsResponse {
+        private Long articleId;
+        private String title;
+        private String content;
+        private String hashtag;
+        private String createdBy;
+        private LocalDateTime createdAt;
+        private List<CommentInfoResponse> comments;
+    }
+
+    @Getter
+    @ToString
+    @Builder
+    public static class CommentInfoResponse {
+        private Long commentId;
+        private String content;
         private String createdBy;
         private LocalDateTime createdAt;
     }

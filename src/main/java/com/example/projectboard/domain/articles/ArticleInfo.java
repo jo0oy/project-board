@@ -45,9 +45,9 @@ public class ArticleInfo {
         private String hashtag;
         private String createdBy;
         private LocalDateTime createdAt;
-        private List<ArticleCommentInfo.SimpleInfo> articleComments;
+        private List<ArticleCommentInfo.SimpleInfo> comments;
         public ArticleWithCommentsInfo(Article entity,
-                                       List<ArticleCommentInfo.SimpleInfo> articleComments) {
+                                       List<ArticleCommentInfo.SimpleInfo> comments) {
 
             this.articleId = entity.getId();
             this.title = entity.getTitle();
@@ -55,8 +55,10 @@ public class ArticleInfo {
             this.hashtag = (entity.getHashtag() != null) ? entity.getHashtag() : null;
             this.createdBy = entity.getCreatedBy();
             this.createdAt = entity.getCreatedAt();
-            this.articleComments = new ArrayList<>();
-            this.articleComments.addAll(articleComments);
+            this.comments = new ArrayList<>();
+            if (comments != null && comments.size() > 0) {
+                this.comments.addAll(comments);
+            }
         }
     }
 

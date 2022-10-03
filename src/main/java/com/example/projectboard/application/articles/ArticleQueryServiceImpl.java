@@ -1,6 +1,8 @@
 package com.example.projectboard.application.articles;
 
 import com.example.projectboard.common.exception.EntityNotFoundException;
+import com.example.projectboard.domain.articlecomments.ArticleCommentInfo;
+import com.example.projectboard.domain.articlecomments.ArticleCommentRepository;
 import com.example.projectboard.domain.articles.ArticleCommand;
 import com.example.projectboard.domain.articles.ArticleInfo;
 import com.example.projectboard.domain.articles.ArticleRepository;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 @Service
 public class ArticleQueryServiceImpl implements ArticleQueryService {
     private final ArticleRepository articleRepository;
+    private final ArticleCommentRepository articleCommentRepository;
 
     @Override
     public ArticleInfo.MainInfo getArticle(Long articleId) {
@@ -30,6 +33,22 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
                 .orElseThrow(() -> {throw new EntityNotFoundException("존재하지 않는 게시글입니다.");});
 
         return new ArticleInfo.MainInfo(article);
+    }
+
+    @Override
+    public ArticleInfo.ArticleWithCommentsInfo getArticleWithComments(Long articleId) {
+        log.info("{}:{}", getClass().getSimpleName(), "getArticleWithComments(Long)");
+
+        // 게시글 엔티티 조회
+        var article = articleRepository.findById(articleId)
+                .orElseThrow(() -> {throw new EntityNotFoundException("존재하지 않는 게시글입니다.");});
+
+        // 게시글 댓글 리스트 조회
+        var commentList = articleCommentRepository.findByArticleId(articleId).stream()
+                .map(ArticleCommentInfo.SimpleInfo::new)
+                .collect(Collectors.toList());
+
+        return new ArticleInfo.ArticleWithCommentsInfo(article, commentList);
     }
 
     @Override
@@ -48,6 +67,11 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
                 .stream()
                 .map(ArticleInfo.MainInfo::new)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public long articleCount() {
+        return articleRepository.count();
     }
 
     private PageRequest getPageRequest(Pageable pageable) {
