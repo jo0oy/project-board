@@ -6,7 +6,6 @@ import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper(

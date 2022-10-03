@@ -33,7 +33,7 @@ public class ArticleCommandServiceImpl implements ArticleCommandService {
 
         // update 할 엔티티 조회
         var article = articleRepository.findById(articleId)
-                .orElseThrow(() -> {throw new EntityNotFoundException("존재하지 않는 게시글입니다.");});
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
 
         article.update(command.getTitle(), command.getContent(), command.getHashtag());
     }
@@ -48,7 +48,7 @@ public class ArticleCommandServiceImpl implements ArticleCommandService {
 
         // 게시글 엔티티 조회
         var article = articleRepository.findById(articleId)
-                .orElseThrow(() -> {throw new EntityNotFoundException("존재하지 않는 게시글입니다.");});
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
 
         // 게시글 삭제
         articleRepository.delete(article);
