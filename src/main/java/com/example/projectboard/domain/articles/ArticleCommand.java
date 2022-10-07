@@ -1,5 +1,6 @@
 package com.example.projectboard.domain.articles;
 
+import com.example.projectboard.domain.users.UserAccount;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -16,11 +17,12 @@ public class ArticleCommand {
         private String content;
         private String hashtag;
 
-        public Article toEntity() {
+        public Article toEntity(UserAccount userAccount) {
             return Article.ArticleWithHashtag()
                     .title(title)
                     .content(content)
                     .hashtag(hashtag)
+                    .userAccount(userAccount)
                     .build();
         }
     }
