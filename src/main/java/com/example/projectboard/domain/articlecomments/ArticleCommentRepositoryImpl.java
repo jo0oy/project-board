@@ -18,11 +18,24 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static com.example.projectboard.domain.articlecomments.QArticleComment.articleComment;
+import static com.example.projectboard.domain.users.QUserAccount.userAccount;
 
 @RequiredArgsConstructor
 public class ArticleCommentRepositoryImpl implements ArticleCommentRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
+
+    @Override
+    public Optional<ArticleComment> findByIdFetchJoinUserAccount(Long commentId) {
+        return Optional.ofNullable(
+                queryFactory
+                        .selectFrom(articleComment)
+                        .leftJoin(articleComment.userAccount, userAccount)
+                        .fetchJoin()
+                        .where(articleComment.id.eq(commentId))
+                        .fetchOne()
+        );
+    }
 
     @Override
     public Optional<ArticleCommentInfo.MainInfo> findWithArticleId(Long id) {

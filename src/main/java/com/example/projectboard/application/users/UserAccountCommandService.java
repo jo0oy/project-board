@@ -7,7 +7,7 @@ public interface UserAccountCommandService {
 
     UserAccountInfo registerUser(UserAccountCommand.RegisterReq command);
 
-    void updateUserInfo(Long userAccountId, UserAccountCommand.UpdateReq command);
+    void updateUserInfo(Long userAccountId, String principalUsername, UserAccountCommand.UpdateReq command);
 
-    void delete(Long userAccountId);
+    void delete(Long userAccountId, String principalUsername);
 }
