@@ -1,6 +1,6 @@
 package com.example.projectboard.domain.users;
 
-import com.example.projectboard.domain.JpaAuditingFields;
+import com.example.projectboard.domain.JpaAuditingDateTimeFields;
 import lombok.*;
 import org.springframework.util.StringUtils;
 
@@ -10,8 +10,13 @@ import java.util.Objects;
 @ToString
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "user_accounts", indexes = {
+        @Index(columnList = "username", unique = true),
+        @Index(columnList = "email", unique = true),
+        @Index(columnList = "phoneNumber")
+})
 @Entity
-public class UserAccount extends JpaAuditingFields {
+public class UserAccount extends JpaAuditingDateTimeFields {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -32,6 +37,7 @@ public class UserAccount extends JpaAuditingFields {
     @Column(length = 50, nullable = false)
     private String phoneNumber;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RoleType role;
 
