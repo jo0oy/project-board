@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <div th:fragment="header-config">
     <body>
     <header class="p-3 bg-dark text-white">
@@ -11,9 +11,15 @@
                 </ul>
 
                 <div class="text-end">
-                    <span id="username" class="text-white me-2">username</span>
-                    <a role="button" id="login" class="btn btn-outline-light me-2">Login</a>
-                    <a role="button" id="logout" class="btn btn-outline-light me-2">Logout</a>
+                    <a role="button" id="login" class="btn btn-outline-light me-2" th:href="@{/auth/login}" sec:authorize="!isAuthenticated()">Login</a>
+                    <a role="button" id="sign-up" class="btn btn-outline-light me-2" th:href="@{/auth/sign-up}" sec:authorize="!isAuthenticated()">Sign-up</a>
+
+                    <div class="d-flex justify-content-end" sec:authorize="isAuthenticated()">
+                        <a id="username" class="text-white me-2 mr-2 align-self-center" style="text-decoration: none" th:href="@{#}" sec:authentication="name">username</a>
+                        <form th:action="@{/auth/logout}" th:method="post">
+                            <button type="submit" id="logout" class="btn btn-outline-light me-2 mx-1">Logout</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

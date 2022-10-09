@@ -20,7 +20,7 @@
 
 <main id="article-main" class="container">
     <header id="article-header" class="py-5 text-center">
-        <h3 th:text="${article.title}">첫번째 글</h3>
+        <h3 class="fw-semibold" th:text="${article.title}">첫번째 글</h3>
     </header>
 
     <div class="row g-5 ms-lg-5 mt-4">
@@ -42,7 +42,7 @@
         </article>
     </div>
 
-    <div class="row g-5 ms-lg-5 mt-2" id="article-buttons">
+    <div class="row g-5 ms-lg-5 mt-2" id="article-buttons" th:if="${#authorization.expression('isAuthenticated()')} and ${article.createdBy} == ${#authentication.name}">
         <form id="delete-article-form" th:action="@{/articles/{id}(id=${article.articleId})}" th:method="post">
             <input type="hidden" name="_method" value="delete"/>
             <div class="pb-5 d-grid gap-2 d-md-block ms-4">
@@ -87,7 +87,7 @@
                                     댓글 내용
                                 </p>
                             </div>
-                            <div class="col-2 mb-3 align-self-center">
+                            <div class="col-2 mb-3 align-self-center" th:if="${#authorization.expression('isAuthenticated()')} and ${comment.createdBy} == ${#authentication.name}">
                                 <button type="submit" class="badge text-bg-secondary" id="delete-comment-button">삭제
                                 </button>
                             </div>
