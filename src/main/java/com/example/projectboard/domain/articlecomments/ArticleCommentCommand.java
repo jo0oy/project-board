@@ -31,6 +31,7 @@ public class ArticleCommentCommand {
     @ToString
     @Builder
     public static class UpdateReq {
+        private Long articleId;
         private String content;
     }
 

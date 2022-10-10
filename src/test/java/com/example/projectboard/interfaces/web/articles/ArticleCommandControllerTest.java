@@ -1,6 +1,7 @@
 package com.example.projectboard.interfaces.web.articles;
 
 import com.example.projectboard.common.exception.EntityNotFoundException;
+import com.example.projectboard.common.exception.NoAuthorityToUpdateDeleteException;
 import com.example.projectboard.domain.articles.ArticleRepository;
 import com.example.projectboard.interfaces.dto.articles.ArticleDto;
 import com.example.projectboard.util.FormDataEncoder;
@@ -11,9 +12,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.TestExecutionEvent;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -31,7 +35,8 @@ class ArticleCommandControllerTest {
     @Autowired
     private FormDataEncoder encoder;
 
-    @DisplayName("[성공][controller][POST] 게시글 등록 테스트")
+    @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @DisplayName("[성공][controller][POST] 게시글 등록 테스트 - 인증된 사용자")
     @Test
     void givenRegisterReq_WhenPostMapping_ThenRedirectToMainPage() throws Exception {
 
@@ -51,6 +56,7 @@ class ArticleCommandControllerTest {
         mvc.perform(post("/articles")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .content(encoder.encode(registerReq))
+                        .with(csrf())
                 ).andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/articles"))
                 .andExpect(view().name("redirect:/articles"));
@@ -58,12 +64,13 @@ class ArticleCommandControllerTest {
         assertThat(articleRepository.count()).isEqualTo(beforeRegister + 1);
     }
 
-    @DisplayName("[성공][controller][PUT] 게시글 수정 테스트")
+    @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @DisplayName("[성공][controller][PUT] 게시글 수정 테스트 - 인증된 사용자(작성자)")
     @Test
     void givenArticleIdAndUpdateReq_WhenPutMapping_ThenRedirectToDetailPage() throws Exception {
 
         //given
-        var articleId = 1L;
+        var articleId = 2L;
         var updateTitle = "수정한 제목입니다.";
         var updateContent = "수정한 내용입니다.";
         var updateHashtag = "#update";
@@ -78,6 +85,7 @@ class ArticleCommandControllerTest {
         mvc.perform(put("/articles/" + articleId)
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .content(encoder.encode(updateReq))
+                        .with(csrf())
                 ).andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/articles/" + articleId))
                 .andExpect(view().name("redirect:/articles/" + articleId));
@@ -90,6 +98,35 @@ class ArticleCommandControllerTest {
         assertThat(updatedArticle.getHashtag()).isEqualTo(updateHashtag);
     }
 
+    @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @DisplayName("[실패][controller][PUT] 게시글 수정 테스트 - 수정 권한이 없는 인증된 사용자")
+    @Test
+    void givenNoAuthorityToUpdateUsername_WhenPutMapping_ThenShowErrorPage() throws Exception {
+
+        //given
+        var articleId = 1L;
+        var updateTitle = "수정한 제목입니다.";
+        var updateContent = "수정한 내용입니다.";
+        var updateHashtag = "#update";
+
+        var updateReq = ArticleDto.UpdateReq.builder()
+                .title(updateTitle)
+                .content(updateContent)
+                .hashtag(updateHashtag)
+                .build();
+
+        //when & then
+        var mvcResult = mvc.perform(put("/articles/" + articleId)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .content(encoder.encode(updateReq))
+                .with(csrf())
+        ).andExpect(status().isForbidden()).andReturn();
+
+        assertThat(mvcResult.getResolvedException()).isNotNull();
+        assertThat(mvcResult.getResolvedException()).isInstanceOf(NoAuthorityToUpdateDeleteException.class);
+    }
+
+    @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[실패][controller][PUT] 게시글 수정 테스트 - 존재하지 않는 게시글")
     @Test
     void givenNonExistArticleIdAndUpdateReq_WhenPutMapping_ThenShowErrorPage() throws Exception {
@@ -110,22 +147,24 @@ class ArticleCommandControllerTest {
         var mvcResult = mvc.perform(put("/articles/" + articleId)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .content(encoder.encode(updateReq))
+                .with(csrf())
         ).andExpect(status().is4xxClientError()).andReturn();
 
         assertThat(mvcResult.getResolvedException()).isNotNull();
         assertThat(mvcResult.getResolvedException()).isInstanceOf(EntityNotFoundException.class);
     }
 
+    @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[성공][controller][DELETE] 게시글 삭제 테스트")
     @Test
     void givenArticleId_WhenDeleteMapping_ThenRedirectToMainPage() throws Exception {
 
         //given
-        var articleId = 5L;
+        var articleId = 4L;
         var beforeDeleteTotal = articleRepository.count();
 
         //when & then
-        mvc.perform(delete("/articles/" + articleId))
+        mvc.perform(delete("/articles/" + articleId).with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/articles"))
                 .andExpect(view().name("redirect:/articles"));
@@ -133,6 +172,7 @@ class ArticleCommandControllerTest {
         assertThat(beforeDeleteTotal).isEqualTo(articleRepository.count() + 1);
     }
 
+    @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[실패][controller][PUT] 게시글 삭제 테스트 - 존재하지 않는 게시글")
     @Test
     void givenNonExistArticleId_WhenDeleteMapping_ThenShowErrorPage() throws Exception {
@@ -141,10 +181,26 @@ class ArticleCommandControllerTest {
         var articleId = 400L;
 
         //when & then
-        var mvcResult = mvc.perform(delete("/articles/" + articleId))
+        var mvcResult = mvc.perform(delete("/articles/" + articleId).with(csrf()))
                 .andExpect(status().is4xxClientError()).andReturn();
 
         assertThat(mvcResult.getResolvedException()).isNotNull();
         assertThat(mvcResult.getResolvedException()).isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @DisplayName("[실패][controller][PUT] 게시글 삭제 테스트 - 삭제 권한이 없는 인증된 사용자")
+    @Test
+    void givenNoAuthorityToUpdateUsername_WhenDeleteMapping_ThenShowErrorPage() throws Exception {
+
+        //given
+        var articleId = 1L;
+
+        //when & then
+        var mvcResult = mvc.perform(delete("/articles/" + articleId).with(csrf()))
+                .andExpect(status().isForbidden()).andReturn();
+
+        assertThat(mvcResult.getResolvedException()).isNotNull();
+        assertThat(mvcResult.getResolvedException()).isInstanceOf(NoAuthorityToUpdateDeleteException.class);
     }
 }

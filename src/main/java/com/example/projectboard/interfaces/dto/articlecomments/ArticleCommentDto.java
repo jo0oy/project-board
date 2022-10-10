@@ -24,6 +24,7 @@ public class ArticleCommentDto {
     @ToString
     @Builder
     public static class UpdateReq {
+        private Long articleId;
         private String content;
     }
 

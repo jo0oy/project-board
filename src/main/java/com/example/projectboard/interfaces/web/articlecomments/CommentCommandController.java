@@ -9,10 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,12 +32,11 @@ public class CommentCommandController {
     @PutMapping("/article-comments/{id}")
     public String update(@PathVariable Long id,
                          @AuthenticationPrincipal PrincipalUserAccount userAccount,
-                         ArticleCommentDto.UpdateReq req,
-                         Long articleId) {
+                         ArticleCommentDto.UpdateReq req) {
 
         commentCommandService.update(id, userAccount.getUsername(), commentDtoMapper.toCommand(req));
 
-        return "redirect:/articles/" + articleId;
+        return "redirect:/articles/" + req.getArticleId();
     }
 
     @DeleteMapping("/article-comments/{id}")
