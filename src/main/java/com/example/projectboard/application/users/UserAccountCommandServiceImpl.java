@@ -88,7 +88,7 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
 
         // 삭제 권한 확인
         if (userAccount.equals(principal) || principal.getRole() == UserAccount.RoleType.ADMIN) {
-            // 엔티티 삭제
+            // 유저 엔티티 삭제
             userAccountRepository.delete(userAccount);
         } else {
             log.error("삭제 권한이 없는 사용자입니다. username={}", principalUsername);

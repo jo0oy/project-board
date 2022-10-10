@@ -23,6 +23,8 @@ public interface ArticleDtoMapper {
 
     // INFO -> DTO
     ArticleDto.MainInfoResponse toDto(ArticleInfo.MainInfo info);
+
     ArticleDto.CommentInfoResponse toDto(ArticleCommentInfo.SimpleInfo info);
+
     ArticleDto.ArticleWithCommentsResponse toDto(ArticleInfo.ArticleWithCommentsInfo info);
 }

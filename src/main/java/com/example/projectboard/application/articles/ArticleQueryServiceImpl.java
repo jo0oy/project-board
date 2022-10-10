@@ -25,6 +25,11 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
     private final ArticleRepository articleRepository;
     private final ArticleCommentRepository articleCommentRepository;
 
+    /**
+     * Article 단일 조회 메서드.
+     * @param articleId : 조회하려는 Article id (Long)
+     * @return ArticleInfo.MainInfo : 조회한 Article -> ArticleInfo.MainInfo 감싸서 반환.
+     */
     @Override
     public ArticleInfo.MainInfo getArticle(Long articleId) {
         log.info("{}:{}", getClass().getSimpleName(), "getArticle(Long)");
@@ -35,6 +40,11 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
         return new ArticleInfo.MainInfo(article);
     }
 
+    /**
+     * 해당 게시글의 댓글 리스트 포함한 Article 단일 조회 메서드.
+     * @param articleId : 조회하려는 Article id (Long)
+     * @return ArticleInfo.ArticleWithCommentsInfo : 조회한 Article, List<ArticleCommentInfo.SimpleInfo>> -> ArticleInfo.ArticleWithCommentsInfo 감싸서 반환.
+     */
     @Override
     public ArticleInfo.ArticleWithCommentsInfo getArticleWithComments(Long articleId) {
         log.info("{}:{}", getClass().getSimpleName(), "getArticleWithComments(Long)");
@@ -51,6 +61,12 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
         return new ArticleInfo.ArticleWithCommentsInfo(article, commentList);
     }
 
+    /**
+     * 검색 조건에 따른 Article 리스트 페이징 조회 메서드.
+     * @param condition : Article 검색조건 (ArticleCommand.SearchCondition)
+     * @param pageable : 페이징을 위한 페이징 정보 (Pageable)
+     * @return Page<ArticleInfo.MainInfo> : 조회된 Article -> ArticleCommentInfo.MainInfo 변환해서 반환.
+     */
     @Override
     public Page<ArticleInfo.MainInfo> articles(ArticleCommand.SearchCondition condition, Pageable pageable) {
         log.info("{}:{}", getClass().getSimpleName(), "articles(ArticleCommand.SearchCondition, Pageable)");
@@ -59,6 +75,11 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
                 .map(ArticleInfo.MainInfo::new);
     }
 
+    /**
+     * 검색 조건에 따른 Article 리스트 조회 메서드.
+     * @param condition : Article 검색조건 (ArticleCommand.SearchCondition)
+     * @return List<ArticleInfo.MainInfo> : 조회된 Article -> ArticleCommentInfo.MainInfo 변환해서 반환.
+     */
     @Override
     public List<ArticleInfo.MainInfo> articleList(ArticleCommand.SearchCondition condition) {
         log.info("{}:{}", getClass().getSimpleName(), "articleList(ArticleCommand.SearchCondition)");
@@ -69,6 +90,10 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 모든 게시글 수 반환하는 메서드.
+     * @return long : 모든 게시글 수
+     */
     @Override
     public long articleCount() {
         return articleRepository.count();
