@@ -69,7 +69,7 @@ class ArticleCommentQueryServiceTest {
         var result = sut.comments(condition, pageable);
 
         // then
-        assertThat(result.getTotalElements()).isEqualTo(4);
+        assertThat(result.getTotalElements()).isEqualTo(2);
         assertThat(result.getTotalPages()).isEqualTo(1);
     }
 
@@ -78,26 +78,7 @@ class ArticleCommentQueryServiceTest {
     void givenCreatedByAndPageable_whenComments_thenWorksFine() {
         // given
         var condition = ArticleCommentCommand.SearchCondition.builder()
-                .createdBy("Lonnie")
-                .build();
-
-        var pageSize = 20;
-        var pageable = PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "id"));
-
-        // when
-        var result = sut.comments(condition, pageable);
-
-        // then
-        assertThat(result.getTotalElements()).isEqualTo(1);
-    }
-
-    @DisplayName("[성공][service] 댓글 검색(작성일 & 작성자) 페이징 결과 조회")
-    @Test
-    void givenSearchCondiAndPageable_whenComments_thenWorksFine() {
-        // given
-        var condition = ArticleCommentCommand.SearchCondition.builder()
-                .createdAt(LocalDateTime.of(2022, 2, 2, 9, 30))
-                .createdBy("Lonnie")
+                .createdBy("user10")
                 .build();
 
         var pageSize = 20;
@@ -108,6 +89,25 @@ class ArticleCommentQueryServiceTest {
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(0);
+    }
+
+    @DisplayName("[성공][service] 댓글 검색(작성일 & 작성자) 페이징 결과 조회")
+    @Test
+    void givenSearchCondiAndPageable_whenComments_thenWorksFine() {
+        // given
+        var condition = ArticleCommentCommand.SearchCondition.builder()
+                .createdAt(LocalDateTime.of(2022, 2, 2, 9, 30))
+                .createdBy("jo0oy")
+                .build();
+
+        var pageSize = 20;
+        var pageable = PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "id"));
+
+        // when
+        var result = sut.comments(condition, pageable);
+
+        // then
+        assertThat(result.getTotalElements()).isEqualTo(2);
     }
 
     @DisplayName("[성공][service] 전체 게시글별 댓글 리스트 조회(group by articleId)")

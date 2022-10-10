@@ -31,6 +31,7 @@ public class ArticleCommentRepositoryImpl implements ArticleCommentRepositoryCus
                         Projections.fields(ArticleCommentInfo.MainInfo.class,
                                 articleComment.id.as("commentId"),
                                 articleComment.article.id.as("articleId"),
+                                articleComment.userId,
                                 articleComment.content,
                                 articleComment.createdBy,
                                 articleComment.createdAt))
@@ -63,6 +64,7 @@ public class ArticleCommentRepositoryImpl implements ArticleCommentRepositoryCus
                 Projections.fields(ArticleCommentInfo.MainInfo.class,
                 articleComment.id.as("commentId"),
                 articleComment.article.id.as("articleId"),
+                articleComment.userId,
                 articleComment.content,
                 articleComment.createdBy,
                 articleComment.createdAt)
@@ -79,6 +81,7 @@ public class ArticleCommentRepositoryImpl implements ArticleCommentRepositoryCus
                 Projections.fields(ArticleCommentInfo.MainInfo.class,
                         articleComment.id.as("commentId"),
                         articleComment.article.id.as("articleId"),
+                        articleComment.userId,
                         articleComment.content,
                         articleComment.createdBy,
                         articleComment.createdAt)
@@ -100,6 +103,7 @@ public class ArticleCommentRepositoryImpl implements ArticleCommentRepositoryCus
                         Projections.fields(ArticleCommentInfo.MainInfo.class,
                                 articleComment.id.as("commentId"),
                                 articleComment.article.id.as("articleId"),
+                                articleComment.userId,
                                 articleComment.content,
                                 articleComment.createdBy,
                                 articleComment.createdAt)
@@ -119,6 +123,7 @@ public class ArticleCommentRepositoryImpl implements ArticleCommentRepositoryCus
                         Projections.fields(ArticleCommentInfo.MainInfo.class,
                                 articleComment.id.as("commentId"),
                                 articleComment.article.id.as("articleId"),
+                                articleComment.userId,
                                 articleComment.content,
                                 articleComment.createdBy,
                                 articleComment.createdAt)

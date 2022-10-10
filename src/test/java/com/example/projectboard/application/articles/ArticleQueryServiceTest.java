@@ -42,10 +42,10 @@ class ArticleQueryServiceTest {
 
     @DisplayName("[성공][service] 게시글 검색조건 페이징 조회 테스트 - 일부 조건")
     @Test
-    void givenSearchCondiAndPageable_whenArticles_thenWorksFine() {
+    void givenSearchConditionAndPageable_whenArticles_thenWorksFine() {
         // given
-        var createdBy = "Ethelin";
-        var hashtag = "#Computers";
+        var createdBy = "jo0oy";
+        var hashtag = "#Maroon";
         var condition = ArticleCommand.SearchCondition
                 .builder()
                 .hashtag(hashtag)
@@ -58,17 +58,17 @@ class ArticleQueryServiceTest {
         var result = sut.articles(condition, pageable);
 
         // then
-        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getTotalElements()).isEqualTo(3);
     }
 
     @DisplayName("[성공][service] 게시글 검색조건 페이징 조회 테스트 - 모든 조건 포함")
     @Test
-    void givenAllSearchCondiAndPageable_whenArticles_thenWorksFine() {
+    void givenAllSearchConditionAndPageable_whenArticles_thenWorksFine() {
         // given
-        var createdBy = "Jania";
-        var hashtag = "#Garden";
-        var title = "et eros vestibulum";
-        var createdAt = LocalDateTime.of(2022, 1, 17, 11, 56);
+        var createdBy = "yooj";
+        var hashtag = "#Crimson";
+        var title = "eleifend";
+        var createdAt = LocalDateTime.of(2022, 1, 8, 23, 05);
         var condition = ArticleCommand.SearchCondition
                 .builder()
                 .title(title)

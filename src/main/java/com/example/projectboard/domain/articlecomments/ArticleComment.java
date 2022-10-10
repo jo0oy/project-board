@@ -22,18 +22,22 @@ public class ArticleComment extends JpaAuditingFields {
     @Column(name = "article_comment_id")
     private Long id;
 
+    @Column(nullable = false, length = 500)
+    private String content; // 본문
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "article_id", updatable = false)
     private Article article; // 게시글 (id)
 
-    @Column(nullable = false, length = 500)
-    private String content; // 본문
+    @Column(nullable = false, updatable = false)
+    private Long userId; // 연관관계 매핑: UserAccount id
 
     @Builder
     private ArticleComment(Article article,
-                           String content) {
+                           String content,
+                           Long userId) {
         this.article = article;
         this.content = content;
+        this.userId = userId;
     }
 
     public void update(String content) {
@@ -45,8 +49,8 @@ public class ArticleComment extends JpaAuditingFields {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ArticleComment)) return false;
-        ArticleComment that = (ArticleComment) o;
-        return id != null && id.equals(that.id);
+        ArticleComment comment = (ArticleComment) o;
+        return id != null && id.equals(comment.id);
     }
 
     @Override

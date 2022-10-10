@@ -19,6 +19,8 @@ public interface UserAccountDtoMapper {
 
     UserAccountCommand.UpdateReq toCommand(UserAccountDto.UpdateReq req);
 
+    UserAccountCommand.SearchCondition toCommand(UserAccountDto.SearchCondition req);
+
     // INFO -> DTO
 
     UserAccountDto.MainInfoResponse toDto(UserAccountInfo info);

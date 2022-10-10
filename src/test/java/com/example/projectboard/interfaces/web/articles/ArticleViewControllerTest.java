@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -86,9 +87,10 @@ public class ArticleViewControllerTest {
 
     }
 
-    @DisplayName("[성공][view][GET] 새 게시글 작성 페이지")
+    @WithMockUser
+    @DisplayName("[성공][view][GET] 새 게시글 작성 페이지 - 인증된 사용자")
     @Test
-    void givenNothing_whenRequesting_thenReturnsNewArticlePage() throws Exception {
+    void givenNothing_whenRequestingNewPostPage_thenReturnsNewArticlePage() throws Exception {
         // Given
 
         // When & Then
@@ -99,11 +101,23 @@ public class ArticleViewControllerTest {
                 .andDo(print());
     }
 
-    @DisplayName("[성공][view][POST] 게시글 수정 페이지")
+    @DisplayName("[성공][view][GET] 새 게시글 작성 페이지 - 인증 없을 땐 로그인 페이지로 이동")
     @Test
-    void givenNothing_whenRequesting_thenReturnsUpdatedArticlePage() throws Exception {
+    void givenNothing_whenRequestingNewPostPage_thenRedirectsToLoginPage() throws Exception {
         // Given
-        long articleId = 1L;
+
+        // When & Then
+        mvc.perform(get("/articles/new"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("**/login"));
+    }
+
+    @WithMockUser
+    @DisplayName("[성공][view][GET] 게시글 수정 페이지 - 인증된 사용자")
+    @Test
+    void givenNothing_whenRequestingEditPage_thenReturnsUpdatedArticlePage() throws Exception {
+        // Given
+        var articleId = 1L;
 
         // When & Then
         mvc.perform(get("/articles/" + articleId + "/edit"))
@@ -111,6 +125,19 @@ public class ArticleViewControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/edit-form"))
                 .andExpect(model().attributeExists("article"))
+                .andDo(print());
+    }
+
+    @DisplayName("[성공][view][GET] 게시글 수정 페이지 - 인증 없을 땐 로그인 페이지로 이동")
+    @Test
+    void givenNothing_whenRequestingEditPage_thenRedirectsToLoginPage() throws Exception {
+        // Given
+        var articleId = 1L;
+
+        // When & Then
+        mvc.perform(get("/articles/" + articleId + "/edit"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("**/login"))
                 .andDo(print());
     }
 

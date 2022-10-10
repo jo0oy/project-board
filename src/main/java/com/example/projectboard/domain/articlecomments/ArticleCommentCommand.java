@@ -1,6 +1,7 @@
 package com.example.projectboard.domain.articlecomments;
 
 import com.example.projectboard.domain.articles.Article;
+import com.example.projectboard.domain.users.UserAccount;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -17,10 +18,11 @@ public class ArticleCommentCommand {
         private Long articleId;
         private String content;
 
-        public ArticleComment toEntity(Article article) {
+        public ArticleComment toEntity(Article article, Long userId) {
             return ArticleComment.builder()
                     .article(article)
                     .content(content)
+                    .userId(userId)
                     .build();
         }
     }
@@ -29,6 +31,7 @@ public class ArticleCommentCommand {
     @ToString
     @Builder
     public static class UpdateReq {
+        private Long articleId;
         private String content;
     }
 
@@ -38,7 +41,6 @@ public class ArticleCommentCommand {
     public static class SearchCondition {
 
         private LocalDateTime createdAt;
-
         private String createdBy;
 
         public ArticleCommentSearchCondition toSearchCondition() {
