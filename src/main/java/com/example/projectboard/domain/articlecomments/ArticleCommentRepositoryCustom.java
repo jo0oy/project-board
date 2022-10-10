@@ -8,8 +8,6 @@ import java.util.Optional;
 
 public interface ArticleCommentRepositoryCustom {
 
-    Optional<ArticleComment> findByIdFetchJoinUserAccount(Long commentId);
-
     Optional<ArticleCommentInfo.MainInfo> findWithArticleId(Long id);
 
     Page<ArticleComment> findByArticleId(Long articleId, Pageable pageable);

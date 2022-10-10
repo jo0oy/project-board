@@ -16,4 +16,8 @@ public interface ArticleCommentRepository extends
     @Modifying(clearAutomatically = true)
     @Query("DELETE FROM ArticleComment ac WHERE ac.article.id = :articleId")
     void deleteByArticleId(@Param("articleId") Long articleId);
+
+    @Modifying(clearAutomatically = true)
+    @Query("DELETE FROM ArticleComment ac WHERE ac.userId = :userId")
+    void deleteByUserAccountId(@Param("userId") Long userId);
 }

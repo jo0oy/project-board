@@ -1,7 +1,6 @@
 package com.example.projectboard.domain.articles;
 
 import com.example.projectboard.domain.JpaAuditingFields;
-import com.example.projectboard.domain.users.UserAccount;
 import lombok.*;
 import org.springframework.util.StringUtils;
 
@@ -32,30 +31,29 @@ public class Article extends JpaAuditingFields {
 
     private String hashtag; // 해시태그
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserAccount userAccount;
+    @Column(nullable = false, updatable = false)
+    private Long userId; // 연관관계 매핑: UserAccount id
 
     @Builder(builderClassName = "ArticleWithoutHashtag", builderMethodName = "ArticleWithoutHashtag")
-    public Article(String title,
+    private Article(String title,
                    String content,
-                   UserAccount userAccount) {
+                   Long userId) {
 
         this.title = title;
         this.content = content;
-        this.userAccount = userAccount;
+        this.userId = userId;
     }
 
     @Builder(builderClassName = "ArticleWithHashtag", builderMethodName = "ArticleWithHashtag")
-    public Article(String title,
+    private Article(String title,
                    String content,
                    String hashtag,
-                   UserAccount userAccount) {
+                   Long userId) {
 
         this.title = title;
         this.content = content;
         this.hashtag = hashtag;
-        this.userAccount = userAccount;
+        this.userId = userId;
     }
 
     // 수정 메서드

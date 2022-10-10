@@ -5,9 +5,9 @@ import com.example.projectboard.domain.articles.ArticleInfo;
 
 public interface ArticleCommandService {
 
-    ArticleInfo.MainInfo registerArticle(String username, ArticleCommand.RegisterReq command);
+    ArticleInfo.MainInfo registerArticle(String principalUsername, ArticleCommand.RegisterReq command);
 
-    void update(Long articleId, String username, ArticleCommand.UpdateReq command);
+    void update(Long articleId, String principalUsername, ArticleCommand.UpdateReq command);
 
-    void delete(Long articleId, String username);
+    void delete(Long articleId, String principalUsername);
 }

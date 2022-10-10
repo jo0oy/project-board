@@ -14,26 +14,13 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import static com.example.projectboard.domain.articles.QArticle.article;
-import static com.example.projectboard.domain.users.QUserAccount.userAccount;
 
 @RequiredArgsConstructor
 public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
-
-    @Override
-    public Optional<Article> findByIdFetchJoinUserAccount(Long articleId) {
-        return Optional.ofNullable(
-                queryFactory
-                        .selectFrom(article)
-                        .leftJoin(article.userAccount, userAccount)
-                        .fetchJoin()
-                        .where(article.id.eq(articleId))
-                        .fetchOne());
-    }
 
     @Override
     public List<Article> findAll(ArticleSearchCondition condition) {

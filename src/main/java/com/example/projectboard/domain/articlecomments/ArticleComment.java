@@ -2,7 +2,6 @@ package com.example.projectboard.domain.articlecomments;
 
 import com.example.projectboard.domain.JpaAuditingFields;
 import com.example.projectboard.domain.articles.Article;
-import com.example.projectboard.domain.users.UserAccount;
 import lombok.*;
 import org.springframework.util.StringUtils;
 
@@ -29,17 +28,16 @@ public class ArticleComment extends JpaAuditingFields {
     @JoinColumn(name = "article_id", updatable = false)
     private Article article; // 게시글 (id)
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id")
-    private UserAccount userAccount;
+    @Column(nullable = false, updatable = false)
+    private Long userId; // 연관관계 매핑: UserAccount id
 
     @Builder
     private ArticleComment(Article article,
                            String content,
-                           UserAccount userAccount) {
+                           Long userId) {
         this.article = article;
         this.content = content;
-        this.userAccount = userAccount;
+        this.userId = userId;
     }
 
     public void update(String content) {
@@ -51,8 +49,8 @@ public class ArticleComment extends JpaAuditingFields {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ArticleComment)) return false;
-        ArticleComment that = (ArticleComment) o;
-        return id != null && id.equals(that.id);
+        ArticleComment comment = (ArticleComment) o;
+        return id != null && id.equals(comment.id);
     }
 
     @Override

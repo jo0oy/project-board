@@ -17,6 +17,7 @@ public class ArticleInfo {
     @Builder
     public static class MainInfo {
         private Long articleId;
+        private Long userId;
         private String title;
         private String content;
         private String hashtag;
@@ -25,6 +26,7 @@ public class ArticleInfo {
 
         public MainInfo(Article entity) {
             this.articleId = entity.getId();
+            this.userId = entity.getUserId();
             this.title = entity.getTitle();
             this.content = entity.getContent();
             this.hashtag = (entity.getHashtag() != null) ? entity.getHashtag() : null;
@@ -40,6 +42,7 @@ public class ArticleInfo {
     @Builder
     public static class ArticleWithCommentsInfo {
         private Long articleId;
+        private Long userId;
         private String title;
         private String content;
         private String hashtag;
@@ -50,6 +53,7 @@ public class ArticleInfo {
                                        List<ArticleCommentInfo.SimpleInfo> comments) {
 
             this.articleId = entity.getId();
+            this.userId = entity.getUserId();
             this.title = entity.getTitle();
             this.content = entity.getContent();
             this.hashtag = (entity.getHashtag() != null) ? entity.getHashtag() : null;

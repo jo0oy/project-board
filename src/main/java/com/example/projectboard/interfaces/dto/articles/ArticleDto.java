@@ -82,6 +82,7 @@ public class ArticleDto {
     @Builder
     public static class MainInfoResponse {
         private Long articleId;
+        private Long userId;
         private String title;
         private String content;
         private String hashtag;
@@ -94,6 +95,7 @@ public class ArticleDto {
     @Builder
     public static class ArticleWithCommentsResponse {
         private Long articleId;
+        private Long userId;
         private String title;
         private String content;
         private String hashtag;
@@ -107,6 +109,7 @@ public class ArticleDto {
     @Builder
     public static class CommentInfoResponse {
         private Long commentId;
+        private Long userId;
         private String content;
         private String createdBy;
         private LocalDateTime createdAt;
