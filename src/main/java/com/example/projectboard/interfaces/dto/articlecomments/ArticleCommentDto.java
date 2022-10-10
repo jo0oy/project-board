@@ -3,7 +3,6 @@ package com.example.projectboard.interfaces.dto.articlecomments;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -55,6 +54,7 @@ public class ArticleCommentDto {
     public static class MainInfoResponse {
         private Long commentId;
         private Long articleId;
+        private Long userId;
         private String content;
         private String createdBy;
         private LocalDateTime createdAt;
@@ -65,6 +65,7 @@ public class ArticleCommentDto {
     @Builder
     public static class SimpleInfoResponse {
         private Long commentId;
+        private Long userId;
         private String content;
         private String createdBy;
         private LocalDateTime createdAt;
