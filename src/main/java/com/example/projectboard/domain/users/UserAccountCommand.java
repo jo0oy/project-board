@@ -29,4 +29,21 @@ public class UserAccountCommand {
         private String email;
         private String phoneNumber;
     }
+
+    @ToString
+    @Getter
+    @Builder
+    public static class SearchCondition {
+        private String username;
+        private String email;
+        private String phoneNumber;
+
+        public UserAccountSearchCondition toSearchCondition() {
+            return UserAccountSearchCondition.builder()
+                    .username(username)
+                    .email(email)
+                    .phoneNumber(phoneNumber)
+                    .build();
+        }
+    }
 }
