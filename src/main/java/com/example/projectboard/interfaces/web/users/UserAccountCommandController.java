@@ -27,7 +27,7 @@ public class UserAccountCommandController {
 
         userAccountCommandService.registerUser(userAccountDtoMapper.toCommand(req));
 
-        return "redirect:/auth/sign-up/success";
+        return "redirect:/accounts/sign-up/success";
     }
 
     @PreAuthorize("hasAnyRole({'ROLE_USER', 'ROLE_ADMIN'})")
@@ -38,7 +38,7 @@ public class UserAccountCommandController {
 
         userAccountCommandService.updateUserInfo(id, principalUserAccount.getUsername(), userAccountDtoMapper.toCommand(req));
 
-        return "redirect:/user-accounts/me";
+        return "redirect:/accounts/me";
     }
 
     @PreAuthorize("hasAnyRole({'ROLE_USER', 'ROLE_ADMIN'})")
