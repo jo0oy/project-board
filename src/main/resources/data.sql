@@ -1,12 +1,12 @@
 -- User_Accounts TABLE INSERT --
-insert into user_accounts (username, password, name, email, phone_number, role, created_at, created_by, modified_at, modified_by) values
-    ('jo0oy', '{noop}jo0oy1234', '이주연', 'jo0oy@gmail.com', '010-1111-1111', 'USER', now(), 'jo0oy', now(), 'jo0oy');
+insert into user_accounts (username, password, name, email, phone_number, role, created_at, modified_at) values
+    ('jo0oy', '{noop}jo0oy1234', '이주연', 'jo0oy@gmail.com', '010-1111-1111', 'USER', now(), now());
 
-insert into user_accounts (username, password, name, email, phone_number, role, created_at, created_by, modified_at, modified_by) values
-    ('yooj', '{noop}yooj1234', '이유진', 'yooj@gmail.com', '010-2222-2222', 'USER', now(), 'yooj', now(), 'yooj');
+insert into user_accounts (username, password, name, email, phone_number, role, created_at, modified_at) values
+    ('yooj', '{noop}yooj1234', '이유진', 'yooj@gmail.com', '010-2222-2222', 'USER', now(), now());
 
-insert into user_accounts (username, password, name, email, phone_number, role, created_at, created_by, modified_at, modified_by) values
-    ('adminAcc', '{noop}adminAcc1234', '관리자계정', 'adminAcc@gmail.com', '010-3333-3333', 'ADMIN', now(), 'adminAcc', now(), 'adminAcc');
+insert into user_accounts (username, password, name, email, phone_number, role, created_at, modified_at) values
+    ('adminAcc', '{noop}adminAcc1234', '관리자계정', 'adminAcc@gmail.com', '010-3333-3333', 'ADMIN', now(), now());
 
 -- Articles TABLE INSERT TOTAL : 200 --
 insert into articles (title, content, hashtag, user_id, created_at, created_by, modified_at, modified_by) values ('nulla nunc purus phasellus in', 'Quisque porta volutpat erat. Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla. Nunc purus. Phasellus in felis. Donec semper sapien a libero. Nam dui. Proin leo odio, porttitor id, consequat in, consequat ut, nulla. Sed accumsan felis.', null, 2, '2022-05-30 05:15:41', 'yooj', '2022-06-01 05:15:41', 'yooj');

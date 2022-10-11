@@ -42,8 +42,8 @@ public class SecurityConfig {
                                 "/",
                                 "/articles",
                                 "/articles/search-hashtag",
-                                "/auth/sign-in",
-                                "/auth/sign-up",
+                                "/auth/login",
+                                "/accounts/sign-up/**",
                                 "/articles/**"
                         ).permitAll()
                         .mvcMatchers(

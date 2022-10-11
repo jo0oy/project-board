@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface UserAccountQueryService {
 
+    UserAccountInfo getUserAccountInfo(String principalUsername);
+
     UserAccountInfo getUserAccountInfo(Long id, String principalUsername);
 
     UserAccountInfo getUserAccountInfo(String username, String principalUsername);

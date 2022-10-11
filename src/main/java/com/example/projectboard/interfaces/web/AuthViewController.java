@@ -8,13 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class AuthViewController {
 
-    @GetMapping("/auth/sign-up")
-    public String signUpPage() {
-        return "sign-up";
-    }
-
     @GetMapping("/auth/login")
-    public String signInPage() {
+    public String loginPage() {
         return "sign-in";
     }
 }

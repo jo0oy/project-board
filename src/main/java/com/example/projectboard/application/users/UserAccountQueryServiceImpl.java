@@ -27,6 +27,23 @@ public class UserAccountQueryServiceImpl implements UserAccountQueryService {
     private final UserAccountRepository userAccountRepository;
 
     /**
+     * UserAccountInfo 를 단일 조회하는 메서드: 현재 로그인된 사용자 계정 조회하는 메서드
+     * @param principalUsername : 현재 인증 객체(Security Context)에 담겨 있는 사용자 정보에서 추출한 username (String)
+     *                          -> 현재 로그인된 사용자 계정 조회
+     * @return UserAccountInfo : 조회한 UserAccount -> UserAccountInfo 객체로 반환.
+     */
+    @Override
+    public UserAccountInfo getUserAccountInfo(String principalUsername) {
+        log.info("{}: {}", getClass().getSimpleName(), "getUserAccountInfo(String)");
+
+        // UserAccount 엔티티 조회
+        var userAccount = userAccountRepository.findByUsername(principalUsername)
+                .orElseThrow(UsernameNotFoundException::new);
+
+        return UserAccountInfo.of(userAccount);
+    }
+
+    /**
      * UserAccountInfo 를 단일 조회하는 메서드.
      * @param id : 조회하고자 하는 UserAccount 의 id (Long)
      * @param principalUsername : 현재 인증 객체(Security Context)에 담겨 있는 사용자 정보에서 추출한 username (String)
