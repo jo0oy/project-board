@@ -23,7 +23,7 @@ public class Article extends JpaAuditingFields {
     @Column(name = "article_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 150)
     private String title; // 제목
 
     @Column(nullable = false, length = 10000)

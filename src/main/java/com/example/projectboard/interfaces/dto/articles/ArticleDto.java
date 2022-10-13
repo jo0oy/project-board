@@ -7,6 +7,9 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.util.StringUtils;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,8 +22,12 @@ public class ArticleDto {
     @ToString
     @Builder
     public static class RegisterReq {
+        @NotBlank @Size(min = 5, max = 70)
         private String title;
+
+        @NotBlank @Size(min = 10, max = 10000)
         private String content;
+
         private String hashtag;
     }
 
@@ -29,8 +36,43 @@ public class ArticleDto {
     @ToString
     @Builder
     public static class UpdateReq {
+        @NotBlank @Size(min = 5, max = 70)
         private String title;
+
+        @NotBlank @Size(min = 10, max = 10000)
         private String content;
+
+        private String hashtag;
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    @Builder
+    public static class RegisterForm {
+        @NotBlank @Size(min = 5, max = 70)
+        private String title;
+
+        @NotBlank @Size(min = 10, max = 10000)
+        private String content;
+
+        private String hashtag;
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    @Builder
+    public static class UpdateForm {
+        @NotNull
+        private Long articleId;
+
+        @NotBlank @Size(min = 5, max = 70)
+        private String title;
+
+        @NotBlank @Size(min = 10, max = 10000)
+        private String content;
+
         private String hashtag;
     }
 
@@ -110,7 +152,7 @@ public class ArticleDto {
     public static class CommentInfoResponse {
         private Long commentId;
         private Long userId;
-        private String content;
+        private String commentBody;
         private String createdBy;
         private LocalDateTime createdAt;
     }
