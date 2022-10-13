@@ -97,6 +97,7 @@ public class ArticleViewControllerTest {
         mvc.perform(get("/articles/new"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(model().attributeExists("registerForm"))
                 .andExpect(view().name("articles/add-form"))
                 .andDo(print());
     }
@@ -124,7 +125,7 @@ public class ArticleViewControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/edit-form"))
-                .andExpect(model().attributeExists("article"))
+                .andExpect(model().attributeExists("updateForm"))
                 .andDo(print());
     }
 
@@ -140,6 +141,4 @@ public class ArticleViewControllerTest {
                 .andExpect(redirectedUrlPattern("**/login"))
                 .andDo(print());
     }
-
 }
-

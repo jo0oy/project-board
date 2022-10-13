@@ -4,6 +4,7 @@ import com.example.projectboard.common.exception.EntityNotFoundException;
 import com.example.projectboard.common.exception.NoAuthorityToUpdateDeleteException;
 import com.example.projectboard.domain.articlecomments.ArticleCommentRepository;
 import com.example.projectboard.interfaces.dto.articlecomments.ArticleCommentDto;
+import com.example.projectboard.interfaces.dto.articles.ArticleDto;
 import com.example.projectboard.util.FormDataEncoder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,9 +45,10 @@ class CommentCommandControllerTest {
         //given
         var articleId = 1L;
         var content = "새로운 댓글 내용입니다.";
-        var registerReq = ArticleCommentDto.RegisterReq.builder()
-                .articleId(articleId)
-                .content(content)
+        var article = ArticleDto.ArticleWithCommentsResponse.builder().build();
+        var registerReq = ArticleCommentDto.RegisterForm.builder()
+                .parentArticleId(articleId)
+                .commentBody(content)
                 .build();
 
         var beforeRegister = commentRepository.count();
@@ -54,6 +56,7 @@ class CommentCommandControllerTest {
         //when & then
         mvc.perform(post("/article-comments")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .sessionAttr("article", article)
                         .content(encoder.encode(registerReq))
                         .with(csrf())
                 ).andExpect(status().is3xxRedirection())
@@ -71,7 +74,7 @@ class CommentCommandControllerTest {
         var content = "새로운 댓글 내용입니다.";
         var registerReq = ArticleCommentDto.RegisterReq.builder()
                 .articleId(articleId)
-                .content(content)
+                .commentBody(content)
                 .build();
 
         //when & then
@@ -88,13 +91,13 @@ class CommentCommandControllerTest {
     @Test
     void givenCommentIdAndUpdateReq_WhenPutMapping_ThenRedirectToDetailPage() throws Exception {
         //given
-        var commentId = 2L; // createdBy 'jo0oy'
-        var articleId = 3L;
-        var updateContent = "수정한 내용입니다.";
+        var commentId = 3L; // createdBy 'jo0oy'
+        var articleId = 4L;
+        var updateCommentBody = "수정한 내용입니다.";
 
-        var updateReq = ArticleCommentDto.UpdateReq.builder()
-                .articleId(articleId)
-                .content(updateContent)
+        var updateReq = ArticleCommentDto.UpdateForm.builder()
+                .parentArticleId(articleId)
+                .updateCommentBody(updateCommentBody)
                 .build();
 
         //when & then
@@ -109,7 +112,7 @@ class CommentCommandControllerTest {
         var updatedComment = commentRepository.findById(commentId).orElse(null);
 
         assertThat(updatedComment).isNotNull();
-        assertThat(updatedComment.getContent()).isEqualTo(updateContent);
+        assertThat(updatedComment.getCommentBody()).isEqualTo(updateCommentBody);
     }
 
     @WithUserDetails(value = "user3", setupBefore = TestExecutionEvent.TEST_EXECUTION)
@@ -117,13 +120,13 @@ class CommentCommandControllerTest {
     @Test
     void givenCommentIdAndUpdateReqWithForbiddenUsername_WhenPutMapping_ThenReturnsForbiddenError() throws Exception {
         //given
-        var commentId = 2L; // createdBy jo0oy
-        var articleId = 3L;
-        var updateContent = "수정한 내용입니다.";
+        var commentId = 3L; // createdBy jo0oy
+        var articleId = 4L;
+        var updateForm = "수정한 내용입니다.";
 
-        var updateReq = ArticleCommentDto.UpdateReq.builder()
-                .articleId(articleId)
-                .content(updateContent)
+        var updateReq = ArticleCommentDto.UpdateForm.builder()
+                .parentArticleId(articleId)
+                .updateCommentBody(updateForm)
                 .build();
 
         //when & then
@@ -144,17 +147,17 @@ class CommentCommandControllerTest {
         //given
         var commentId = 1500L;
         var articleId = 2L;
-        var updateContent = "수정한 댓글 내용입니다.";
+        var updateCommentBody = "수정한 댓글 내용입니다.";
 
-        var updateReq = ArticleCommentDto.UpdateReq.builder()
-                .articleId(articleId)
-                .content(updateContent)
+        var updateForm = ArticleCommentDto.UpdateForm.builder()
+                .parentArticleId(articleId)
+                .updateCommentBody(updateCommentBody)
                 .build();
 
         //when & then
         var mvcResult = mvc.perform(put("/article-comments/" + commentId)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content(encoder.encode(updateReq))
+                .content(encoder.encode(updateForm))
                 .with(csrf())
         ).andExpect(status().is4xxClientError()).andReturn();
 
@@ -167,8 +170,8 @@ class CommentCommandControllerTest {
     @Test
     void givenCommentId_WhenDeleteMapping_ThenRedirectToDetailPage() throws Exception {
         //given
-        var commentId = 5L;
-        var articleId = 6L;
+        var commentId = 1L;
+        var articleId = 2L;
         var beforeDeleteTotal = commentRepository.count();
 
         //when & then

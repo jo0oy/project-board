@@ -41,12 +41,12 @@ class UserAccountCommandControllerTest {
 
         //given
         var username = "newUser";
-        var password = "newUser1234";
+        var password = "newUser1234!";
         var name = "새로운유저";
         var email = "newUser@naver.com";
         var phoneNumber = "010-9090-0909";
         var role = UserAccount.RoleType.USER;
-        var registerReq = UserAccountDto.RegisterReq.builder()
+        var registerForm = UserAccountDto.RegisterForm.builder()
                 .username(username)
                 .password(password)
                 .name(name)
@@ -58,9 +58,9 @@ class UserAccountCommandControllerTest {
         var beforeRegister = userAccountRepository.count();
 
         //when & then
-        mvc.perform(post("/user-accounts")
+        mvc.perform(post("/accounts/sign-up")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .content(encoder.encode(registerReq))
+                        .content(encoder.encode(registerForm))
                         .with(csrf())
                 ).andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrlPattern("/**/sign-up/success"));
@@ -75,16 +75,19 @@ class UserAccountCommandControllerTest {
 
         //given
         var userId = 1L;
+        var email = "jo0oy@gmail.com";
         var updateEmail = "jo0oy@naver.com";
         var updatePhoneNumber = "010-0101-1010";
 
-        var updateReq = UserAccountDto.UpdateReq.builder()
+        var updateReq = UserAccountDto.UpdateForm.builder()
+                .userId(userId)
+                .beforeEmail(email)
                 .email(updateEmail)
                 .phoneNumber(updatePhoneNumber)
                 .build();
 
         //when & then
-        mvc.perform(put("/user-accounts/" + userId)
+        mvc.perform(put("/accounts/" + userId + "/edit")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .content(encoder.encode(updateReq))
                         .with(csrf())
@@ -105,16 +108,19 @@ class UserAccountCommandControllerTest {
 
         //given
         var userId = 1L;
-        var updateEmail = "jo0oy@naver.com";
+        var email = "jo0oy@gmail.com";
+        var updateEmail = "jo0oy1234@naver.com";
         var updatePhoneNumber = "010-0101-1010";
 
-        var updateReq = UserAccountDto.UpdateReq.builder()
+        var updateReq = UserAccountDto.UpdateForm.builder()
+                .userId(userId)
+                .beforeEmail(email)
                 .email(updateEmail)
                 .phoneNumber(updatePhoneNumber)
                 .build();
 
         //when & then
-        var mvcResult = mvc.perform(delete("/user-accounts/" + userId)
+        var mvcResult = mvc.perform(put("/accounts/" + userId + "/edit")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .content(encoder.encode(updateReq))
                         .with(csrf()))
@@ -134,7 +140,7 @@ class UserAccountCommandControllerTest {
         var beforeDelete = userAccountRepository.count();
 
         //when & then
-        mvc.perform(delete("/user-accounts/" + userId)
+        mvc.perform(delete("/accounts/" + userId)
                         .with(csrf())
                 ).andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
@@ -151,11 +157,10 @@ class UserAccountCommandControllerTest {
         var userId = 2L;
 
         //when & then
-        var mvcResult = mvc.perform(delete("/user-accounts/" + userId).with(csrf()))
+        var mvcResult = mvc.perform(delete("/accounts/" + userId).with(csrf()))
                 .andExpect(status().is4xxClientError()).andReturn();
 
         assertThat(mvcResult.getResolvedException()).isNotNull();
         assertThat(mvcResult.getResolvedException()).isInstanceOf(NoAuthorityToUpdateDeleteException.class);
     }
-
 }

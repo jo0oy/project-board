@@ -11,6 +11,5 @@ import java.time.LocalDateTime;
 @Builder
 public class ArticleCommentSearchCondition {
     private LocalDateTime createdAt;
-
     private String createdBy;
 }

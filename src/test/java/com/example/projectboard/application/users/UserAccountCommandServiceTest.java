@@ -1,6 +1,7 @@
 package com.example.projectboard.application.users;
 
 import com.example.projectboard.common.exception.NoAuthorityToUpdateDeleteException;
+import com.example.projectboard.common.exception.VerifyDuplicateException;
 import com.example.projectboard.domain.users.UserAccount;
 import com.example.projectboard.domain.users.UserAccountCommand;
 import com.example.projectboard.domain.users.UserAccountInfo;
@@ -49,15 +50,55 @@ class UserAccountCommandServiceTest {
         assertThat(req.getUsername()).isEqualTo(registeredUser.getUsername());
     }
 
+    @DisplayName("[실패][service] 사용자 등록 테스트 - 이미 존재하는 아이디")
+    @Test
+    void givenRegisterReqWithDuplicateUsername_whenRegister_thenReturnsVerifyDuplicateException() {
+        //given
+        var req = UserAccountCommand.RegisterReq
+                .builder()
+                .username("jo0oy")
+                .password("user1001234")
+                .name("유저100")
+                .email("user100@naver.com")
+                .phoneNumber("010-9999-9999")
+                .role(UserAccount.RoleType.USER)
+                .build();
+
+        //when & then
+        assertThatThrownBy(() -> sut.registerUser(req))
+                .isNotNull()
+                .isInstanceOf(VerifyDuplicateException.class);
+    }
+
+    @DisplayName("[실패][service] 사용자 등록 테스트 - 이미 존재하는 이메일")
+    @Test
+    void givenRegisterReqWithDuplicateEmail_whenRegister_thenReturnsVerifyDuplicateException() {
+        //given
+        var req = UserAccountCommand.RegisterReq
+                .builder()
+                .username("user9999")
+                .password("user99991234")
+                .name("유저9999")
+                .email("jo0oy@gmail.com")
+                .phoneNumber("010-9999-9999")
+                .role(UserAccount.RoleType.USER)
+                .build();
+
+        //when & then
+        assertThatThrownBy(() -> sut.registerUser(req))
+                .isNotNull()
+                .isInstanceOf(VerifyDuplicateException.class);
+    }
+
     @DisplayName("[실패][service] 사용자 등록 테스트 - not null 필드에 null 값 전달")
     @Test
     void givenRegisterReqWithNullUsername_whenRegister_thenThrowsException() {
         //given
         var req = UserAccountCommand.RegisterReq
                 .builder()
-                .password("user71234")
-                .name("유저7")
-                .email("user7@naver.com")
+                .password("user991234")
+                .name("유저99")
+                .email("user99@naver.com")
                 .phoneNumber("010-9999-9999")
                 .role(UserAccount.RoleType.USER)
                 .build();
