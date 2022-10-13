@@ -3,6 +3,7 @@ package com.example.projectboard.application.users;
 import com.example.projectboard.common.exception.EntityNotFoundException;
 import com.example.projectboard.common.exception.NoAuthorityToUpdateDeleteException;
 import com.example.projectboard.common.exception.UsernameNotFoundException;
+import com.example.projectboard.common.exception.VerifyDuplicateException;
 import com.example.projectboard.domain.users.UserAccount;
 import com.example.projectboard.domain.users.UserAccountCommand;
 import com.example.projectboard.domain.users.UserAccountInfo;
@@ -30,6 +31,9 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
     @Transactional
     public UserAccountInfo registerUser(UserAccountCommand.RegisterReq command) {
         log.info("{}: {}", getClass().getSimpleName(), "registerUser(UserAccountCommand.RegisterReq)");
+
+        // 중복 아이디/이메일 확인
+        verifyDuplicateUsernameEmail(command.getUsername(), command.getEmail());
 
         var userAccount = command.toEntity();
 
@@ -93,6 +97,29 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
         } else {
             log.error("삭제 권한이 없는 사용자입니다. username={}", principalUsername);
             throw new NoAuthorityToUpdateDeleteException();
+        }
+    }
+
+    @Override
+    public boolean verifyDuplicateUsername(String username) {
+        return userAccountRepository.findByUsername(username).isEmpty();
+    }
+
+    @Override
+    public boolean verifyDuplicateEmail(String email) {
+        return userAccountRepository.findByEmail(email).isEmpty();
+    }
+
+    private void verifyDuplicateUsernameEmail(String username, String email) {
+        log.info("아이디 & 이메일 중복 검증 로직 실행");
+        if (userAccountRepository.existsByUsername(username)) {
+            log.error("이미 존재하는 아이디입니다. username={}", username);
+            throw new VerifyDuplicateException("이미 존재하는 아이디입니다. username=" + username);
+        }
+
+        if (userAccountRepository.existsByEmail(email)) {
+            log.error("이미 사용중인 이메일입니다. email={}", email);
+            throw new VerifyDuplicateException("이미 사용중인 이메일입니다. email=" + email);
         }
     }
 }
