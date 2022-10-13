@@ -1,6 +1,7 @@
 package com.example.projectboard.interfaces.web.users;
 
 import com.example.projectboard.application.users.UserAccountQueryService;
+import com.example.projectboard.interfaces.dto.users.UserAccountDto;
 import com.example.projectboard.interfaces.dto.users.UserAccountDtoMapper;
 import com.example.projectboard.security.PrincipalUserAccount;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,9 @@ public class UserAccountViewController {
 
     // 회원가입 페이지
     @GetMapping("/accounts/sign-up")
-    public String signUpPage() {
+    public String signUpPage(Model model) {
+        var registerForm = UserAccountDto.RegisterForm.builder().build();
+        model.addAttribute("registerForm", registerForm);
         return "users/sign-up";
     }
 
@@ -35,8 +38,8 @@ public class UserAccountViewController {
     // myAccount 페이지
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/accounts/me")
-    public String myAccountPage(Model model,
-                                @AuthenticationPrincipal PrincipalUserAccount principalUserAccount) {
+    public String myAccountPage(@AuthenticationPrincipal PrincipalUserAccount principalUserAccount,
+                                Model model) {
 
         var userInfo = userAccountQueryService.getUserAccountInfo(principalUserAccount.getUsername());
         model.addAttribute("userInfo", userAccountDtoMapper.toDto(userInfo));
@@ -47,12 +50,12 @@ public class UserAccountViewController {
     // {username}의 계정 정보 페이지 -> 본인 혹은 관리자 계정만 접근 가능
     @PreAuthorize("(hasRole('ROLE_USER') and (#username == authentication.principal.username)) or hasRole('ROLE_ADMIN')")
     @GetMapping("/accounts/{username}")
-    public String userInfoPage(Model model,
-                                @PathVariable String username,
-                                @AuthenticationPrincipal PrincipalUserAccount principalUserAccount) {
+    public String userInfoPage(@PathVariable String username,
+                               @AuthenticationPrincipal PrincipalUserAccount principalUserAccount,
+                               Model model) {
 
         var userInfo = userAccountQueryService.getUserAccountInfo(username, principalUserAccount.getUsername());
-        model.addAttribute("userInfo", userAccountDtoMapper.toDto(userInfo));
+        model.addAttribute("userInfo", userInfo);
 
         return "users/user-info";
     }
@@ -60,11 +63,13 @@ public class UserAccountViewController {
     // myAccount 정보 수정 페이지
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/accounts/me/edit")
-    public String myAccountEditPage(Model model,
-                                @AuthenticationPrincipal PrincipalUserAccount principalUserAccount) {
+    public String myAccountEditPage(@AuthenticationPrincipal PrincipalUserAccount principalUserAccount,
+                                    Model model) {
 
         var userInfo = userAccountQueryService.getUserAccountInfo(principalUserAccount.getUsername());
-        model.addAttribute("userInfo", userAccountDtoMapper.toDto(userInfo));
+        var updateForm = userAccountDtoMapper.toFormDto(userInfo);
+
+        model.addAttribute("updateForm", updateForm);
 
         return "users/edit-form";
     }
@@ -72,12 +77,14 @@ public class UserAccountViewController {
     // {username}의 계정 정보 수정 페이지 -> 본인 혹은 관리자 계정만 접근 가능
     @PreAuthorize("(hasRole('ROLE_USER') and (#username == authentication.principal.username)) or hasRole('ROLE_ADMIN')")
     @GetMapping("/accounts/{username}/edit")
-    public String userInfoEditPage(Model model,
-                                    @PathVariable String username,
-                                    @AuthenticationPrincipal PrincipalUserAccount principalUserAccount) {
+    public String userInfoEditPage(@PathVariable String username,
+                                   @AuthenticationPrincipal PrincipalUserAccount principalUserAccount,
+                                   Model model) {
 
         var userInfo = userAccountQueryService.getUserAccountInfo(username, principalUserAccount.getUsername());
-        model.addAttribute("userInfo", userAccountDtoMapper.toDto(userInfo));
+        var updateForm = userAccountDtoMapper.toFormDto(userInfo);
+
+        model.addAttribute("updateForm", updateForm);
 
         return "users/edit-form";
     }

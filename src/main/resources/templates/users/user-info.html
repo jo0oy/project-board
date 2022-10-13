@@ -69,8 +69,11 @@
                 <hr class="my-lg-3">
                 <div class="col-12 d-flex">
                     <a role="button" class="w-50 mx-1 btn btn-primary btn-lg"
-                       th:if="${#authorization.expression('isAuthenticated()')} and ${userInfo.username} == ${#authentication.name}"
+                       th:if="(${#authorization.expression('isAuthenticated()')} and ${userInfo.username} == ${#authentication.name}) and ${#authorization.expression('hasRole(''ROLE_USER'')')}"
                        th:href="@{/accounts/me/edit}">회원정보 수정</a>
+                    <a role="button" class="w-50 mx-1 btn btn-primary btn-lg"
+                       th:if="${#authorization.expression('isAuthenticated()')} and ${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
+                       th:href="@{/accounts/{username}/edit(username=${userInfo.username})}">회원정보 수정</a>
                     <button type="button" class="w-50 mx-1 btn btn-secondary btn-lg" id="cancel-button" th:onclick="'history.back()'">뒤로가기</button>
                 </div>
             </div>

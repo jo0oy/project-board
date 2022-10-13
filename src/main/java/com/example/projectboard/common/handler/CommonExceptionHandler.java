@@ -6,7 +6,6 @@ import com.example.projectboard.common.exception.NoAuthorityToUpdateDeleteExcept
 import com.example.projectboard.common.exception.UsernameNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,7 +22,7 @@ public class CommonExceptionHandler {
 
         model.addAttribute("exception", exception.getMessage());
 
-        return "error/exception";
+        return "error/error-page";
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -33,7 +32,7 @@ public class CommonExceptionHandler {
 
         model.addAttribute("exception", exception.getMessage());
 
-        return "error/exception";
+        return "error/error-page";
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -43,17 +42,17 @@ public class CommonExceptionHandler {
 
         model.addAttribute("exception", exception.getMessage());
 
-        return "error/exception";
+        return "error/error-page";
     }
 
     // 접근 권한 에러
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler({NoAuthorityToUpdateDeleteException.class, NoAuthorityToReadException.class, AccessDeniedException.class})
+    @ExceptionHandler({NoAuthorityToUpdateDeleteException.class, NoAuthorityToReadException.class})
     public String accessDeniedException(Model model, Exception exception) {
         log.error("handling {}: {}", exception.getClass().getSimpleName(), exception.getMessage());
 
         model.addAttribute("exception", exception.getMessage());
 
-        return "error/exception";
+        return "error/error-page";
     }
 }

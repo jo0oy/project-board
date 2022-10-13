@@ -44,7 +44,7 @@ class ArticleCommandControllerTest {
         var title = "새로운 글 제목";
         var content = "새로운 글 내용입니다.";
         var hashtag = "#newArticle";
-        var registerReq = ArticleDto.RegisterReq.builder()
+        var registerForm = ArticleDto.RegisterForm.builder()
                 .title(title)
                 .content(content)
                 .hashtag(hashtag)
@@ -53,9 +53,9 @@ class ArticleCommandControllerTest {
         var beforeRegister = articleRepository.count();
 
         //when & then
-        mvc.perform(post("/articles")
+        mvc.perform(post("/articles/new")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .content(encoder.encode(registerReq))
+                        .content(encoder.encode(registerForm))
                         .with(csrf())
                 ).andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/articles"))
@@ -75,14 +75,15 @@ class ArticleCommandControllerTest {
         var updateContent = "수정한 내용입니다.";
         var updateHashtag = "#update";
 
-        var updateReq = ArticleDto.UpdateReq.builder()
+        var updateReq = ArticleDto.UpdateForm.builder()
+                .articleId(articleId)
                 .title(updateTitle)
                 .content(updateContent)
                 .hashtag(updateHashtag)
                 .build();
 
         //when & then
-        mvc.perform(put("/articles/" + articleId)
+        mvc.perform(put("/articles/" + articleId + "/edit")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .content(encoder.encode(updateReq))
                         .with(csrf())
@@ -109,16 +110,17 @@ class ArticleCommandControllerTest {
         var updateContent = "수정한 내용입니다.";
         var updateHashtag = "#update";
 
-        var updateReq = ArticleDto.UpdateReq.builder()
+        var updateForm = ArticleDto.UpdateForm.builder()
+                .articleId(articleId)
                 .title(updateTitle)
                 .content(updateContent)
                 .hashtag(updateHashtag)
                 .build();
 
         //when & then
-        var mvcResult = mvc.perform(put("/articles/" + articleId)
+        var mvcResult = mvc.perform(put("/articles/" + articleId + "/edit")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content(encoder.encode(updateReq))
+                .content(encoder.encode(updateForm))
                 .with(csrf())
         ).andExpect(status().isForbidden()).andReturn();
 
@@ -137,14 +139,15 @@ class ArticleCommandControllerTest {
         var updateContent = "수정한 내용입니다.";
         var updateHashtag = "#update";
 
-        var updateReq = ArticleDto.UpdateReq.builder()
+        var updateReq = ArticleDto.UpdateForm.builder()
+                .articleId(articleId)
                 .title(updateTitle)
                 .content(updateContent)
                 .hashtag(updateHashtag)
                 .build();
 
         //when & then
-        var mvcResult = mvc.perform(put("/articles/" + articleId)
+        var mvcResult = mvc.perform(put("/articles/" + articleId + "/edit")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .content(encoder.encode(updateReq))
                 .with(csrf())

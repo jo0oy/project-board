@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithUserDetails;
 
@@ -113,7 +114,7 @@ class UserAccountQueryServiceTest {
                 .username("admin")
                 .build();
 
-        var pageRequest = PageRequest.of(0, 5);
+        var pageRequest = PageRequest.of(0, 5, Sort.Direction.DESC, "id");
 
         // when
         var result = sut.userAccounts(condition, pageRequest);
@@ -129,7 +130,7 @@ class UserAccountQueryServiceTest {
     void givenNullSearchConditionAndPageable_whenUserAccountsMethod_thenReturnsPageResult() {
         // given
         var condition = UserAccountCommand.SearchCondition.builder().build();
-        var pageRequest = PageRequest.of(0, 5);
+        var pageRequest = PageRequest.of(0, 5, Sort.Direction.DESC, "id");
         var total = userAccountRepository.count();
 
         // when

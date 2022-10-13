@@ -10,4 +10,8 @@ public interface UserAccountCommandService {
     void updateUserInfo(Long userAccountId, String principalUsername, UserAccountCommand.UpdateReq command);
 
     void delete(Long userAccountId, String principalUsername);
+
+    boolean verifyDuplicateUsername(String username);
+
+    boolean verifyDuplicateEmail(String email);
 }

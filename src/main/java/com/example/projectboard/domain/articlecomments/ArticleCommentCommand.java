@@ -1,7 +1,6 @@
 package com.example.projectboard.domain.articlecomments;
 
 import com.example.projectboard.domain.articles.Article;
-import com.example.projectboard.domain.users.UserAccount;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -16,12 +15,12 @@ public class ArticleCommentCommand {
     public static class RegisterReq {
 
         private Long articleId;
-        private String content;
+        private String commentBody;
 
         public ArticleComment toEntity(Article article, Long userId) {
             return ArticleComment.builder()
                     .article(article)
-                    .content(content)
+                    .commentBody(commentBody)
                     .userId(userId)
                     .build();
         }
@@ -31,8 +30,7 @@ public class ArticleCommentCommand {
     @ToString
     @Builder
     public static class UpdateReq {
-        private Long articleId;
-        private String content;
+        private String commentBody;
     }
 
     @Getter

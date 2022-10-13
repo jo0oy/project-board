@@ -12,4 +12,9 @@ public class AuthViewController {
     public String loginPage() {
         return "sign-in";
     }
+
+    @GetMapping("/error/denied")
+    public String accessDeniedPage() {
+        return "error/denied-page";
+    }
 }

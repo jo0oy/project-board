@@ -65,7 +65,7 @@ public class ArticleCommentCommandServiceImpl implements ArticleCommentCommandSe
         // 수정 권한 확인
         if (validateAuthorityToCommand(comment.getUserId(), principalUsername)) {
             // 댓글 수정
-            comment.update(command.getContent());
+            comment.update(command.getCommentBody());
         } else {
             log.error("수정 권한이 없는 사용자입니다. username={}", principalUsername);
             throw new NoAuthorityToUpdateDeleteException();

@@ -17,7 +17,7 @@ public class ArticleCommentInfo {
         private Long commentId;
         private Long articleId;
         private Long userId;
-        private String content;
+        private String commentBody;
         private String createdBy;
         private LocalDateTime createdAt;
 
@@ -28,7 +28,7 @@ public class ArticleCommentInfo {
             this.commentId = entity.getId();
             this.articleId = articleId;
             this.userId = entity.getUserId();
-            this.content = entity.getContent();
+            this.commentBody = entity.getCommentBody();
             this.createdBy = entity.getCreatedBy();
             this.createdAt = entity.getCreatedAt();
         }
@@ -41,7 +41,7 @@ public class ArticleCommentInfo {
     public static class SimpleInfo {
         private Long commentId;
         private Long userId;
-        private String content;
+        private String commentBody;
         private String createdBy;
         private LocalDateTime createdAt;
 
@@ -51,7 +51,7 @@ public class ArticleCommentInfo {
         public SimpleInfo(ArticleComment entity) {
             this.commentId = entity.getId();
             this.userId = entity.getUserId();
-            this.content = entity.getContent();
+            this.commentBody = entity.getCommentBody();
             this.createdBy = entity.getCreatedBy();
             this.createdAt = entity.getCreatedAt();
         }

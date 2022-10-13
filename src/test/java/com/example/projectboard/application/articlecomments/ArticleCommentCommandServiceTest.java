@@ -37,7 +37,7 @@ class ArticleCommentCommandServiceTest {
         var req = ArticleCommentCommand.RegisterReq
                 .builder()
                 .articleId(articleId)
-                .content(content)
+                .commentBody(content)
                 .build();
 
         // when
@@ -45,7 +45,7 @@ class ArticleCommentCommandServiceTest {
 
         // then
         assertThat(result.getArticleId()).isEqualTo(articleId);
-        assertThat(result.getContent()).isEqualTo(content);
+        assertThat(result.getCommentBody()).isEqualTo(content);
     }
 
     @DisplayName("[실패][service] 게시글 댓글 등록 테스트 - 존재하지 않는 유저")
@@ -58,7 +58,7 @@ class ArticleCommentCommandServiceTest {
         var req = ArticleCommentCommand.RegisterReq
                 .builder()
                 .articleId(articleId)
-                .content(content)
+                .commentBody(content)
                 .build();
 
         // when & then
@@ -76,7 +76,7 @@ class ArticleCommentCommandServiceTest {
         var updateContent = "업데이트할 댓글 내용입니다.";
         var req = ArticleCommentCommand.UpdateReq
                 .builder()
-                .content(updateContent)
+                .commentBody(updateContent)
                 .build();
 
         // when
@@ -86,19 +86,19 @@ class ArticleCommentCommandServiceTest {
         // then
         var updatedComment = articleCommentRepository.findById(updateCommentId).orElse(null);
         assertThat(updatedComment).isNotNull();
-        assertThat(updatedComment.getContent()).isEqualTo(updateContent);
+        assertThat(updatedComment.getCommentBody()).isEqualTo(updateContent);
     }
 
     @DisplayName("[실패][service] 게시글 댓글 수정 테스트 - 수정 권한 없는 사용자")
     @Test
     void givenUpdateReqWithNotAuthorizedUsername_WhenUpdate_ThenThrowsException() {
         // given
-        var updateCommentId = 4L;
+        var updateCommentId = 3L;
         var username = "yooj";
         var updateContent = "업데이트할 댓글 내용입니다.";
         var req = ArticleCommentCommand.UpdateReq
                 .builder()
-                .content(updateContent)
+                .commentBody(updateContent)
                 .build();
 
         // when & then
@@ -111,7 +111,7 @@ class ArticleCommentCommandServiceTest {
     @Test
     void givenCommentIdWithNotAuthorizedUsername_WhenDelete_ThenThrowsException() {
         // given
-        var commentId = 4L;
+        var commentId = 5L;
         var username = "yooj";
 
         // when & then
@@ -124,7 +124,7 @@ class ArticleCommentCommandServiceTest {
     @Test
     void givenCommentIdWithAuthorizedUsername_WhenDelete_WorksFine() {
         // given
-        var commentId = 2L;
+        var commentId = 6L;
         var username = "jo0oy";
         var beforeDeleteTotal = articleCommentRepository.count();
 

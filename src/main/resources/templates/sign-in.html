@@ -15,6 +15,7 @@
 
     <!-- Custom styles for this template -->
     <link href="/css/sign-in.css" th:href="@{/css/sign-in.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/form-error.css}">
 
 </head>
 <body class="text-center">
@@ -24,8 +25,8 @@
     <img class="mb-4" src="https://getbootstrap.com/docs/5.2/assets/brand/bootstrap-logo.svg" alt="" width="72"
     height="57">
     <h1 class="h3 mb-3 fw-normal">Please Sign in</h1>
-    <div th:if="${param.error}" class="alert alert-error">
-        Invalid username and password.
+    <div th:if="${param.error}" class="alert alert-error field-error">
+        아이디 또는 비밀번호가 일치하지 않습니다.
     </div>
     <form th:action="@{/auth/login-proc}" th:method="post">
         <div class="form-floating">

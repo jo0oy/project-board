@@ -19,6 +19,10 @@ public interface ArticleDtoMapper {
 
     ArticleCommand.UpdateReq toCommand(ArticleDto.UpdateReq req);
 
+    ArticleCommand.RegisterReq toCommand(ArticleDto.RegisterForm form);
+
+    ArticleCommand.UpdateReq toCommand(ArticleDto.UpdateForm form);
+
     ArticleCommand.SearchCondition toCommand(ArticleDto.SearchCondition req);
 
     // INFO -> DTO
@@ -27,4 +31,6 @@ public interface ArticleDtoMapper {
     ArticleDto.CommentInfoResponse toDto(ArticleCommentInfo.SimpleInfo info);
 
     ArticleDto.ArticleWithCommentsResponse toDto(ArticleInfo.ArticleWithCommentsInfo info);
+
+    ArticleDto.UpdateForm toFormDto(ArticleInfo.MainInfo info);
 }

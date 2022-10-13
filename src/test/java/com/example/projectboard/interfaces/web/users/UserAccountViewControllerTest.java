@@ -84,7 +84,7 @@ class UserAccountViewControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("users/edit-form"))
-                .andExpect(model().attributeExists("userInfo"))
+                .andExpect(model().attributeExists("updateForm"))
                 .andDo(print());
     }
 
@@ -121,16 +121,14 @@ class UserAccountViewControllerTest {
     @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[실패][view][GET] {username}의 회원정보 페이지 - {username}과 다른 인증된 사용자(ROLE_USER)")
     @Test
-    void givenUsernameWithUnAuthorizedUserAccount_whenRequestingUserInfoView_thenReturnsForbiddenError() throws Exception {
+    void givenUsernameWithUnAuthorizedUserAccount_whenRequestingUserInfoView_thenRedirectsToLoginPage() throws Exception {
         // Given
         var username = "yooj";
         // When & Then
-        var mvcResult = mvc.perform(get("/accounts/" + username))
+        mvc.perform(get("/accounts/" + username))
                 .andExpect(status().isForbidden())
+                .andExpect(forwardedUrl("/error/denied"))
                 .andReturn();
-
-        assertThat(mvcResult.getResolvedException()).isNotNull();
-        assertThat(mvcResult.getResolvedException()).isInstanceOf(AccessDeniedException.class);
     }
 
     @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
@@ -144,22 +142,20 @@ class UserAccountViewControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("users/edit-form"))
-                .andExpect(model().attributeExists("userInfo"))
+                .andExpect(model().attributeExists("updateForm"))
                 .andDo(print());
     }
 
     @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[실패][view][GET] {username}의 회원정보 수정 페이지 - {username}과 다른 인증된 사용자(ROLE_USER)")
     @Test
-    void givenUsernameWithUnAuthorizedUserAccount_whenRequestingUserInfoEditView_thenReturnsForbiddenError() throws Exception {
+    void givenUsernameWithUnAuthorizedUserAccount_whenRequestingUserInfoEditView_thenRedirectsToErrorPage() throws Exception {
         // Given
         var username = "yooj";
         // When & Then
-        var mvcResult = mvc.perform(get("/accounts/" + username + "/edit"))
+        mvc.perform(get("/accounts/" + username + "/edit"))
                 .andExpect(status().isForbidden())
+                .andExpect(forwardedUrl("/error/denied"))
                 .andReturn();
-
-        assertThat(mvcResult.getResolvedException()).isNotNull();
-        assertThat(mvcResult.getResolvedException()).isInstanceOf(AccessDeniedException.class);
     }
 }
