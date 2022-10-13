@@ -23,7 +23,7 @@ public class ArticleComment extends JpaAuditingFields {
     private Long id;
 
     @Column(nullable = false, length = 500)
-    private String content; // 본문
+    private String commentBody; // 본문
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "article_id", updatable = false)
     private Article article; // 게시글 (id)
@@ -33,15 +33,15 @@ public class ArticleComment extends JpaAuditingFields {
 
     @Builder
     private ArticleComment(Article article,
-                           String content,
+                           String commentBody,
                            Long userId) {
         this.article = article;
-        this.content = content;
+        this.commentBody = commentBody;
         this.userId = userId;
     }
 
     public void update(String content) {
-        if(StringUtils.hasText(content)) this.content = content;
+        if(StringUtils.hasText(content)) this.commentBody = content;
     }
 
     // equals & hashcode override
