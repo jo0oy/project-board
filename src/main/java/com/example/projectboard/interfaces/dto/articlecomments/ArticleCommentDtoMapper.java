@@ -4,6 +4,7 @@ import com.example.projectboard.domain.articlecomments.ArticleCommentCommand;
 import com.example.projectboard.domain.articlecomments.ArticleCommentInfo;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
@@ -19,6 +20,12 @@ public interface ArticleCommentDtoMapper {
     ArticleCommentCommand.RegisterReq toCommand(ArticleCommentDto.RegisterReq req);
 
     ArticleCommentCommand.UpdateReq toCommand(ArticleCommentDto.UpdateReq req);
+
+    @Mapping(target = "articleId", source = "parentArticleId")
+    ArticleCommentCommand.RegisterReq toCommand(ArticleCommentDto.RegisterForm form);
+
+    @Mapping(target = "commentBody", source = "updateCommentBody")
+    ArticleCommentCommand.UpdateReq toCommand(ArticleCommentDto.UpdateForm form);
 
     ArticleCommentCommand.SearchCondition toCommand(ArticleCommentDto.SearchCondition req);
 

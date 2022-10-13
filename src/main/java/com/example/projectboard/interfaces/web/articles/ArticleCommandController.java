@@ -9,10 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,21 +23,34 @@ public class ArticleCommandController {
     private final ArticleDtoMapper articleDtoMapper;
 
     @PreAuthorize("hasAnyRole({'ROLE_USER', 'ROLE_ADMIN'})")
-    @PostMapping("/articles")
-    public String registerArticle(ArticleDto.RegisterReq req,
-                                  @AuthenticationPrincipal PrincipalUserAccount principalUserAccount) {
-        articleCommandService.registerArticle(principalUserAccount.getUsername(), articleDtoMapper.toCommand(req));
+    @PostMapping("/articles/new")
+    public String registerArticle(@AuthenticationPrincipal PrincipalUserAccount principalUserAccount,
+                                  @Valid @ModelAttribute("registerForm") ArticleDto.RegisterForm form,
+                                  BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            log.debug("errors={}", bindingResult);
+            return "articles/add-form";
+        }
+
+        articleCommandService.registerArticle(principalUserAccount.getUsername(), articleDtoMapper.toCommand(form));
 
         return "redirect:/articles";
     }
 
     @PreAuthorize("hasAnyRole({'ROLE_USER', 'ROLE_ADMIN'})")
-    @PutMapping("/articles/{id}")
+    @PutMapping("/articles/{id}/edit")
     public String updateArticle(@PathVariable Long id,
                                 @AuthenticationPrincipal PrincipalUserAccount principalUserAccount,
-                                ArticleDto.UpdateReq req) {
+                                @Valid @ModelAttribute("updateForm") ArticleDto.UpdateForm updateForm,
+                                BindingResult bindingResult) {
 
-        articleCommandService.update(id, principalUserAccount.getUsername(), articleDtoMapper.toCommand(req));
+        if (bindingResult.hasErrors()) {
+            log.debug("errors={}", bindingResult);
+            return "articles/edit-form";
+        }
+
+        articleCommandService.update(id, principalUserAccount.getUsername(), articleDtoMapper.toCommand(updateForm));
 
         return "redirect:/articles/" + id;
     }

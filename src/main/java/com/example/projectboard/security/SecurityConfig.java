@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
 @RequiredArgsConstructor
 @EnableWebSecurity
@@ -33,6 +34,11 @@ public class SecurityConfig {
     }
 
     @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new WebAccessDeniedHandler();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
@@ -48,7 +54,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .mvcMatchers(
                                 HttpMethod.POST,
-                                "/user-accounts",
+                                "/accounts/sign-up",
                                 "/auth/login-proc"
                         ).permitAll()
                         .anyRequest().authenticated()
@@ -65,7 +71,9 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/")
                         .permitAll()
                         .invalidateHttpSession(true)
-                ).build();
+                )
+                .exceptionHandling().accessDeniedHandler(accessDeniedHandler())
+                .and()
+                .build();
     }
-
 }
