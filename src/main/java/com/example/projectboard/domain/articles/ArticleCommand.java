@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ArticleCommand {
 
@@ -14,15 +15,11 @@ public class ArticleCommand {
     public static class RegisterReq {
         private String title;
         private String content;
-        private String hashtag;
+
+        private List<String> hashtagNames;
 
         public Article toEntity(Long userId) {
-            return Article.ArticleWithHashtag()
-                    .title(title)
-                    .content(content)
-                    .hashtag(hashtag)
-                    .userId(userId)
-                    .build();
+            return Article.of(title, content, userId);
         }
     }
 
@@ -32,7 +29,7 @@ public class ArticleCommand {
     public static class UpdateReq {
         private String title;
         private String content;
-        private String hashtag;
+        private List<String> hashtagNames;
     }
 
     @Getter
