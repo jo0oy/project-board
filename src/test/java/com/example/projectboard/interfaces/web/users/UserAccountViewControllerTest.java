@@ -6,12 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -49,7 +47,7 @@ class UserAccountViewControllerTest {
 
     }
 
-    @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[성공][view][GET] Account me 페이지 - 인증된 사용자(ROLE_USER)")
     @Test
     void givenNothingWithRoleUserAccount_whenRequestingMeView_thenReturnsMeView() throws Exception {
@@ -74,7 +72,7 @@ class UserAccountViewControllerTest {
                 .andDo(print());
     }
 
-    @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[성공][view][GET] 로그인된 회원정보 수정 페이지 - 인증된 사용자(ROLE_USER)")
     @Test
     void givenNothingWithRoleUserAccount_whenRequestingMeEditView_thenReturnsMeEditView() throws Exception {
@@ -88,12 +86,12 @@ class UserAccountViewControllerTest {
                 .andDo(print());
     }
 
-    @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[성공][view][GET] {username}의 회원정보 페이지 - 인증된 사용자 본인(ROLE_USER)")
     @Test
     void givenUsernameWithAuthorizedUserAccount_whenRequestingUserInfoView_thenReturnsUserInfoView() throws Exception {
         // Given
-        var username = "jo0oy";
+        var username = "userTest";
         // When & Then
         mvc.perform(get("/accounts/" + username))
                 .andExpect(status().isOk())
@@ -103,12 +101,12 @@ class UserAccountViewControllerTest {
                 .andDo(print());
     }
 
-    @WithUserDetails(value = "admin1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "adminTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[성공][view][GET] {username}의 회원정보 페이지 - 인증된 관리자 계정(ROLE_ADMIN)")
     @Test
     void givenUsernameWithAdminAccount_whenRequestingUserInfoView_thenReturnsUserInfoView() throws Exception {
         // Given
-        var username = "jo0oy";
+        var username = "userTest";
         // When & Then
         mvc.perform(get("/accounts/" + username))
                 .andExpect(status().isOk())
@@ -118,12 +116,12 @@ class UserAccountViewControllerTest {
                 .andDo(print());
     }
 
-    @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[실패][view][GET] {username}의 회원정보 페이지 - {username}과 다른 인증된 사용자(ROLE_USER)")
     @Test
     void givenUsernameWithUnAuthorizedUserAccount_whenRequestingUserInfoView_thenRedirectsToLoginPage() throws Exception {
         // Given
-        var username = "yooj";
+        var username = "userTest2";
         // When & Then
         mvc.perform(get("/accounts/" + username))
                 .andExpect(status().isForbidden())
@@ -131,12 +129,12 @@ class UserAccountViewControllerTest {
                 .andReturn();
     }
 
-    @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[성공][view][GET] {username}의 회원정보 수정 페이지 - 인증된 사용자 본인(ROLE_USER)")
     @Test
     void givenUsernameWithAuthorizedUserAccount_whenRequestingUserInfoEditView_thenReturnsUserInfoEditView() throws Exception {
         // Given
-        var username = "jo0oy";
+        var username = "userTest";
         // When & Then
         mvc.perform(get("/accounts/" + username + "/edit"))
                 .andExpect(status().isOk())
@@ -146,12 +144,12 @@ class UserAccountViewControllerTest {
                 .andDo(print());
     }
 
-    @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[실패][view][GET] {username}의 회원정보 수정 페이지 - {username}과 다른 인증된 사용자(ROLE_USER)")
     @Test
     void givenUsernameWithUnAuthorizedUserAccount_whenRequestingUserInfoEditView_thenRedirectsToErrorPage() throws Exception {
         // Given
-        var username = "yooj";
+        var username = "userTest2";
         // When & Then
         mvc.perform(get("/accounts/" + username + "/edit"))
                 .andExpect(status().isForbidden())

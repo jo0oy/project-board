@@ -1,15 +1,18 @@
 package com.example.projectboard.interfaces.web.users;
 
+import com.example.projectboard.application.users.UserAccountCommandService;
 import com.example.projectboard.common.exception.NoAuthorityToUpdateDeleteException;
 import com.example.projectboard.domain.users.UserAccount;
 import com.example.projectboard.domain.users.UserAccountRepository;
 import com.example.projectboard.interfaces.dto.users.UserAccountDto;
+import com.example.projectboard.interfaces.dto.users.UserAccountDtoMapper;
 import com.example.projectboard.util.FormDataEncoder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.TestExecutionEvent;
@@ -68,15 +71,15 @@ class UserAccountCommandControllerTest {
         assertThat(userAccountRepository.count()).isEqualTo(beforeRegister + 1);
     }
 
-    @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[성공][controller][PUT] 유저 정보 수정 테스트 - 인증된 사용자(본인)")
     @Test
     void givenUserIdAndUpdateReq_WhenPutMapping_ThenRedirectToMePage() throws Exception {
 
         //given
         var userId = 1L;
-        var email = "jo0oy@gmail.com";
-        var updateEmail = "jo0oy@naver.com";
+        var email = "userTest@gmail.com";
+        var updateEmail = "userTest@naver.com";
         var updatePhoneNumber = "010-0101-1010";
 
         var updateReq = UserAccountDto.UpdateForm.builder()
@@ -101,15 +104,15 @@ class UserAccountCommandControllerTest {
         assertThat(updatedUser.getPhoneNumber()).isEqualTo(updatePhoneNumber);
     }
 
-    @WithUserDetails(value = "yooj", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "userTest2", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[실패][controller][PUT] 유저 정보 수정 테스트 - 수정 권한이 없는 인증된 사용자")
     @Test
     void givenUserIdAndUpdateReqWithForbiddenUsername_WhenPutMapping_ThenThrowsException() throws Exception {
 
         //given
         var userId = 1L;
-        var email = "jo0oy@gmail.com";
-        var updateEmail = "jo0oy1234@naver.com";
+        var email = "userTest@gmail.com";
+        var updateEmail = "userTest111@naver.com";
         var updatePhoneNumber = "010-0101-1010";
 
         var updateReq = UserAccountDto.UpdateForm.builder()
@@ -130,7 +133,7 @@ class UserAccountCommandControllerTest {
         assertThat(mvcResult.getResolvedException()).isInstanceOf(NoAuthorityToUpdateDeleteException.class);
     }
 
-    @WithUserDetails(value = "admin1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "adminTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[성공][controller][DELETE] 유저 삭제 테스트 - 인증된 관리자 계정")
     @Test
     void givenUserId_WhenDeleteMapping_ThenRedirectToMainPage() throws Exception {
@@ -148,7 +151,7 @@ class UserAccountCommandControllerTest {
         assertThat(userAccountRepository.count()).isEqualTo(beforeDelete - 1);
     }
 
-    @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[실패][controller][DELETE] 유저 삭제 테스트 - 삭제 권한이 없는 인증된 사용자")
     @Test
     void givenUserIdWithForbiddenUsername_WhenDeleteMapping_ThenThrowsException() throws Exception {

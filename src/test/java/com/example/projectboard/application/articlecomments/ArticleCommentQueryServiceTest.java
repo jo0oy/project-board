@@ -25,7 +25,7 @@ class ArticleCommentQueryServiceTest {
     @Test
     void givenCommentId_whenGetComment_thenWorksFine() {
         // given
-        var commentId = 3L;
+        var commentId = 1L;
 
         // when
         var result = sut.getComment(commentId);
@@ -41,8 +41,8 @@ class ArticleCommentQueryServiceTest {
     @Test
     void givenArticleIdAndPageable_whenCommentsByArticleId_thenWorksFine() {
         // given
-        var articleId = 10L;
-        var articleCommentsTotal = 5;
+        var articleId = 2L;
+        var articleCommentsTotal = 3;
         var pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "id"));
 
         // when
@@ -59,7 +59,7 @@ class ArticleCommentQueryServiceTest {
     void givenCreatedAtAndPageable_whenComments_thenWorksFine() {
         // given
         var condition = ArticleCommentCommand.SearchCondition.builder()
-                .createdAt(LocalDateTime.of(2022, 2, 2, 11, 0))
+                .createdAt(LocalDateTime.of(2022, 10, 21, 11, 0))
                 .build();
 
         var pageSize = 20;
@@ -69,7 +69,7 @@ class ArticleCommentQueryServiceTest {
         var result = sut.comments(condition, pageable);
 
         // then
-        assertThat(result.getTotalElements()).isEqualTo(2);
+        assertThat(result.getTotalElements()).isEqualTo(1);
         assertThat(result.getTotalPages()).isEqualTo(1);
     }
 
@@ -96,10 +96,10 @@ class ArticleCommentQueryServiceTest {
     void givenSearchConditionAndPageable_whenComments_thenWorksFine() {
         // given
         var condition = ArticleCommentCommand.SearchCondition.builder()
-                .createdBy("user3")
+                .createdAt(LocalDateTime.of(2022, 10, 1, 11, 0))
+                .createdBy("userTest2")
                 .build();
 
-        var total = 1000 / 3;
         var pageSize = 20;
         var pageable = PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "id"));
 
@@ -107,7 +107,7 @@ class ArticleCommentQueryServiceTest {
         var result = sut.comments(condition, pageable);
 
         // then
-        assertThat(result.getTotalElements()).isEqualTo(total);
+        assertThat(result.getTotalElements()).isEqualTo(1);
     }
 
     @DisplayName("[성공][service] 전체 게시글별 댓글 리스트 조회(group by articleId)")
@@ -119,7 +119,7 @@ class ArticleCommentQueryServiceTest {
         var result = sut.commentsGroupByArticleId();
 
         // then
-        assertThat(result.size()).isEqualTo(200);
-        assertThat(result.get(1L).size()).isEqualTo(5);
+        assertThat(result.size()).isEqualTo(30);
+        assertThat(result.get(2L).size()).isEqualTo(3);
     }
 }

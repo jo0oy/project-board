@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Profile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,14 +45,12 @@ public class JpaRepositoryTest {
     void whenInserting_thenWorksFine() {
         //given
         var previousArticlesCnt = articleRepository.count();
+        var title = "new article title";
+        var content = "new article content!!!";
 
         //when
         articleRepository.save(
-                Article.ArticleWithHashtag()
-                        .title("new article title")
-                        .content("new article content!!!")
-                        .hashtag("#hashtag")
-                        .build()
+                Article.of(title, content, 1L)
         );
 
         //then
@@ -67,7 +64,7 @@ public class JpaRepositoryTest {
         //given
         var article = articleRepository.findById(1L).orElseThrow();
         var updateHashtag = "#springboot";
-        article.update(null, null, updateHashtag);
+        article.update(null, null);
 
         //when
         var updatedArticle = articleRepository.saveAndFlush(article);
