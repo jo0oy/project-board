@@ -26,12 +26,11 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
     public List<Article> findAll(ArticleSearchCondition condition) {
         return queryFactory.selectFrom(article)
                 .where(containsTitle(condition.getTitle()),
-                        containsHashtag(condition.getHashtag()),
                         containsCreatedBy(condition.getCreatedBy()),
                         goeCreatedAt(condition.getCreatedAt()),
                         ltCreatedAt(condition.getCreatedAt())
                 )
-                .orderBy(article.id.desc())
+                .orderBy(article.createdAt.desc())
                 .fetch();
     }
 
@@ -41,7 +40,6 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
         var content
                 = queryFactory.selectFrom(article)
                 .where(containsTitle(condition.getTitle()),
-                        containsHashtag(condition.getHashtag()),
                         containsCreatedBy(condition.getCreatedBy()),
                         goeCreatedAt(condition.getCreatedAt()),
                         ltCreatedAt(condition.getCreatedAt())
@@ -53,7 +51,6 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
         var countQuery
                 = queryFactory.selectFrom(article)
                 .where(containsTitle(condition.getTitle()),
-                        containsHashtag(condition.getHashtag()),
                         containsCreatedBy(condition.getCreatedBy()),
                         goeCreatedAt(condition.getCreatedAt()),
                         ltCreatedAt(condition.getCreatedAt())
@@ -69,10 +66,6 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 
     private BooleanExpression containsTitle(String title) {
         return StringUtils.hasText(title) ? article.title.containsIgnoreCase(title) : null;
-    }
-
-    private BooleanExpression containsHashtag(String hashtag) {
-        return StringUtils.hasText(hashtag) ? article.hashtag.containsIgnoreCase(hashtag) : null;
     }
 
     private BooleanExpression goeCreatedAt(LocalDateTime createdAt) {
