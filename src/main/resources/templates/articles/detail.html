@@ -32,7 +32,11 @@
                           th:text="*{#temporals.format(article.createdAt, 'yyyy-MM-dd HH:mm:ss')}">2022-01-01
                     </time>
                 </p>
-                <p><span id="hashtag" th:text="${article.hashtag}">#java</span></p>
+                <p th:if="${article.hashtagInfos != null and article.hashtagInfos.size() > 0}" th:each="hashtag : ${article.hashtagInfos}">
+                    <span class="badge text-bg-secondary mx-1">
+                        <a class="text-reset" th:text="${hashtag.actualHashtagName}" th:href="@{#}">#java</a>
+                    </span>
+                </p>
             </aside>
         </section>
 

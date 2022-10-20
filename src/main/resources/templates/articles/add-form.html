@@ -62,10 +62,10 @@
         </div>
         <div class="row mb-4 justify-content-md-center">
             <label for="hashtag" class="col-sm-3 col-lg-2 col-form-label text-sm-end">해시태그
-                <span class="fw-lighter" style="font-size: small">('#'포함 필수)</span></label>
+                <span class="fw-lighter" style="font-size: small">('#'포함 필수, 해시태그명 공백 포함 불가(ex. '#red house': 불가), &nbsp;구분자는 ',', '/' 만 가능, 최대 10개 입력 가능)</span></label>
             <div class="col-sm-8 col-lg-8">
                 <input type="text" class="form-control" id="hashtag" name="hashtag"
-                       th:field="*{hashtag}" placeholder="해시태그를 입력하세요. (최대 5개 입력가능)">
+                       th:field="*{hashtagContent}" placeholder="해시태그를 입력하세요. (최대 5개 입력가능)">
             </div>
         </div>
         <div class="row mb-5 justify-content-md-center">

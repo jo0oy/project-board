@@ -2,6 +2,7 @@ package com.example.projectboard.interfaces.api.v1.articles;
 
 import com.example.projectboard.application.articles.ArticleCommandService;
 import com.example.projectboard.common.response.ResultResponse;
+import com.example.projectboard.common.util.HashtagContentUtil;
 import com.example.projectboard.interfaces.dto.articles.ArticleDto;
 import com.example.projectboard.interfaces.dto.articles.ArticleDtoMapper;
 import com.example.projectboard.security.PrincipalUserAccount;
@@ -24,9 +25,9 @@ public class ArticleCommandApiController {
     @PostMapping("/api/v1/articles")
     public ResponseEntity<?> registerArticle(@RequestBody ArticleDto.RegisterReq req,
                                              @AuthenticationPrincipal PrincipalUserAccount userAccount) {
-
+        var hashtagNames = HashtagContentUtil.convertToList(req.getHashtagContent());
         var registeredArticle
-                = articleCommandService.registerArticle(userAccount.getUsername(), articleDtoMapper.toCommand(req));
+                = articleCommandService.registerArticle(userAccount.getUsername(), articleDtoMapper.toCommand(req, hashtagNames));
 
         var data = articleDtoMapper.toDto(registeredArticle);
 
@@ -39,7 +40,8 @@ public class ArticleCommandApiController {
                                            @RequestBody ArticleDto.UpdateReq req,
                                            @AuthenticationPrincipal PrincipalUserAccount userAccount) {
 
-        articleCommandService.update(id, userAccount.getUsername(), articleDtoMapper.toCommand(req));
+        var hashtagNames = HashtagContentUtil.convertToList(req.getHashtagContent());
+        articleCommandService.update(id, userAccount.getUsername(), articleDtoMapper.toCommand(req, hashtagNames));
 
         return ResponseEntity.ok()
                 .body(ResultResponse.success("게시글 수정 성공"));
