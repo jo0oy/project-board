@@ -1,6 +1,7 @@
 package com.example.projectboard.interfaces.web.articles;
 
 import com.example.projectboard.application.articles.ArticleCommandService;
+import com.example.projectboard.common.util.HashtagContentUtil;
 import com.example.projectboard.interfaces.dto.articles.ArticleDto;
 import com.example.projectboard.interfaces.dto.articles.ArticleDtoMapper;
 import com.example.projectboard.security.PrincipalUserAccount;
@@ -13,6 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -28,12 +30,19 @@ public class ArticleCommandController {
                                   @Valid @ModelAttribute("registerForm") ArticleDto.RegisterForm form,
                                   BindingResult bindingResult) {
 
+        // hashtagContent 검증 로직 실행
+        var hashtagNames = HashtagContentUtil.convertToList(form.getHashtagContent());
+
+        verifyHashtagContent(hashtagNames, bindingResult);
+
+        // 검증 오류 발생시 이전 뷰에 오류 담아서 반환.
         if (bindingResult.hasErrors()) {
             log.debug("errors={}", bindingResult);
             return "articles/add-form";
         }
 
-        articleCommandService.registerArticle(principalUserAccount.getUsername(), articleDtoMapper.toCommand(form));
+        articleCommandService.registerArticleWithValidHashtags(principalUserAccount.getUsername(),
+                articleDtoMapper.toCommand(form, hashtagNames));
 
         return "redirect:/articles";
     }
@@ -45,12 +54,18 @@ public class ArticleCommandController {
                                 @Valid @ModelAttribute("updateForm") ArticleDto.UpdateForm updateForm,
                                 BindingResult bindingResult) {
 
+        // hashtagContent 검증 로직 실행
+        var hashtagNames = HashtagContentUtil.convertToList(updateForm.getHashtagContent());
+
+        verifyHashtagContent(hashtagNames, bindingResult);
+
+        // 검증 오류 발생시 이전 뷰에 오류 담아서 반환.
         if (bindingResult.hasErrors()) {
             log.debug("errors={}", bindingResult);
             return "articles/edit-form";
         }
 
-        articleCommandService.update(id, principalUserAccount.getUsername(), articleDtoMapper.toCommand(updateForm));
+        articleCommandService.update(id, principalUserAccount.getUsername(), articleDtoMapper.toCommand(updateForm, hashtagNames));
 
         return "redirect:/articles/" + id;
     }
@@ -63,5 +78,17 @@ public class ArticleCommandController {
         articleCommandService.delete(id, principalUserAccount.getUsername());
 
         return "redirect:/articles";
+    }
+
+    private void verifyHashtagContent(List<String> hashtagNames, BindingResult bindingResult) {
+        if (HashtagContentUtil.verifyFormat(hashtagNames)) {
+            bindingResult.rejectValue("hashtagContent", "Format");
+            log.debug("errors={}", bindingResult);
+        }
+
+        if (HashtagContentUtil.verifyHashtagSize(hashtagNames)) {
+            bindingResult.rejectValue("hashtagContent", "Size");
+            log.debug("errors={}", bindingResult);
+        }
     }
 }

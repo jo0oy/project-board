@@ -102,12 +102,12 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
 
     @Override
     public boolean verifyDuplicateUsername(String username) {
-        return userAccountRepository.findByUsername(username).isEmpty();
+        return !userAccountRepository.existsByUsername(username);
     }
 
     @Override
     public boolean verifyDuplicateEmail(String email) {
-        return userAccountRepository.findByEmail(email).isEmpty();
+        return !userAccountRepository.existsByEmail(email);
     }
 
     private void verifyDuplicateUsernameEmail(String username, String email) {

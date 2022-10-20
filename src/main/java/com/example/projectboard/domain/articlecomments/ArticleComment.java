@@ -48,9 +48,9 @@ public class ArticleComment extends JpaAuditingFields {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ArticleComment)) return false;
+        if (o == null || this.getClass() != o.getClass()) return false;
         ArticleComment comment = (ArticleComment) o;
-        return id != null && id.equals(comment.id);
+        return this.getId() != null && this.getId().equals(comment.getId());
     }
 
     @Override

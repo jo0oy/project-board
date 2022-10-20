@@ -10,6 +10,6 @@ public interface ArticleRepository extends
 
     @Modifying(clearAutomatically = true)
     @Query("DELETE FROM Article a WHERE a.userId = :userId")
-    void deleteByUserAccountId(@Param("userId") Long userId);
+    void bulkDeleteByUserAccount_Id(@Param("userId") Long userId);
 }
 

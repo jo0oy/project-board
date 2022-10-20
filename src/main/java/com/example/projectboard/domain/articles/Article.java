@@ -1,25 +1,28 @@
 package com.example.projectboard.domain.articles;
 
 import com.example.projectboard.domain.JpaAuditingFields;
+import com.example.projectboard.domain.articles.articlehashtags.ArticleHashtag;
 import lombok.*;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Getter
-@ToString
+@ToString(exclude = "hashtags")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "articles", indexes = {
         @Index(columnList = "title"),
-        @Index(columnList = "hashtag"),
         @Index(columnList = "createdAt"),
         @Index(columnList = "createdBy")
 })
 @Entity
 public class Article extends JpaAuditingFields {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "article_id")
     private Long id;
 
@@ -29,54 +32,63 @@ public class Article extends JpaAuditingFields {
     @Column(nullable = false, length = 10000)
     private String content; // 본문
 
-    private String hashtag; // 해시태그
-
     @Column(nullable = false, updatable = false)
     private Long userId; // 연관관계 매핑: UserAccount id
 
-    @Builder(builderClassName = "ArticleWithoutHashtag", builderMethodName = "ArticleWithoutHashtag")
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private Set<ArticleHashtag> hashtags = new LinkedHashSet<>(); // 게시물에 달린 해시태그 Set
+
+
     private Article(String title,
-                   String content,
-                   Long userId) {
+                    String content,
+                    Long userId) {
 
         this.title = title;
         this.content = content;
         this.userId = userId;
     }
 
-    @Builder(builderClassName = "ArticleWithHashtag", builderMethodName = "ArticleWithHashtag")
-    private Article(String title,
-                   String content,
-                   String hashtag,
-                   Long userId) {
 
-        this.title = title;
-        this.content = content;
-        this.hashtag = hashtag;
-        this.userId = userId;
+    // 생성 메서드 -> hashtags 제외
+    public static Article of(String title,
+                             String content,
+                             Long userId) {
+        return new Article(title, content, userId);
     }
 
-    // 수정 메서드
+    // 연관관계 메서드
+    public void addHashtagArticle(ArticleHashtag articleHashtag) {
+        this.hashtags.add(articleHashtag);
+        articleHashtag.setArticle(this);
+    }
+
+    public void addHashtags(Set<ArticleHashtag> hashtags) {
+        this.hashtags.addAll(hashtags);
+    }
+
+    // 비즈니스 로직 메서드
     public void update(String title,
-                       String content,
-                       String hashtag) {
+                       String content) {
 
-        if(StringUtils.hasText(title)) this.title = title;
-        if(StringUtils.hasText(content)) this.content = content;
-        this.hashtag = hashtag;
+        if (StringUtils.hasText(title)) this.title = title;
+        if (StringUtils.hasText(content)) this.content = content;
+    }
+
+    public void clearHashtags() {
+        this.hashtags.clear();
     }
 
     // equals & hashcode override
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || this.getClass() != o.getClass()) return false;
         Article article = (Article) o;
-        return id != null && id.equals(article.id);
+        return this.getId() != null && this.getId().equals(article.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(this.id);
     }
 }

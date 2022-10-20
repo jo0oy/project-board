@@ -94,15 +94,15 @@ public class UserAccount extends JpaAuditingDateTimeFields {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        UserAccount userAccount = (UserAccount) obj;
-        return id != null && id.equals(userAccount.id);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserAccount userAccount = (UserAccount) o;
+        return this.getId() != null && this.getId().equals(userAccount.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(this.getId());
     }
 }

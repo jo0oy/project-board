@@ -38,7 +38,7 @@ class CommentCommandControllerTest {
     @Autowired
     private FormDataEncoder encoder;
 
-    @WithUserDetails(value = "user3", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "userTest3", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[성공][controller][POST] 댓글 등록 테스트 - 인증된 사용자")
     @Test
     void givenRegisterReq_WhenPostMapping_ThenRedirectToDetailPage() throws Exception {
@@ -86,13 +86,13 @@ class CommentCommandControllerTest {
                 .andExpect(redirectedUrlPattern("**/login"));
     }
 
-    @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[성공][controller][PUT] 댓글 수정 테스트 - 인증된 사용자[본인]")
     @Test
     void givenCommentIdAndUpdateReq_WhenPutMapping_ThenRedirectToDetailPage() throws Exception {
         //given
-        var commentId = 3L; // createdBy 'jo0oy'
-        var articleId = 4L;
+        var commentId = 2L; // createdBy 'userTest'
+        var articleId = 3L;
         var updateCommentBody = "수정한 내용입니다.";
 
         var updateReq = ArticleCommentDto.UpdateForm.builder()
@@ -115,13 +115,13 @@ class CommentCommandControllerTest {
         assertThat(updatedComment.getCommentBody()).isEqualTo(updateCommentBody);
     }
 
-    @WithUserDetails(value = "user3", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "userTest3", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[실패][controller][PUT] 댓글 수정 테스트 - 수정 권한없는 인증된 사용자")
     @Test
     void givenCommentIdAndUpdateReqWithForbiddenUsername_WhenPutMapping_ThenReturnsForbiddenError() throws Exception {
         //given
-        var commentId = 3L; // createdBy jo0oy
-        var articleId = 4L;
+        var commentId = 2L; // createdBy 'userTest'
+        var articleId = 3L;
         var updateForm = "수정한 내용입니다.";
 
         var updateReq = ArticleCommentDto.UpdateForm.builder()
@@ -140,7 +140,7 @@ class CommentCommandControllerTest {
         assertThat(mvcResult.getResolvedException()).isInstanceOf(NoAuthorityToUpdateDeleteException.class);
     }
 
-    @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[실패][controller][PUT] 댓글 수정 테스트 - 존재하지 않는 댓글")
     @Test
     void givenNonExistCommentIdAndUpdateReq_WhenPutMapping_ThenReturnsClientError() throws Exception {
@@ -165,7 +165,7 @@ class CommentCommandControllerTest {
         assertThat(mvcResult.getResolvedException()).isInstanceOf(EntityNotFoundException.class);
     }
 
-    @WithUserDetails(value = "yooj", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "userTest2", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[성공][controller][DELETE] 댓글 삭제 테스트 - 인증된 사용자[본인]")
     @Test
     void givenCommentId_WhenDeleteMapping_ThenRedirectToDetailPage() throws Exception {
@@ -187,7 +187,7 @@ class CommentCommandControllerTest {
         assertThat(beforeDeleteTotal).isEqualTo(commentRepository.count() + 1);
     }
 
-    @WithUserDetails(value = "admin1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "adminTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[성공][controller][DELETE] 댓글 삭제 테스트 - 관리자 계정")
     @Test
     void givenCommentIdWithAdminAccount_WhenDeleteMapping_ThenRedirectToDetailPage() throws Exception {
@@ -209,7 +209,7 @@ class CommentCommandControllerTest {
         assertThat(beforeDeleteTotal).isEqualTo(commentRepository.count() + 1);
     }
 
-    @WithUserDetails(value = "user5", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "userTest3", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[성공][controller][DELETE] 댓글 삭제 테스트 - 삭제 권한이 없는 인증된 사용자")
     @Test
     void givenCommentIdWithForbiddenUsername_WhenDeleteMapping_ThenReturnsForbiddenError() throws Exception {
@@ -229,7 +229,7 @@ class CommentCommandControllerTest {
         assertThat(mvcResult.getResolvedException()).isInstanceOf(NoAuthorityToUpdateDeleteException.class);
     }
 
-    @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[실패][controller][DELETE] 게시글 삭제 테스트 - 존재하지 않는 댓글")
     @Test
     void givenNonExistCommentId_WhenDeleteMapping_ThenReturnsClientError() throws Exception {

@@ -47,7 +47,7 @@ class ArticleCommandControllerTest {
         var registerForm = ArticleDto.RegisterForm.builder()
                 .title(title)
                 .content(content)
-                .hashtag(hashtag)
+                .hashtagContent(hashtag)
                 .build();
 
         var beforeRegister = articleRepository.count();
@@ -79,7 +79,7 @@ class ArticleCommandControllerTest {
                 .articleId(articleId)
                 .title(updateTitle)
                 .content(updateContent)
-                .hashtag(updateHashtag)
+//                .hashtag(updateHashtag)
                 .build();
 
         //when & then
@@ -96,7 +96,7 @@ class ArticleCommandControllerTest {
         assertThat(updatedArticle).isNotNull();
         assertThat(updatedArticle.getTitle()).isEqualTo(updateTitle);
         assertThat(updatedArticle.getContent()).isEqualTo(updateContent);
-        assertThat(updatedArticle.getHashtag()).isEqualTo(updateHashtag);
+//        assertThat(updatedArticle.getHashtag()).isEqualTo(updateHashtag);
     }
 
     @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
@@ -114,7 +114,7 @@ class ArticleCommandControllerTest {
                 .articleId(articleId)
                 .title(updateTitle)
                 .content(updateContent)
-                .hashtag(updateHashtag)
+//                .hashtag(updateHashtag)
                 .build();
 
         //when & then
@@ -143,7 +143,7 @@ class ArticleCommandControllerTest {
                 .articleId(articleId)
                 .title(updateTitle)
                 .content(updateContent)
-                .hashtag(updateHashtag)
+//                .hashtag(updateHashtag)
                 .build();
 
         //when & then

@@ -65,7 +65,15 @@
             <label for="hashtag" class="col-sm-3 col-lg-2 col-form-label text-sm-end">해시태그
                 <span class="fw-lighter" style="font-size: small">('#'포함 필수)</span></label>
             <div class="col-sm-8 col-lg-8">
-                <input type="text" class="form-control" id="hashtag" name="hashtag" th:field="*{hashtag}">
+                <input type="text" class="form-control" id="hashtag" name="hashtag" th:field="*{hashtagContent}">
+            </div>
+        </div>
+        <div class="row mb-3 justify-content-md-center">
+            <div class="col-sm-2 col-lg-1 col-form-label text-sm-end"></div>
+            <div class="col-sm-8 col-lg-9">
+                <div class="error-message text-small text-danger" th:errors="*{hashtagContent}">
+                    검증 오류
+                </div>
             </div>
         </div>
         <div class="row mb-5 justify-content-md-center">

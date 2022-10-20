@@ -117,7 +117,11 @@
             <tr th:each="article : ${articles}">
                 <td class="title"><a th:text="${article.title}"
                                      th:href="@{/articles/{id}(id=${article.articleId})}">첫글</a></td>
-                <td class="hashtag" th:text="${article.hashtag}">#java</td>
+                <td class="hashtag">
+                    <span class="badge text-bg-secondary mx-1" th:each="hashtag : ${article.hashtagInfos}">
+                        <a class="text-reset" th:text="${hashtag.actualHashtagName}" th:href="@{#}">#java</a>
+                    </span>
+                </td>
                 <td class="user-id" th:text="${article.createdBy}">Uno</td>
                 <td class="created-at" th:datetime="${article.createdAt}"
                     th:text="*{#temporals.format(article.createdAt, 'yyyy-MM-dd')}">

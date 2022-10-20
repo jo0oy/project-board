@@ -26,14 +26,14 @@ class ArticleCommentCommandServiceTest {
     @Autowired
     private ArticleCommentCommandService sut;
 
-    @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[성공][service] 게시글 댓글 등록 테스트")
     @Test
     void givenRegisterReq_WhenRegisterComment_WorksFine() {
         // given
-        var articleId = 3L;
+        var articleId = 1L;
         var content = "새로운 댓글 등록 테스트입니다.";
-        var username = "jo0oy";
+        var username = "userTest";
         var req = ArticleCommentCommand.RegisterReq
                 .builder()
                 .articleId(articleId)
@@ -72,7 +72,7 @@ class ArticleCommentCommandServiceTest {
     void givenUpdateReqWithAuthorizedUsername_WhenUpdate_WorksFine() {
         // given
         var updateCommentId = 1L;
-        var username = "yooj";
+        var username = "userTest2";
         var updateContent = "업데이트할 댓글 내용입니다.";
         var req = ArticleCommentCommand.UpdateReq
                 .builder()
@@ -93,8 +93,8 @@ class ArticleCommentCommandServiceTest {
     @Test
     void givenUpdateReqWithNotAuthorizedUsername_WhenUpdate_ThenThrowsException() {
         // given
-        var updateCommentId = 3L;
-        var username = "yooj";
+        var updateCommentId = 2L;
+        var username = "userTest2";
         var updateContent = "업데이트할 댓글 내용입니다.";
         var req = ArticleCommentCommand.UpdateReq
                 .builder()
@@ -111,8 +111,8 @@ class ArticleCommentCommandServiceTest {
     @Test
     void givenCommentIdWithNotAuthorizedUsername_WhenDelete_ThenThrowsException() {
         // given
-        var commentId = 5L;
-        var username = "yooj";
+        var commentId = 3L;
+        var username = "userTest";
 
         // when & then
         Assertions.assertThatThrownBy(() -> sut.delete(commentId, username))
@@ -124,8 +124,8 @@ class ArticleCommentCommandServiceTest {
     @Test
     void givenCommentIdWithAuthorizedUsername_WhenDelete_WorksFine() {
         // given
-        var commentId = 6L;
-        var username = "jo0oy";
+        var commentId = 4L;
+        var username = "userTest";
         var beforeDeleteTotal = articleCommentRepository.count();
 
         // when

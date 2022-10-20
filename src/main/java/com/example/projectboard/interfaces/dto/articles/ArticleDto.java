@@ -28,7 +28,7 @@ public class ArticleDto {
         @NotBlank @Size(min = 10, max = 10000)
         private String content;
 
-        private String hashtag;
+        private String hashtagContent;
     }
 
     @Getter
@@ -42,7 +42,7 @@ public class ArticleDto {
         @NotBlank @Size(min = 10, max = 10000)
         private String content;
 
-        private String hashtag;
+        private String hashtagContent;
     }
 
     @Getter
@@ -56,7 +56,7 @@ public class ArticleDto {
         @NotBlank @Size(min = 10, max = 10000)
         private String content;
 
-        private String hashtag;
+        private String hashtagContent;
     }
 
     @Getter
@@ -73,7 +73,7 @@ public class ArticleDto {
         @NotBlank @Size(min = 10, max = 10000)
         private String content;
 
-        private String hashtag;
+        private String hashtagContent;
     }
 
     @Getter
@@ -127,7 +127,7 @@ public class ArticleDto {
         private Long userId;
         private String title;
         private String content;
-        private String hashtag;
+        private List<HashtagInfoResponse> hashtagInfos;
         private String createdBy;
         private LocalDateTime createdAt;
     }
@@ -140,10 +140,19 @@ public class ArticleDto {
         private Long userId;
         private String title;
         private String content;
-        private String hashtag;
+        private List<HashtagInfoResponse> hashtagInfos;
         private String createdBy;
         private LocalDateTime createdAt;
         private List<CommentInfoResponse> comments;
+    }
+
+    @Getter
+    @ToString
+    @Builder
+    public static class HashtagInfoResponse {
+        private Long hashtagId;
+        private String actualHashtagName;
+        private String hashtagName;
     }
 
     @Getter

@@ -25,7 +25,7 @@ public class UserAccountCommandController {
     @PostMapping("/accounts/sign-up")
     public String registerUser(@Valid @ModelAttribute("registerForm") UserAccountDto.RegisterForm registerForm,
                                BindingResult bindingResult) {
-
+        
         // 중복 아이디 검증
         if (!userAccountCommandService.verifyDuplicateUsername(registerForm.getUsername())) {
             log.debug("중복된 아이디입니다! username={}", registerForm.getUsername());

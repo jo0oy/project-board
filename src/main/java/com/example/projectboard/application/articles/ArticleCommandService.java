@@ -7,6 +7,8 @@ public interface ArticleCommandService {
 
     ArticleInfo.MainInfo registerArticle(String principalUsername, ArticleCommand.RegisterReq command);
 
+    ArticleInfo.MainInfo registerArticleWithValidHashtags(String principalUsername, ArticleCommand.RegisterReq command);
+
     void update(Long articleId, String principalUsername, ArticleCommand.UpdateReq command);
 
     void delete(Long articleId, String principalUsername);

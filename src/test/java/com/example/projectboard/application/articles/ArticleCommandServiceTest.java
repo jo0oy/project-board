@@ -2,6 +2,7 @@ package com.example.projectboard.application.articles;
 
 import com.example.projectboard.common.exception.NoAuthorityToUpdateDeleteException;
 import com.example.projectboard.common.exception.UsernameNotFoundException;
+import com.example.projectboard.common.util.HashtagContentUtil;
 import com.example.projectboard.config.JpaConfig;
 import com.example.projectboard.domain.articlecomments.ArticleCommentRepository;
 import com.example.projectboard.domain.articles.ArticleCommand;
@@ -14,8 +15,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,29 +26,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 class ArticleCommandServiceTest {
 
-    @Autowired
+    @PersistenceContext
     private EntityManager em;
+
     @Autowired
     private ArticleCommandService sut;
+
     @Autowired
     private ArticleRepository articleRepository;
 
     @Autowired
     private ArticleCommentRepository articleCommentRepository;
 
-    @WithUserDetails(value = "jo0oy", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[성공][service] 게시물 등록 테스트")
     @Test
     void givenRegisterReq_whenRegisterArticle_thenWorksFine() {
         // given
         var title = "새 게시글 제목";
         var content = "새 게시글 내용입니다!!";
-        var hashtag = "#newPost";
-        var username = "jo0oy";
+        var hashtagContent = "#newPost,#hashtag,#oohlala,#Happy, #happy";
+        var username = "userTest";
         var req = ArticleCommand.RegisterReq.builder()
                 .title(title)
                 .content(content)
-                .hashtag(hashtag)
+                .hashtagNames(HashtagContentUtil.convertToList(hashtagContent))
                 .build();
 
         // when
@@ -54,7 +59,7 @@ class ArticleCommandServiceTest {
         // then
         assertThat(result.getTitle()).isEqualTo(title);
         assertThat(result.getContent()).isEqualTo(content);
-        assertThat(result.getHashtag()).isEqualTo(hashtag);
+        assertThat(result.getHashtagInfos().size()).isEqualTo(5);
     }
 
     @DisplayName("[실패][service] 게시물 등록 테스트 - 존재하지 않는 사용자")
@@ -63,12 +68,12 @@ class ArticleCommandServiceTest {
         // given
         var title = "새 게시글 제목";
         var content = "새 게시글 내용입니다!!";
-        var hashtag = "#newPost";
+        var hashtagContent = "#newPost,#hashtag,#oohlala,#Happy, #happy";
         var username = "noneUser";
         var req = ArticleCommand.RegisterReq.builder()
                 .title(title)
                 .content(content)
-                .hashtag(hashtag)
+                .hashtagNames(HashtagContentUtil.convertToList(hashtagContent))
                 .build();
 
         // when & then
@@ -77,22 +82,27 @@ class ArticleCommandServiceTest {
                 .hasMessage("유저를 찾을 수 없습니다. username=" + username);
     }
 
+    @Transactional
+    @WithUserDetails(value = "userTest2", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[성공][service] 게시물 수정 테스트 - 수정 권한 있는 사용자")
     @Test
     void givenUpdateReqWithAuthorizedUsername_whenUpdate_thenArticleUpdated() {
+
         // given
-        var articleId = 4L;
-        var username = "jo0oy";
+        var articleId = 1L;
+        var username = "userTest2";
         var updateTitle = "수정할 게시글 제목";
         var updateContent = "수정할 게시글 내용입니다.";
-        var req = ArticleCommand.UpdateReq
+        var updateReq = ArticleCommand.UpdateReq
                 .builder()
                 .title(updateTitle)
                 .content(updateContent)
+                .hashtagNames(HashtagContentUtil.convertToList("#newyork,  #EmpireStates"))
                 .build();
 
         // when
-        sut.update(articleId, username, req);
+        sut.update(articleId, username, updateReq);
+        em.flush();
         em.clear();
 
         // then
@@ -108,8 +118,8 @@ class ArticleCommandServiceTest {
     @Test
     void givenUpdateReqWithNoneAuthorizedUsername_whenUpdate_thenThrowsException() {
         // given
-        var articleId = 4L;
-        var username = "yooj";
+        var articleId = 1L;
+        var username = "userTest";
         var updateTitle = "수정할 게시글 제목";
         var updateContent = "수정할 게시글 내용입니다.";
         var req = ArticleCommand.UpdateReq
@@ -128,8 +138,8 @@ class ArticleCommandServiceTest {
     @Test
     void givenArticleIdWithAuthorizedUsername_whenDelete_thenDeleteCommentsAndArticle() {
         // given
-        var articleId = 1L;
-        var username = "yooj";
+        var articleId = 2L;
+        var username = "userTest";
         var beforeDeleteCommentListSize = articleCommentRepository.findByArticleId(articleId).size();
 
         // when
@@ -149,8 +159,8 @@ class ArticleCommandServiceTest {
     @Test
     void givenArticleIdWithNoneAuthorizedUsername_whenDelete_thenThrowsException() {
         // given
-        var articleId = 1L;
-        var username = "jo0oy";
+        var articleId = 3L;
+        var username = "userTest";
 
         // when & then
         Assertions.assertThatThrownBy(() -> sut.delete(articleId, username))
