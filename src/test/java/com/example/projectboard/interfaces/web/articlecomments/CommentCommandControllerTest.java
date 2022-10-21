@@ -1,16 +1,24 @@
 package com.example.projectboard.interfaces.web.articlecomments;
 
+import com.example.projectboard.application.articlecomments.ArticleCommentCommandService;
 import com.example.projectboard.common.exception.EntityNotFoundException;
 import com.example.projectboard.common.exception.NoAuthorityToUpdateDeleteException;
-import com.example.projectboard.domain.articlecomments.ArticleCommentRepository;
+import com.example.projectboard.config.TestSecurityConfig;
+import com.example.projectboard.domain.articlecomments.ArticleCommentCommand;
+import com.example.projectboard.domain.articlecomments.ArticleCommentInfo;
 import com.example.projectboard.interfaces.dto.articlecomments.ArticleCommentDto;
+import com.example.projectboard.interfaces.dto.articlecomments.ArticleCommentDtoMapper;
+import com.example.projectboard.interfaces.dto.articlecomments.ArticleCommentDtoMapperImpl;
 import com.example.projectboard.interfaces.dto.articles.ArticleDto;
 import com.example.projectboard.util.FormDataEncoder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.TestExecutionEvent;
@@ -20,25 +28,30 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@Import(FormDataEncoder.class)
+@Import({FormDataEncoder.class, TestSecurityConfig.class})
+@ComponentScan(basePackageClasses = {ArticleCommentDtoMapper.class, ArticleCommentDtoMapperImpl.class})
 @AutoConfigureMockMvc
+@WebMvcTest(controllers = CommentCommandController.class)
 class CommentCommandControllerTest {
 
     @Autowired
     private MockMvc mvc;
 
     @Autowired
-    private ArticleCommentRepository commentRepository;
-
-    @Autowired
     private FormDataEncoder encoder;
 
-    @WithUserDetails(value = "userTest3", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @SpyBean
+    private ArticleCommentDtoMapper commentDtoMapper;
+
+    @MockBean
+    private ArticleCommentCommandService commentCommandService;
+
+    @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[성공][controller][POST] 댓글 등록 테스트 - 인증된 사용자")
     @Test
     void givenRegisterReq_WhenPostMapping_ThenRedirectToDetailPage() throws Exception {
@@ -46,24 +59,22 @@ class CommentCommandControllerTest {
         var articleId = 1L;
         var content = "새로운 댓글 내용입니다.";
         var article = ArticleDto.ArticleWithCommentsResponse.builder().build();
-        var registerReq = ArticleCommentDto.RegisterForm.builder()
-                .parentArticleId(articleId)
-                .commentBody(content)
-                .build();
+        var registerForm = getRegisterForm(articleId, content);
 
-        var beforeRegister = commentRepository.count();
+        given(commentCommandService.registerComment(anyString(), any(ArticleCommentCommand.RegisterReq.class)))
+                .willReturn(any(ArticleCommentInfo.MainInfo.class));
 
         //when & then
         mvc.perform(post("/article-comments")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .sessionAttr("article", article)
-                        .content(encoder.encode(registerReq))
+                        .content(encoder.encode(registerForm))
                         .with(csrf())
                 ).andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/articles/" + articleId))
                 .andExpect(view().name("redirect:/articles/" + articleId));
 
-        assertThat(commentRepository.count()).isEqualTo(beforeRegister + 1);
+        then(commentCommandService).should().registerComment(anyString(), any(ArticleCommentCommand.RegisterReq.class));
     }
 
     @DisplayName("[실패][controller][POST] 댓글 등록 테스트 - 미인증된 사용자일 경우 로그인 페이지로 이동")
@@ -72,10 +83,7 @@ class CommentCommandControllerTest {
         //given
         var articleId = 1L;
         var content = "새로운 댓글 내용입니다.";
-        var registerReq = ArticleCommentDto.RegisterReq.builder()
-                .articleId(articleId)
-                .commentBody(content)
-                .build();
+        var registerReq = getRegisterReq(articleId, content);
 
         //when & then
         mvc.perform(post("/article-comments")
@@ -95,27 +103,46 @@ class CommentCommandControllerTest {
         var articleId = 3L;
         var updateCommentBody = "수정한 내용입니다.";
 
-        var updateReq = ArticleCommentDto.UpdateForm.builder()
-                .parentArticleId(articleId)
-                .updateCommentBody(updateCommentBody)
-                .build();
+        var updateForm = getUpdateForm(articleId, updateCommentBody);
+
+        willDoNothing().given(commentCommandService)
+                .update(anyLong(), anyString(), any(ArticleCommentCommand.UpdateReq.class));
 
         //when & then
         mvc.perform(put("/article-comments/" + commentId)
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .content(encoder.encode(updateReq))
+                        .content(encoder.encode(updateForm))
                         .with(csrf())
                 ).andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/articles/" + articleId))
                 .andExpect(view().name("redirect:/articles/" + articleId));
 
-        var updatedComment = commentRepository.findById(commentId).orElse(null);
-
-        assertThat(updatedComment).isNotNull();
-        assertThat(updatedComment.getCommentBody()).isEqualTo(updateCommentBody);
+        then(commentCommandService).should()
+                .update(anyLong(), anyString(), any(ArticleCommentCommand.UpdateReq.class));
     }
 
-    @WithUserDetails(value = "userTest3", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @DisplayName("[실패][controller][PUT] 댓글 수정 테스트 - 인증되지 않은 사용자")
+    @Test
+    void givenNotAuthenticatedUser_WhenPutMapping_ThenRedirectToLoginPage() throws Exception {
+        //given
+        var commentId = 2L; // createdBy 'userTest'
+        var articleId = 3L;
+        var updateForm = "수정한 내용입니다.";
+
+        var updateReq = getUpdateForm(articleId, updateForm);
+
+        //when & then
+        mvc.perform(put("/article-comments/" + commentId)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .content(encoder.encode(updateReq))
+                .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("**/login"));
+
+        then(commentCommandService).shouldHaveNoInteractions();
+    }
+
+    @WithUserDetails(value = "userTest2", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[실패][controller][PUT] 댓글 수정 테스트 - 수정 권한없는 인증된 사용자")
     @Test
     void givenCommentIdAndUpdateReqWithForbiddenUsername_WhenPutMapping_ThenReturnsForbiddenError() throws Exception {
@@ -124,10 +151,10 @@ class CommentCommandControllerTest {
         var articleId = 3L;
         var updateForm = "수정한 내용입니다.";
 
-        var updateReq = ArticleCommentDto.UpdateForm.builder()
-                .parentArticleId(articleId)
-                .updateCommentBody(updateForm)
-                .build();
+        var updateReq = getUpdateForm(articleId, updateForm);
+
+        willThrow(NoAuthorityToUpdateDeleteException.class).given(commentCommandService)
+                .update(anyLong(), anyString(), any(ArticleCommentCommand.UpdateReq.class));
 
         //when & then
         var mvcResult = mvc.perform(put("/article-comments/" + commentId)
@@ -138,6 +165,9 @@ class CommentCommandControllerTest {
 
         assertThat(mvcResult.getResolvedException()).isNotNull();
         assertThat(mvcResult.getResolvedException()).isInstanceOf(NoAuthorityToUpdateDeleteException.class);
+
+        then(commentCommandService).should()
+                .update(anyLong(), anyString(), any(ArticleCommentCommand.UpdateReq.class));
     }
 
     @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
@@ -149,10 +179,10 @@ class CommentCommandControllerTest {
         var articleId = 2L;
         var updateCommentBody = "수정한 댓글 내용입니다.";
 
-        var updateForm = ArticleCommentDto.UpdateForm.builder()
-                .parentArticleId(articleId)
-                .updateCommentBody(updateCommentBody)
-                .build();
+        var updateForm = getUpdateForm(articleId, updateCommentBody);
+
+        willThrow(EntityNotFoundException.class).given(commentCommandService)
+                .update(anyLong(), anyString(), any(ArticleCommentCommand.UpdateReq.class));
 
         //when & then
         var mvcResult = mvc.perform(put("/article-comments/" + commentId)
@@ -163,6 +193,8 @@ class CommentCommandControllerTest {
 
         assertThat(mvcResult.getResolvedException()).isNotNull();
         assertThat(mvcResult.getResolvedException()).isInstanceOf(EntityNotFoundException.class);
+        then(commentCommandService).should()
+                .update(anyLong(), anyString(), any(ArticleCommentCommand.UpdateReq.class));
     }
 
     @WithUserDetails(value = "userTest2", setupBefore = TestExecutionEvent.TEST_EXECUTION)
@@ -172,7 +204,8 @@ class CommentCommandControllerTest {
         //given
         var commentId = 1L;
         var articleId = 2L;
-        var beforeDeleteTotal = commentRepository.count();
+
+        willDoNothing().given(commentCommandService).delete(anyLong(), anyString());
 
         //when & then
         mvc.perform(delete("/article-comments/" + commentId)
@@ -184,7 +217,7 @@ class CommentCommandControllerTest {
                 .andExpect(redirectedUrl("/articles/" + articleId))
                 .andExpect(view().name("redirect:/articles/" + articleId));
 
-        assertThat(beforeDeleteTotal).isEqualTo(commentRepository.count() + 1);
+        then(commentCommandService).should().delete(anyLong(), anyString());
     }
 
     @WithUserDetails(value = "adminTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
@@ -194,7 +227,8 @@ class CommentCommandControllerTest {
         //given
         var commentId = 4L;
         var articleId = 5L;
-        var beforeDeleteTotal = commentRepository.count();
+
+        willDoNothing().given(commentCommandService).delete(anyLong(), anyString());
 
         //when & then
         mvc.perform(delete("/article-comments/" + commentId)
@@ -206,16 +240,19 @@ class CommentCommandControllerTest {
                 .andExpect(redirectedUrl("/articles/" + articleId))
                 .andExpect(view().name("redirect:/articles/" + articleId));
 
-        assertThat(beforeDeleteTotal).isEqualTo(commentRepository.count() + 1);
+        then(commentCommandService).should().delete(anyLong(), anyString());
     }
 
-    @WithUserDetails(value = "userTest3", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "userTest2", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[성공][controller][DELETE] 댓글 삭제 테스트 - 삭제 권한이 없는 인증된 사용자")
     @Test
     void givenCommentIdWithForbiddenUsername_WhenDeleteMapping_ThenReturnsForbiddenError() throws Exception {
         //given
         var commentId = 6L;
         var articleId = 7L;
+
+        willThrow(NoAuthorityToUpdateDeleteException.class).given(commentCommandService)
+                .delete(anyLong(), anyString());
 
         //when & then
         var mvcResult = mvc.perform(delete("/article-comments/" + commentId)
@@ -227,6 +264,26 @@ class CommentCommandControllerTest {
 
         assertThat(mvcResult.getResolvedException()).isNotNull();
         assertThat(mvcResult.getResolvedException()).isInstanceOf(NoAuthorityToUpdateDeleteException.class);
+        then(commentCommandService).should().delete(anyLong(), anyString());
+    }
+
+    @DisplayName("[실패][controller][DELETE] 게시글 삭제 테스트 - 인증되지 않은 사용자")
+    @Test
+    void givenNotAuthenticatedUser_WhenDeleteMapping_ThenRedirectToLoginPage() throws Exception {
+        //given
+        var commentId = 1500L;
+        var articleId = 1L;
+
+        //when & then
+        var mvcResult = mvc.perform(delete("/article-comments/" + commentId)
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .content(encoder.encode(Map.of("articleId", articleId)))
+                        .with(csrf())
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("**/login"));
+
+        then(commentCommandService).shouldHaveNoInteractions();
     }
 
     @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
@@ -236,6 +293,9 @@ class CommentCommandControllerTest {
         //given
         var commentId = 1500L;
         var articleId = 1L;
+
+        willThrow(EntityNotFoundException.class).given(commentCommandService)
+                .delete(anyLong(), anyString());
 
         //when & then
         var mvcResult = mvc.perform(delete("/article-comments/" + commentId)
@@ -247,5 +307,27 @@ class CommentCommandControllerTest {
 
         assertThat(mvcResult.getResolvedException()).isNotNull();
         assertThat(mvcResult.getResolvedException()).isInstanceOf(EntityNotFoundException.class);
+        then(commentCommandService).should().delete(anyLong(), anyString());
+    }
+
+    private static ArticleCommentDto.RegisterReq getRegisterReq(long articleId, String content) {
+        return ArticleCommentDto.RegisterReq.builder()
+                .articleId(articleId)
+                .commentBody(content)
+                .build();
+    }
+
+    private static ArticleCommentDto.RegisterForm getRegisterForm(long articleId, String content) {
+        return ArticleCommentDto.RegisterForm.builder()
+                .parentArticleId(articleId)
+                .commentBody(content)
+                .build();
+    }
+
+    private static ArticleCommentDto.UpdateForm getUpdateForm(long articleId, String updateCommentBody) {
+        return ArticleCommentDto.UpdateForm.builder()
+                .parentArticleId(articleId)
+                .updateCommentBody(updateCommentBody)
+                .build();
     }
 }

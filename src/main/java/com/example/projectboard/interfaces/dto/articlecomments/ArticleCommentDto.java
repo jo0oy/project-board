@@ -24,7 +24,6 @@ public class ArticleCommentDto {
 
         @NotBlank @Size(min = 5, max = 500)
         private String commentBody;
-
     }
 
     @Getter
@@ -56,7 +55,6 @@ public class ArticleCommentDto {
 
         @NotBlank @Size(min = 5, max = 500)
         private String updateCommentBody;
-
     }
 
     @Getter
@@ -80,6 +78,7 @@ public class ArticleCommentDto {
         }
 
     }
+
     @ToString
     @Getter
     @Builder
@@ -92,6 +91,7 @@ public class ArticleCommentDto {
         private LocalDateTime createdAt;
 
     }
+
     @ToString
     @Getter
     @Builder
@@ -101,14 +101,13 @@ public class ArticleCommentDto {
         private String commentBody;
         private String createdBy;
         private LocalDateTime createdAt;
-
     }
+
     @ToString
     @Getter
     @Builder
     public static class GroupByArticleInfoResponse {
         private Long articleId;
         private List<MainInfoResponse> comments;
-
     }
 }

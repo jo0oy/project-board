@@ -1,5 +1,6 @@
 package com.example.projectboard.security;
 
+import com.example.projectboard.domain.users.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +11,7 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -36,6 +38,11 @@ public class SecurityConfig {
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
         return new WebAccessDeniedHandler();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService(UserAccountRepository userAccountRepository) {
+        return new PrincipalUserDetailsService(userAccountRepository);
     }
 
     @Bean
