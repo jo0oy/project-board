@@ -6,6 +6,8 @@ import com.example.projectboard.domain.articlecomments.ArticleCommentRepository;
 import com.example.projectboard.domain.articles.ArticleCommand;
 import com.example.projectboard.domain.articles.ArticleInfo;
 import com.example.projectboard.domain.articles.ArticleRepository;
+import com.example.projectboard.domain.articles.articlehashtags.ArticleHashtag;
+import com.example.projectboard.domain.articles.articlehashtags.ArticleHashtagRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -13,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,8 +25,10 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @Service
 public class ArticleQueryServiceImpl implements ArticleQueryService {
+
     private final ArticleRepository articleRepository;
     private final ArticleCommentRepository articleCommentRepository;
+    private final ArticleHashtagRepository articleHashtagRepository;
 
     /**
      * Article 단일 조회 메서드.
@@ -71,6 +76,13 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
     public Page<ArticleInfo.MainInfo> articles(ArticleCommand.SearchCondition condition, Pageable pageable) {
         log.info("{}:{}", getClass().getSimpleName(), "articles(ArticleCommand.SearchCondition, Pageable)");
 
+        // 해시태그 검색 조회 하는 경우
+        if (StringUtils.hasText(condition.getHashtag())) {
+            return articleHashtagRepository.findByHashtagNameIgnoreCase(condition.getHashtag(), getPageRequest(pageable))
+                    .map(ArticleHashtag::getArticle)
+                    .map(ArticleInfo.MainInfo::new);
+        }
+
         return articleRepository.findAll(condition.toSearchCondition(), getPageRequest(pageable))
                 .map(ArticleInfo.MainInfo::new);
     }
@@ -84,10 +96,33 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
     public List<ArticleInfo.MainInfo> articleList(ArticleCommand.SearchCondition condition) {
         log.info("{}:{}", getClass().getSimpleName(), "articleList(ArticleCommand.SearchCondition)");
 
+        // 해시태그 검색 조회 하는 경우
+        if (StringUtils.hasText(condition.getHashtag())) {
+            return articleHashtagRepository.findByHashtagNameIgnoreCase(condition.getHashtag())
+                    .stream()
+                    .map(ArticleHashtag::getArticle)
+                    .map(ArticleInfo.MainInfo::new)
+                    .collect(Collectors.toList());
+        }
+
         return articleRepository.findAll(condition.toSearchCondition())
                 .stream()
                 .map(ArticleInfo.MainInfo::new)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<ArticleInfo.MainInfo> articlesByHashtagId(Long hashtagId, Pageable pageable) {
+        return articleHashtagRepository.findByHashtagId(hashtagId, getPageRequest(pageable))
+                .map(ArticleHashtag::getArticle)
+                .map(ArticleInfo.MainInfo::new);
+    }
+
+    @Override
+    public Page<ArticleInfo.MainInfo> articlesByHashtagName(String hashtagName, Pageable pageable) {
+        return articleHashtagRepository.findByHashtagNameIgnoreCase(hashtagName, getPageRequest(pageable))
+                .map(ArticleHashtag::getArticle)
+                .map(ArticleInfo.MainInfo::new);
     }
 
     /**
