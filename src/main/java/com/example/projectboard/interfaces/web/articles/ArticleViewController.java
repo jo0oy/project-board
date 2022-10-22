@@ -54,6 +54,20 @@ public class ArticleViewController {
         return "articles/index";
     }
 
+    @GetMapping("/hashtag-search/{hashtagId}")
+    public String articlesByHashtag(@PathVariable Long hashtagId,
+                                    @PageableDefault(size = 15, direction = Sort.Direction.DESC, sort = "article.createdAt") Pageable pageable,
+                                    Model model) {
+
+        var articles = articleQueryService.articlesByHashtagId(hashtagId, pageable).map(articleDtoMapper::toDto);
+        var barNumbers = paginationService.getPaginationBarNumbers(pageable.getPageNumber(), articles.getTotalPages());
+
+        model.addAttribute("articles", articles);
+        model.addAttribute("paginationBar", barNumbers);
+
+        return "articles/hashtag-search";
+    }
+
     @GetMapping("/{id}")
     public String articleDetail(@PathVariable Long id, Model model) {
 

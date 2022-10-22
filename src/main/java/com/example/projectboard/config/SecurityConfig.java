@@ -1,6 +1,8 @@
-package com.example.projectboard.security;
+package com.example.projectboard.config;
 
 import com.example.projectboard.domain.users.UserAccountRepository;
+import com.example.projectboard.security.PrincipalUserDetailsService;
+import com.example.projectboard.security.WebAccessDeniedHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -54,10 +56,10 @@ public class SecurityConfig {
                                 HttpMethod.GET,
                                 "/",
                                 "/articles",
-                                "/articles/search-hashtag",
+                                "/articles/**",
+                                "/hashtags",
                                 "/auth/login",
-                                "/accounts/sign-up/**",
-                                "/articles/**"
+                                "/accounts/sign-up/**"
                         ).permitAll()
                         .mvcMatchers(
                                 HttpMethod.POST,
