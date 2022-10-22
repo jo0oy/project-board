@@ -81,8 +81,8 @@ class ArticleQueryServiceTest {
         var result = sut.articles(condition, pageable);
 
         // then
-        assertThat(result.getTotalElements()).isEqualTo(1);
-        assertThat(result.getTotalPages()).isEqualTo(1);
+        assertThat(result.getTotalElements()).isEqualTo(0);
+        assertThat(result.getTotalPages()).isEqualTo(0);
     }
 
     @DisplayName("[성공][service] 전체 댓글 리스트 조회 테스트 - 검색조건 없음")
@@ -97,5 +97,35 @@ class ArticleQueryServiceTest {
         // then
         assertThat(result.size()).isEqualTo(30);
         assertThat(result.get(0).getArticleId()).isEqualTo(1L);
+    }
+
+    @DisplayName("[성공][service] 게시글 해시태그 검색 페이징 조회 테스트 - by hashtagId")
+    @Test
+    void givenHashtagIdAndPageable_whenArticlesByHashtagId_thenWorksFine() {
+        // given
+        var hashtagId = 1L;
+        var pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "article.createdAt"));
+
+        // when
+        var result = sut.articlesByHashtagId(hashtagId, pageable);
+
+        // then
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getTotalPages()).isEqualTo(1);
+    }
+
+    @DisplayName("[성공][service] 게시글 해시태그 검색 페이징 조회 테스트 - by hashtagName")
+    @Test
+    void givenHashtagNameAndPageable_whenArticlesByHashtagName_thenWorksFine() {
+        // given
+        var hashtagName = "#PUCE";
+        var pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "article.createdAt"));
+
+        // when
+        var result = sut.articlesByHashtagName(hashtagName, pageable);
+
+        // then
+        assertThat(result.getTotalElements()).isEqualTo(2);
+        assertThat(result.getTotalPages()).isEqualTo(1);
     }
 }
