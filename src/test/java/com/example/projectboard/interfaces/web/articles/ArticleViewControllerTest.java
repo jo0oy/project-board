@@ -133,6 +133,31 @@ public class ArticleViewControllerTest {
         then(paginationService).should().getPaginationBarNumbers(anyInt(), anyInt());
     }
 
+    @DisplayName("[성공][view][GET] 게시글 해시태그 검색 페이지 - by hashtagId")
+    @Test
+    void givenHashtagId_whenHashtagSearchResultArticlesView_thenReturnsHashtagArticlesView() throws Exception {
+        // Given
+        var hashtagId = 1L;
+        var pageNumber = 0;
+        var pageSize = 5;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Order.desc("article.createdAt")));
+        List<Integer> barNumbers = List.of(1, 2, 3, 4, 5);
+
+        given(articleQueryService.articlesByHashtagId(anyLong(), any(Pageable.class))).willReturn(Page.empty());
+        given(paginationService.getPaginationBarNumbers(pageNumber, Page.empty().getTotalPages())).willReturn(barNumbers);
+
+        // When & Then
+        mvc.perform(get("/articles/hashtag-search/" + hashtagId))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(view().name("articles/hashtag-search"))
+                .andExpect(model().attributeExists("articles"))
+                .andExpect(model().attribute("paginationBar", barNumbers));
+
+        then(articleQueryService).should().articlesByHashtagId(anyLong(), any(Pageable.class));
+        then(paginationService).should().getPaginationBarNumbers(anyInt(), anyInt());
+    }
+
     @WithMockUser
     @DisplayName("[성공][view][GET] 새 게시글 작성 페이지 - 인증된 사용자")
     @Test
