@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <title>해시태그 리스트 페이지</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+  <link href="/css/search-bar.css" rel="stylesheet">
+  <link href="/css/articles/table-header.css" rel="stylesheet">
+</head>
+
+<body>
+<header th:replace="/fragments/header.html :: header-config">
+  헤더 삽입부
+  <hr>
+</header>
+
+<main class="container">
+
+  <div class="row mt-5 m-2 d-flex justify-content-end">
+    <div class="col-sm-1 btn-group">
+      <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown"
+              aria-expanded="false" id="dropdownMenuLink">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+             class="bi bi-sort-alpha-down" viewBox="0 0 16 16">
+          <path fill-rule="evenodd"
+                d="M10.082 5.629 9.664 7H8.598l1.789-5.332h1.234L13.402 7h-1.12l-.419-1.371h-1.781zm1.57-.785L11 2.687h-.047l-.652 2.157h1.351z"/>
+          <path d="M12.96 14H9.028v-.691l2.579-3.72v-.054H9.098v-.867h3.785v.691l-2.567 3.72v.054h2.645V14zM4.5 2.5a.5.5 0 0 0-1 0v9.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L4.5 12.293V2.5z"/>
+        </svg>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+        <li th:with="hashtagNameAsc=(${hashtags.sort.getOrderFor('hashtagName')} != null and ${hashtags.sort.getOrderFor('hashtagName').direction.name} != 'DESC')">
+          <a th:class="'dropdown-item' + (${hashtagNameAsc} ? ' active' : '')" th:aria-current="${hashtagNameAsc}"
+             th:href="@{/hashtags(page=${hashtags.number})}">사전순</a>
+        </li>
+        <li th:with="hashtagNameDesc=${hashtags.sort.getOrderFor('hashtagName')} != null and ${hashtags.sort.getOrderFor('hashtagName').direction.name} == 'DESC'">
+          <a th:class="'dropdown-item' + (${hashtagNameDesc} ? ' active' : '')" th:aria-current="${hashtagNameDesc}"
+             th:href="@{/hashtags(
+                       page=${hashtags.number},
+                       sort='hashtagName,DESC')}">사전역순</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="row">
+    <table class="table" id="article-table">
+      <thead>
+      <tr>
+        <th class="hashtag col-2">해시태그</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="hashtag : ${hashtags}">
+        <td class="title"><a th:text="${hashtag.hashtagName}"
+                             th:href="@{/articles/hashtag-search/{id}(id=${hashtag.hashtagId})}">해시태그명</a></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="row">
+    <nav id="pagination" aria-label="Page navigation">
+      <ul class="pagination justify-content-center">
+        <li class="page-item">
+          <a th:text="'previous'"
+             th:href="@{/hashtags(page=${hashtags.number - 1},
+                       sort=${hashtags.sort.toString().replace(': ', ',')})}"
+             th:class="'page-link' + (${hashtags.number} <= 0 ? ' disabled' : '')">Previous</a>
+        </li>
+        <li class="page-item" th:each="pageNumber : ${paginationBar}">
+          <a th:text="${pageNumber + 1}"
+             th:href="@{/hashtags(page=${pageNumber},
+                       sort=${hashtags.sort.toString().replace(': ', ',')})}"
+             th:class="'page-link' + (${pageNumber} == ${hashtags.number} ? ' disabled' : '')">1</a>
+        </li>
+        <li class="page-item">
+          <a th:text="'next'"
+             th:href="@{/hashtags(page=${hashtags.number + 1},
+                       sort=${hashtags.sort.toString().replace(': ', ',')})}"
+             th:class="'page-link' + (${hashtags.number} >= ${hashtags.totalPages - 1} ? ' disabled' : '')">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</main>
+
+<footer th:replace="/fragments/footer.html :: footer-config">
+  <hr>
+  푸터 삽입부
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+        crossorigin="anonymous"></script>
+</body>
+</html>
