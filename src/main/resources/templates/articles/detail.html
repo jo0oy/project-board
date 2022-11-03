@@ -32,7 +32,16 @@
                           th:text="*{#temporals.format(article.createdAt, 'yyyy-MM-dd HH:mm:ss')}">2022-01-01
                     </time>
                 </p>
-                <p th:if="${article.hashtagInfos != null and article.hashtagInfos.size() > 0}" th:each="hashtag : ${article.hashtagInfos}">
+                <p>
+                    <form th:method="post" th:action="@{/likes/{id}(id=${article.articleId})}">
+                        <button th:if="${#authentication.isAuthenticated()} and ${#authorization.expression('hasRole(''ROLE_USER'')')} and ${article.likedArticle == true}"
+                            type="submit" class="btn btn-danger btn-sm">좋아요</button>
+                        <button th:unless="${#authentication.isAuthenticated()} and ${#authorization.expression('hasRole(''ROLE_USER'')')} and ${article.likedArticle == true}"
+                            type="submit" class="btn btn-outline-danger btn-sm">좋아요</button>
+                    </form>
+                </p>
+                <p th:if="${article.hashtagInfos != null and article.hashtagInfos.size() > 0}"
+                   th:each="hashtag : ${article.hashtagInfos}">
                     <span class="badge text-bg-secondary mx-1">
                         <a class="text-reset" th:text="${hashtag.actualHashtagName}" th:href="@{#}">#java</a>
                     </span>
@@ -45,7 +54,8 @@
         </article>
     </div>
 
-    <div class="row g-5 ms-lg-5 mt-2" id="article-buttons" th:if="${#authorization.expression('isAuthenticated()')} and ${article.createdBy} == ${#authentication.name}">
+    <div class="row g-5 ms-lg-5 mt-2" id="article-buttons"
+         th:if="${#authorization.expression('isAuthenticated()')} and ${article.createdBy} == ${#authentication.name}">
         <form id="delete-article-form" th:action="@{/articles/{id}(id=${article.articleId})}" th:method="post">
             <input type="hidden" name="_method" value="delete"/>
             <div class="pb-5 d-grid gap-2 d-md-block ms-4">
@@ -58,11 +68,13 @@
 
     <div class="row g-5 ms-lg-5 mt-4">
         <section class="ms-4">
-            <form class="row g-3" id="comment-form" th:action="@{/article-comments}" th:method="post" th:object="${registerForm}">
+            <form class="row g-3" id="comment-form" th:action="@{/article-comments}" th:method="post"
+                  th:object="${registerForm}">
                 <div class="col-md-9 col-lg-8">
                     <input type="hidden" class="article-id" name="articleId" th:field="*{parentArticleId}">
                     <label for="comment-textbox" hidden>댓글</label>
-                    <textarea class="form-control" id="comment-textbox" th:field="*{commentBody}" placeholder="댓글 쓰기.." rows="3" required></textarea>
+                    <textarea class="form-control" id="comment-textbox" th:field="*{commentBody}" placeholder="댓글 쓰기.."
+                              rows="3" required></textarea>
                 </div>
                 <div class="col-md-9 col-lg-8">
                     <label for="comment-textbox" hidden></label>
@@ -78,7 +90,8 @@
 
             <ul id="article-comments" class="row col-md-10 col-lg-8 pt-3 mt-2" th:each="comment : ${article.comments}">
                 <li>
-                    <form class="comment-form" th:action="@{/article-comments/{id}(id=${comment.commentId})}" th:method="post">
+                    <form class="comment-form" th:action="@{/article-comments/{id}(id=${comment.commentId})}"
+                          th:method="post">
                         <input type="hidden" name="_method" value="delete"/>
                         <input type="hidden" class="article-id" name="articleId" th:value="${article.articleId}">
                         <div class="row">

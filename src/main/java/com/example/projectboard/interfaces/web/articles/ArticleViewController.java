@@ -6,12 +6,14 @@ import com.example.projectboard.domain.articles.SearchType;
 import com.example.projectboard.interfaces.dto.articlecomments.ArticleCommentDto;
 import com.example.projectboard.interfaces.dto.articles.ArticleDto;
 import com.example.projectboard.interfaces.dto.articles.ArticleDtoMapper;
+import com.example.projectboard.security.PrincipalUserAccount;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -69,9 +71,12 @@ public class ArticleViewController {
     }
 
     @GetMapping("/{id}")
-    public String articleDetail(@PathVariable Long id, Model model) {
+    public String articleDetail(@PathVariable Long id,
+                                @AuthenticationPrincipal PrincipalUserAccount principalUserAccount,
+                                Model model) {
 
-        var article = articleDtoMapper.toDto(articleQueryService.getArticleWithComments(id));
+        var article
+                = articleDtoMapper.toDto(articleQueryService.getArticleWithComments(id, (principalUserAccount != null) ? principalUserAccount.getUsername() : null));
         var registerForm = ArticleCommentDto.RegisterForm.builder().parentArticleId(id).build();
 
         model.addAttribute("article", article);
