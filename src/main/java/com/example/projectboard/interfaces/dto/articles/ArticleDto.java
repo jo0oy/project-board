@@ -144,6 +144,7 @@ public class ArticleDto {
         private String createdBy;
         private LocalDateTime createdAt;
         private List<CommentInfoResponse> comments;
+        private boolean likedArticle;
     }
 
     @Getter

@@ -72,8 +72,10 @@ public class ArticleInfo {
         private String createdBy;
         private LocalDateTime createdAt;
         private List<ArticleCommentInfo.SimpleInfo> comments;
+        private boolean likedArticle;
         public ArticleWithCommentsInfo(Article entity,
-                                       List<ArticleCommentInfo.SimpleInfo> comments) {
+                                       List<ArticleCommentInfo.SimpleInfo> comments,
+                                       boolean likedArticle) {
 
             this.articleId = entity.getId();
             this.userId = entity.getUserId();
@@ -90,6 +92,8 @@ public class ArticleInfo {
             if (comments != null && comments.size() > 0) {
                 this.comments.addAll(comments);
             }
+
+            this.likedArticle = likedArticle;
         }
     }
 

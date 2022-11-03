@@ -11,7 +11,7 @@ public interface ArticleQueryService {
 
     ArticleInfo.MainInfo getArticle(Long articleId);
 
-    ArticleInfo.ArticleWithCommentsInfo getArticleWithComments(Long articleId);
+    ArticleInfo.ArticleWithCommentsInfo getArticleWithComments(Long articleId, String principalUsername);
 
     Page<ArticleInfo.MainInfo> articles(ArticleCommand.SearchCondition condition, Pageable pageable);
 

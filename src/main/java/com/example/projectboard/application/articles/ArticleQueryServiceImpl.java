@@ -8,6 +8,7 @@ import com.example.projectboard.domain.articles.ArticleInfo;
 import com.example.projectboard.domain.articles.ArticleRepository;
 import com.example.projectboard.domain.articles.articlehashtags.ArticleHashtag;
 import com.example.projectboard.domain.articles.articlehashtags.ArticleHashtagRepository;
+import com.example.projectboard.domain.likes.LikeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -29,6 +30,7 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
     private final ArticleRepository articleRepository;
     private final ArticleCommentRepository articleCommentRepository;
     private final ArticleHashtagRepository articleHashtagRepository;
+    private final LikeRepository likeRepository;
 
     /**
      * Article 단일 조회 메서드.
@@ -51,8 +53,8 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
      * @return ArticleInfo.ArticleWithCommentsInfo : 조회한 Article, List<ArticleCommentInfo.SimpleInfo>> -> ArticleInfo.ArticleWithCommentsInfo 감싸서 반환.
      */
     @Override
-    public ArticleInfo.ArticleWithCommentsInfo getArticleWithComments(Long articleId) {
-        log.info("{}:{}", getClass().getSimpleName(), "getArticleWithComments(Long)");
+    public ArticleInfo.ArticleWithCommentsInfo getArticleWithComments(Long articleId, String principalUsername) {
+        log.info("{}:{}", getClass().getSimpleName(), "getArticleWithComments(Long, String)");
 
         // 게시글 엔티티 조회
         var article = articleRepository.findById(articleId)
@@ -63,7 +65,12 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
                 .map(ArticleCommentInfo.SimpleInfo::new)
                 .collect(Collectors.toList());
 
-        return new ArticleInfo.ArticleWithCommentsInfo(article, commentList);
+        // 로그인한 사용자가 '좋아요'한 게시글인지 체크
+        var likedArticle = false; // null 이거나 empty 문자열인 경우 -> false
+        if(StringUtils.hasText(principalUsername))
+            likedArticle = likeRepository.existsByArticle_IdAndUserAccount_Username(articleId, principalUsername);
+
+        return new ArticleInfo.ArticleWithCommentsInfo(article, commentList, likedArticle);
     }
 
     /**
