@@ -12,12 +12,16 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: trace
 
 spring:
+  profiles:
+    include:
+      - aws
+      - aws-credentials
+
   datasource:
     url: jdbc:mariadb://127.0.0.1:3306/board
     username: boardUser
     password: boardUserpw0987!#@
     driver-class-name: org.mariadb.jdbc.Driver
-
   jpa:
     defer-datasource-initialization: true
     hibernate:
@@ -29,6 +33,7 @@ spring:
       hibernate:
         format_sql: true
         default_batch_fetch_size: 200
+
   sql:
     init:
       mode: always
@@ -36,5 +41,10 @@ spring:
     hiddenmethod:
       filter:
         enabled: true
+
   messages:
     basename: errors
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
