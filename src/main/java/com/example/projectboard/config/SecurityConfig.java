@@ -59,7 +59,8 @@ public class SecurityConfig {
                                 "/articles/**",
                                 "/hashtags",
                                 "/auth/login",
-                                "/accounts/sign-up/**"
+                                "/accounts/sign-up/**",
+                                "/api/v1/files/**"
                         ).permitAll()
                         .mvcMatchers(
                                 HttpMethod.POST,
