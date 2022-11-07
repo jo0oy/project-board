@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class HashtagContentUtil {
+public class HashtagContentUtils {
 
     public static List<String> convertToList(String hashtagContent) {
         List<String> hashtagNames = new ArrayList<>();

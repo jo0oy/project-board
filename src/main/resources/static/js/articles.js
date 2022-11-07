@@ -16,7 +16,7 @@ function sendFile(file, el) {
         processData: false,
         data: form_data,
         success: function (response) {
-            $(el).summernote('insertImage', response.data, function ($image) {
+            $(el).summernote('insertImage', response, function ($image) {
                 $image.css('width', '30%');
             });
         }

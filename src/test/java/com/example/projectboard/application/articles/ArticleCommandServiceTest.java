@@ -2,7 +2,7 @@ package com.example.projectboard.application.articles;
 
 import com.example.projectboard.common.exception.NoAuthorityToUpdateDeleteException;
 import com.example.projectboard.common.exception.UsernameNotFoundException;
-import com.example.projectboard.common.util.HashtagContentUtil;
+import com.example.projectboard.common.util.HashtagContentUtils;
 import com.example.projectboard.config.JpaConfig;
 import com.example.projectboard.domain.articlecomments.ArticleCommentRepository;
 import com.example.projectboard.domain.articles.ArticleCommand;
@@ -50,7 +50,7 @@ class ArticleCommandServiceTest {
         var req = ArticleCommand.RegisterReq.builder()
                 .title(title)
                 .content(content)
-                .hashtagNames(HashtagContentUtil.convertToList(hashtagContent))
+                .hashtagNames(HashtagContentUtils.convertToList(hashtagContent))
                 .build();
 
         // when
@@ -73,7 +73,7 @@ class ArticleCommandServiceTest {
         var req = ArticleCommand.RegisterReq.builder()
                 .title(title)
                 .content(content)
-                .hashtagNames(HashtagContentUtil.convertToList(hashtagContent))
+                .hashtagNames(HashtagContentUtils.convertToList(hashtagContent))
                 .build();
 
         // when & then
@@ -97,7 +97,7 @@ class ArticleCommandServiceTest {
                 .builder()
                 .title(updateTitle)
                 .content(updateContent)
-                .hashtagNames(HashtagContentUtil.convertToList("#newyork,  #EmpireStates"))
+                .hashtagNames(HashtagContentUtils.convertToList("#newyork,  #EmpireStates"))
                 .build();
 
         // when

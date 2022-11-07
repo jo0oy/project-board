@@ -25,13 +25,13 @@ public class ArticleCommentCommandServiceImpl implements ArticleCommentCommandSe
 
     /**
      * 새로운 ArticleComment 등록 메서드.
-     * @param principalUsername : 현재 인증 객체(Security Context)에 담겨 있는 사용자 정보에서의 principalUsername (String)
+     * @param writer : 현재 인증 객체(Security Context)에 담겨 있는 사용자 정보에서의 writer (String)
      * @param command : ArticleComment 등록을 위한 데이터가 담긴 객체 (ArticleCommentCommand.RegisterReq)
      * @return ArticleCommentInfo.MainInfo : 등록된 ArticleComment 엔티티를 ArticleCommentInfo.MainInfo에 감싸서 반환.
      */
     @Override
     @Transactional
-    public ArticleCommentInfo.MainInfo registerComment(String principalUsername, ArticleCommentCommand.RegisterReq command) {
+    public ArticleCommentInfo.MainInfo registerComment(String writer, ArticleCommentCommand.RegisterReq command) {
         log.info("{}:{}", getClass().getSimpleName(), "registerComment(String, ArticleCommentCommand.RegisterReq)");
 
         // 게시글(Article) 엔티티 조회
@@ -39,8 +39,8 @@ public class ArticleCommentCommandServiceImpl implements ArticleCommentCommandSe
                 .orElseThrow(EntityNotFoundException::new);
 
         // 작성자(UserAccount) 엔티티 조회
-        var userAccount = userAccountRepository.findByUsername(principalUsername).orElseThrow(() ->
-                new UsernameNotFoundException("유저를 찾을 수 없습니다. username=" + principalUsername));
+        var userAccount = userAccountRepository.findByUsername(writer).orElseThrow(() ->
+                new UsernameNotFoundException("유저를 찾을 수 없습니다. username=" + writer));
 
         // 댓글 등록
         var savedComment = articleCommentRepository.save(command.toEntity(article, userAccount.getId()));

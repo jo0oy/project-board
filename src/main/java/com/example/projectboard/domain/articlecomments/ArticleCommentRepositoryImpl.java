@@ -169,6 +169,8 @@ public class ArticleCommentRepositoryImpl implements ArticleCommentRepositoryCus
                         return new OrderSpecifier<>(direction, articleComment.id);
                     case "createdBy":
                         return new OrderSpecifier<>(direction, articleComment.createdBy);
+                    case "createdAt":
+                        return new OrderSpecifier<>(direction, articleComment.createdAt);
                 }
             }
         }

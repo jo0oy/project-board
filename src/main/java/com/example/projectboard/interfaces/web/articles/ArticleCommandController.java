@@ -1,7 +1,7 @@
 package com.example.projectboard.interfaces.web.articles;
 
 import com.example.projectboard.application.articles.ArticleCommandService;
-import com.example.projectboard.common.util.HashtagContentUtil;
+import com.example.projectboard.common.util.HashtagContentUtils;
 import com.example.projectboard.interfaces.dto.articles.ArticleDto;
 import com.example.projectboard.interfaces.dto.articles.ArticleDtoMapper;
 import com.example.projectboard.security.PrincipalUserAccount;
@@ -31,7 +31,7 @@ public class ArticleCommandController {
                                   BindingResult bindingResult) {
 
         // hashtagContent 검증 로직 실행
-        var hashtagNames = HashtagContentUtil.convertToList(form.getHashtagContent());
+        var hashtagNames = HashtagContentUtils.convertToList(form.getHashtagContent());
 
         verifyHashtagContent(hashtagNames, bindingResult);
 
@@ -55,7 +55,7 @@ public class ArticleCommandController {
                                 BindingResult bindingResult) {
 
         // hashtagContent 검증 로직 실행
-        var hashtagNames = HashtagContentUtil.convertToList(updateForm.getHashtagContent());
+        var hashtagNames = HashtagContentUtils.convertToList(updateForm.getHashtagContent());
 
         verifyHashtagContent(hashtagNames, bindingResult);
 
@@ -81,12 +81,12 @@ public class ArticleCommandController {
     }
 
     private void verifyHashtagContent(List<String> hashtagNames, BindingResult bindingResult) {
-        if (HashtagContentUtil.verifyFormat(hashtagNames)) {
+        if (HashtagContentUtils.verifyFormat(hashtagNames)) {
             bindingResult.rejectValue("hashtagContent", "Format");
             log.debug("errors={}", bindingResult);
         }
 
-        if (HashtagContentUtil.verifyHashtagSize(hashtagNames)) {
+        if (HashtagContentUtils.verifyHashtagSize(hashtagNames)) {
             bindingResult.rejectValue("hashtagContent", "Size");
             log.debug("errors={}", bindingResult);
         }
