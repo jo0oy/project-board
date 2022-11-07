@@ -2,7 +2,7 @@ package com.example.projectboard.common.exception;
 
 public class InvalidParamException extends RuntimeException {
     public InvalidParamException() {
-        super("올바르지 않은 입력값입니다.");
+        super("올바르지 않은 요청값입니다.");
     }
 
     public InvalidParamException(String message) {

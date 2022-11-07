@@ -3,6 +3,7 @@ package com.example.projectboard.interfaces.dto.articlecomments;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -10,7 +11,6 @@ import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 
 public class ArticleCommentDto {
@@ -67,7 +67,7 @@ public class ArticleCommentDto {
         public static SearchCondition of(String createdAt,
                                          String createdBy) {
             LocalDateTime date = null;
-            if (Objects.nonNull(createdAt)) {
+            if (StringUtils.hasText(createdAt)) {
                 date = LocalDate.parse(createdAt).atStartOfDay();
             }
 
