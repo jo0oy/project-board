@@ -4,11 +4,13 @@ import com.example.projectboard.domain.users.UserAccount;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class UserAccountDto {
@@ -99,14 +101,23 @@ public class UserAccountDto {
         private String username;
         private String email;
         private String phoneNumber;
+        private LocalDateTime createdAt;
 
         public static SearchCondition of(String username,
                                          String email,
-                                         String phoneNumber) {
+                                         String phoneNumber,
+                                         String createdAt) {
+            LocalDateTime date = null;
+
+            if (StringUtils.hasText(createdAt)) {
+                date = LocalDate.parse(createdAt).atStartOfDay();
+            }
+
             return SearchCondition.builder()
                     .username(username)
                     .email(email)
                     .phoneNumber(phoneNumber)
+                    .createdAt(date)
                     .build();
         }
     }

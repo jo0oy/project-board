@@ -5,7 +5,7 @@ import com.example.projectboard.common.exception.EntityNotFoundException;
 import com.example.projectboard.common.exception.InvalidContentException;
 import com.example.projectboard.common.exception.NoAuthorityToUpdateDeleteException;
 import com.example.projectboard.common.exception.UsernameNotFoundException;
-import com.example.projectboard.common.util.HashtagContentUtil;
+import com.example.projectboard.common.util.HashtagContentUtils;
 import com.example.projectboard.domain.articlecomments.ArticleCommentRepository;
 import com.example.projectboard.domain.articles.Article;
 import com.example.projectboard.domain.articles.ArticleCommand;
@@ -167,13 +167,13 @@ public class ArticleCommandServiceImpl implements ArticleCommandService {
     }
 
     private void validateHashtagContent(List<String> hashtagNames) {
-        if (HashtagContentUtil.verifyFormat(hashtagNames)) {
+        if (HashtagContentUtils.verifyFormat(hashtagNames)) {
             log.debug("올바르지 않은 해시태그 내용 값입니다. Format 문제 발생.");
             throw new InvalidContentException("해시태그는 '#'로 시작하는 공백이 없는 문자열이어야 합니다. " +
                     "다수의 해시태그를 입력할 경우, 구분자는 ','와 '/'만 가능합니다.");
         }
 
-        if (HashtagContentUtil.verifyHashtagSize(hashtagNames)) {
+        if (HashtagContentUtils.verifyHashtagSize(hashtagNames)) {
             log.debug("올바르지 않은 해시태그 내용 값입니다. Size 문제 발생.");
             throw new InvalidContentException("해시태그는 최대 10개까지 입력 가능합니다.");
         }

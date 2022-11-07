@@ -12,9 +12,11 @@ import lombok.ToString;
 public class HashtagInfo {
     private Long hashtagId;
     private String hashtagName;
+    private Integer totalCount;
 
     public HashtagInfo(Hashtag entity) {
         this.hashtagId = entity.getId();
         this.hashtagName = entity.getHashtagName();
+        this.totalCount = entity.getArticles().size();
     }
 }

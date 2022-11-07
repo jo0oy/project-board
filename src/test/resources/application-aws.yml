@@ -8,4 +8,3 @@ cloud:
       auto: false
     credentials:
       instance-profile: true
-      
