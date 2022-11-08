@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,6 +27,15 @@ public class HashtagQueryServiceImpl implements HashtagQueryService {
     @Override
     public Page<HashtagInfo> hashtags(Pageable pageable) {
         return hashtagRepository.findAll(getPageRequest(pageable)).map(HashtagInfo::new);
+    }
+
+    @Override
+    public Page<HashtagInfo> hashtags(String hashtagName, Pageable pageable) {
+        if (!StringUtils.hasText(hashtagName)) {
+            return hashtagRepository.findAll(getPageRequest(pageable)).map(HashtagInfo::new);
+        }
+        return hashtagRepository.findByHashtagNameContainingIgnoreCase(hashtagName, getPageRequest(pageable))
+                .map(HashtagInfo::new);
     }
 
     @Override

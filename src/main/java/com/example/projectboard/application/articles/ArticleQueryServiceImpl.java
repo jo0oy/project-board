@@ -1,6 +1,7 @@
 package com.example.projectboard.application.articles;
 
 import com.example.projectboard.common.exception.EntityNotFoundException;
+import com.example.projectboard.common.exception.UsernameNotFoundException;
 import com.example.projectboard.domain.articlecomments.ArticleCommentInfo;
 import com.example.projectboard.domain.articlecomments.ArticleCommentRepository;
 import com.example.projectboard.domain.articles.ArticleCommand;
@@ -9,6 +10,7 @@ import com.example.projectboard.domain.articles.ArticleRepository;
 import com.example.projectboard.domain.articles.articlehashtags.ArticleHashtag;
 import com.example.projectboard.domain.articles.articlehashtags.ArticleHashtagRepository;
 import com.example.projectboard.domain.likes.LikeRepository;
+import com.example.projectboard.domain.users.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -31,6 +33,7 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
     private final ArticleCommentRepository articleCommentRepository;
     private final ArticleHashtagRepository articleHashtagRepository;
     private final LikeRepository likeRepository;
+    private final UserAccountRepository userAccountRepository;
 
     /**
      * Article 단일 조회 메서드.
@@ -116,6 +119,19 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
                 .stream()
                 .map(ArticleInfo.MainInfo::new)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<ArticleInfo.MainInfo> articlesWrittenBy(String principalUsername, ArticleCommand.SearchCondition condition, Pageable pageable) {
+        log.info("{}:{}", getClass().getSimpleName(), "articlesWrittenBy(String, ArticleCommand.SearchCondition, Pageable)");
+
+        // 인증된 사용자 엔티티(UserAccount) 조회
+        var userAccount = userAccountRepository.findByUsername(principalUsername)
+                .orElseThrow(() -> new UsernameNotFoundException("유저를 찾을 수 없습니다. username=" + principalUsername));
+
+        return articleRepository
+                .findAllByUserId(userAccount.getId(), condition.toSearchCondition(), getPageRequest(pageable))
+                .map(ArticleInfo.MainInfo::new);
     }
 
     @Override

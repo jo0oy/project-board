@@ -11,5 +11,7 @@ public interface HashtagQueryService {
 
     Page<HashtagInfo> hashtags(Pageable pageable);
 
+    Page<HashtagInfo> hashtags(String hashtagName, Pageable pageable);
+
     Set<Hashtag> hashtagListByHashtagNames(Set<String> hashtagNames);
 }
