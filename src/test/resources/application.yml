@@ -1,4 +1,8 @@
 spring:
+  profiles:
+    include:
+      - aws
+      - aws-credentials
   datasource:
     url: jdbc:h2:mem:testdb;MODE=MySQL
     driver-class-name: org.h2.Driver
@@ -7,7 +11,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     database-platform: org.hibernate.dialect.MySQL57Dialect
     defer-datasource-initialization: true
     properties:
@@ -19,7 +23,6 @@ spring:
     init:
       mode: always
       data-locations: classpath:data-test.sql
-
   h2:
     console:
       enabled: true

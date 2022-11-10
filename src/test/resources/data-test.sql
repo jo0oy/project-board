@@ -9,6 +9,9 @@ insert into user_accounts (username, password, name, email, phone_number, role, 
     ('userTest3', '{noop}userTest3@pw', '테스트유저3', 'userTest3@gmail.com', '010-2222-2300', 'USER', now(), now());
 
 insert into user_accounts (username, password, name, email, phone_number, role, created_at, modified_at) values
+    ('userTest4', '{noop}userTest4@pw', '테스트유저4', 'userTest4@gmail.com', '010-2222-2400', 'USER', now(), now());
+
+insert into user_accounts (username, password, name, email, phone_number, role, created_at, modified_at) values
     ('adminTest', '{noop}adminTest@pw', '관리자계정1', 'adminTest@gmail.com', '010-3333-3000', 'ADMIN', now(), now());
 
 -- Articles TABLE INSERT TOTAL : 30 --
