@@ -50,8 +50,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
                 = queryFactory.selectFrom(article)
                 .where(containsTitle(condition.getTitle()),
                         containsCreatedBy(condition.getCreatedBy()),
-                        goeCreatedAt(condition.getCreatedAt()),
-                        ltCreatedAt(condition.getCreatedAt())
+                        eqCreatedAt(condition.getCreatedAt())
                 );
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
@@ -59,7 +58,23 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 
     @Override
     public Page<Article> findAllByUserId(Long userId, ArticleSearchCondition condition, Pageable pageable) {
-        return null;
+        var content
+                = queryFactory.selectFrom(article)
+                .where(containsTitle(condition.getTitle()),
+                        eqCreatedAt(condition.getCreatedAt()),
+                        eqUserId(userId)
+                ).offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(getSort(pageable))
+                .fetch();
+
+        var countQuery
+                = queryFactory.selectFrom(article)
+                .where(containsTitle(condition.getTitle()),
+                        eqCreatedAt(condition.getCreatedAt()),
+                        eqUserId(userId));
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
     }
 
     // 검색조건 BooleanExpression 메서드
@@ -69,6 +84,10 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 
     private BooleanExpression containsTitle(String title) {
         return StringUtils.hasText(title) ? article.title.containsIgnoreCase(title) : null;
+    }
+
+    private BooleanExpression eqUserId(Long userId) {
+        return Objects.nonNull(userId) ? article.userId.eq(userId) : null;
     }
 
     private BooleanExpression eqCreatedAt(LocalDateTime createdAt) {

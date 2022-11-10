@@ -2,10 +2,12 @@ package com.example.projectboard.interfaces.web.articles;
 
 import com.example.projectboard.application.PaginationService;
 import com.example.projectboard.application.articles.ArticleQueryService;
+import com.example.projectboard.application.likes.ArticleLikeQueryService;
 import com.example.projectboard.config.TestSecurityConfig;
 import com.example.projectboard.domain.articles.ArticleCommand;
 import com.example.projectboard.domain.articles.ArticleInfo;
 import com.example.projectboard.domain.articles.SearchType;
+import com.example.projectboard.domain.likes.ArticleLikeCommand;
 import com.example.projectboard.interfaces.dto.articles.ArticleDtoMapper;
 import com.example.projectboard.interfaces.dto.articles.ArticleDtoMapperImpl;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +24,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -46,6 +50,9 @@ public class ArticleViewControllerTest {
 
     @MockBean
     private ArticleQueryService articleQueryService;
+
+    @MockBean
+    private ArticleLikeQueryService articleLikeQueryService;
 
     @MockBean
     private PaginationService paginationService;
@@ -140,14 +147,19 @@ public class ArticleViewControllerTest {
         var hashtagId = 1L;
         var pageNumber = 0;
         var pageSize = 5;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Order.desc("article.createdAt")));
+        var sort = "article.createdAt";
+        var dir = "DESC";
         List<Integer> barNumbers = List.of(1, 2, 3, 4, 5);
 
         given(articleQueryService.articlesByHashtagId(anyLong(), any(Pageable.class))).willReturn(Page.empty());
         given(paginationService.getPaginationBarNumbers(pageNumber, Page.empty().getTotalPages())).willReturn(barNumbers);
 
         // When & Then
-        mvc.perform(get("/articles/hashtag-search/" + hashtagId))
+        mvc.perform(get("/articles/hashtag-search/" + hashtagId)
+                        .queryParam("page", String.valueOf(pageNumber))
+                        .queryParam("size", String.valueOf(pageSize))
+                        .queryParam("sort", String.format("%s,%s", sort, dir))
+                )
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/hashtag-search"))
@@ -156,6 +168,94 @@ public class ArticleViewControllerTest {
 
         then(articleQueryService).should().articlesByHashtagId(anyLong(), any(Pageable.class));
         then(paginationService).should().getPaginationBarNumbers(anyInt(), anyInt());
+    }
+
+    @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @DisplayName("[성공][view][GET] '내가 작성한 게시글' 탭 페이지 - 페이징, 정렬 기능")
+    @Test
+    void givenAuthenticatedUsernameAndPageRequest_whenArticlesWrittenByLoggInUser_thenReturnsArticlesWrittenByLoggInUserView() throws Exception {
+        // Given
+        var pageNumber = 0;
+        var pageSize = 5;
+        var sort = "article.createdAt";
+        var dir = "DESC";
+        List<Integer> barNumbers = List.of(1, 2, 3, 4, 5);
+
+        given(articleQueryService.articlesWrittenBy(anyString(), any(ArticleCommand.SearchCondition.class), any(Pageable.class))).willReturn(Page.empty());
+        given(paginationService.getPaginationBarNumbers(pageNumber, Page.empty().getTotalPages())).willReturn(barNumbers);
+
+        // When & Then
+        mvc.perform(get("/articles/by-me")
+                        .queryParam("page", String.valueOf(pageNumber))
+                        .queryParam("size", String.valueOf(pageSize))
+                        .queryParam("sort", String.format("%s,%s", sort, dir))
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(view().name("articles/written-by-me"))
+                .andExpect(model().attributeExists("articles"))
+                .andExpect(model().attribute("paginationBar", barNumbers));
+
+        then(articleQueryService).should().articlesWrittenBy(anyString(), any(ArticleCommand.SearchCondition.class), any(Pageable.class));
+        then(paginationService).should().getPaginationBarNumbers(anyInt(), anyInt());
+    }
+
+    @DisplayName("[실패][view][GET] '내가 작성한 게시글' 탭 페이지 - 인증되지 않은 사용자")
+    @Test
+    void givenNothingNotAuthenticatedUser_whenRequestsArticlesWrittenByLoggInUser_thenRedirectsToLoginPage() throws Exception {
+        // Given
+
+        // When & Then
+        mvc.perform(get("/articles/by-me"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("**/login"));
+
+        then(articleQueryService).shouldHaveNoInteractions();
+        then(paginationService).shouldHaveNoInteractions();
+    }
+
+    @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @DisplayName("[성공][view][GET] '내가 좋아요한 게시글' 탭 페이지 - 페이징, 정렬 기능")
+    @Test
+    void givenAuthenticatedUsernameAndPageRequest_whenArticlesLikedByLoggInUser_thenReturnsArticlesLikedByLoggInUserView() throws Exception {
+        // Given
+        var pageNumber = 0;
+        var pageSize = 5;
+        var sort = "article.createdAt";
+        var dir = "DESC";
+        List<Integer> barNumbers = List.of(1, 2, 3, 4, 5);
+
+        given(articleLikeQueryService.articlesLiked(anyString(), any(ArticleLikeCommand.SearchCondition.class), any(Pageable.class))).willReturn(Page.empty());
+        given(paginationService.getPaginationBarNumbers(pageNumber, Page.empty().getTotalPages())).willReturn(barNumbers);
+
+        // When & Then
+        mvc.perform(get("/articles/liked")
+                        .queryParam("page", String.valueOf(pageNumber))
+                        .queryParam("size", String.valueOf(pageSize))
+                        .queryParam("sort", String.format("%s,%s", sort, dir))
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(view().name("articles/liked"))
+                .andExpect(model().attributeExists("articles"))
+                .andExpect(model().attribute("paginationBar", barNumbers));
+
+        then(articleLikeQueryService).should().articlesLiked(anyString(), any(ArticleLikeCommand.SearchCondition.class), any(Pageable.class));
+        then(paginationService).should().getPaginationBarNumbers(anyInt(), anyInt());
+    }
+
+    @DisplayName("[실패][view][GET] '내가 좋아요한 게시글' 탭 페이지 - 인증되지 않은 사용자")
+    @Test
+    void givenNothingNotAuthenticatedUser_whenRequestsArticlesLikedByLoggInUser_thenRedirectsToLoginPage() throws Exception {
+        // Given
+
+        // When & Then
+        mvc.perform(get("/articles/liked"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("**/login"));
+
+        then(articleLikeQueryService).shouldHaveNoInteractions();
+        then(paginationService).shouldHaveNoInteractions();
     }
 
     @WithMockUser

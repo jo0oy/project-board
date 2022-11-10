@@ -3,6 +3,7 @@ package com.example.projectboard.application.users;
 import com.example.projectboard.common.exception.NoAuthorityToReadException;
 import com.example.projectboard.domain.users.UserAccount;
 import com.example.projectboard.domain.users.UserAccountCommand;
+import com.example.projectboard.domain.users.UserAccountInfo;
 import com.example.projectboard.domain.users.UserAccountRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,8 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithUserDetails;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 class UserAccountQueryServiceTest {

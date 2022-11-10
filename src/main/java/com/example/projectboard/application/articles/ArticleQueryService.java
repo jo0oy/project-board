@@ -17,6 +17,8 @@ public interface ArticleQueryService {
 
     List<ArticleInfo.MainInfo> articleList(ArticleCommand.SearchCondition condition);
 
+    Page<ArticleInfo.MainInfo> articlesWrittenBy(String principalUsername, ArticleCommand.SearchCondition condition, Pageable pageable);
+
     Page<ArticleInfo.MainInfo> articlesByHashtagId(Long hashtagId, Pageable pageable);
 
     Page<ArticleInfo.MainInfo> articlesByHashtagName(String hashtagName, Pageable pageable);
