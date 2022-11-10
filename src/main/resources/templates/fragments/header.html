@@ -11,6 +11,8 @@
                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                     <li><a id="home" th:href="@{/}" class="nav-link px-2 text-secondary">Home</a></li>
                     <li><a id="hashtag" th:href="@{/hashtags}" class="nav-link px-2 text-secondary">Hashtags</a></li>
+                    <li><a id="writtenBy" sec:authorize="isAuthenticated()" th:href="@{/articles/by-me}" class="nav-link px-2 text-secondary">내가 작성한 게시글</a></li>
+                    <li><a id="liked" sec:authorize="isAuthenticated()" th:href="@{/articles/liked}" class="nav-link px-2 text-secondary">좋아요한 게시글</a></li>
                 </ul>
 
                 <div class="text-end">

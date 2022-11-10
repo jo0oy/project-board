@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <title>게시판 페이지</title>
+    <title>좋아요한 게시글 페이지</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
@@ -19,11 +19,14 @@
 </header>
 
 <main class="container">
+    <header id="article-form-header" class="py-5 text-center">
+        <h3>내가 '좋아요'한 게시글</h3>
+    </header>
 
     <div class="row">
         <div class="card ms-5 card-margin search-form">
             <div class="card-body p-0">
-                <form id="search-form" th:action="@{/articles}" th:method="get">
+                <form id="search-form" th:action="@{/articles/liked}" th:method="get">
                     <div class="row">
                         <div class="col-12">
                             <div class="row no-gutters">
@@ -61,7 +64,7 @@
             </div>
         </div>
         <div class="col-sm d-flex align-items-center">
-            <a th:href="@{/articles}" class="btn btn-base btn-sm text-sm-center"
+            <a th:href="@{/articles/liked}" class="btn btn-base btn-sm text-sm-center"
                style="text-decoration: none">검색 초기화</a>
         </div>
     </div>
@@ -84,22 +87,22 @@
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                 <li th:with="createdAtDesc=(${articles.sort.getOrderFor('createdAt')} != null and ${articles.sort.getOrderFor('createdAt').direction.name} == 'DESC')">
                     <a th:class="'dropdown-item' + (${createdAtDesc} ? ' active' : '')" th:aria-current="${createdAtDesc}"
-                       th:href="@{/articles(
+                       th:href="@{/articles/liked(
                        page=${articles.number},
                        searchType=${param.searchType},
-                       searchValue=${param.searchValue})}">최신순</a>
+                       searchValue=${param.searchValue})}">'좋아요' 최신순</a>
                 </li>
                 <li th:with="createdAtAsc=${articles.sort.getOrderFor('createdAt')} != null and ${articles.sort.getOrderFor('createdAt').direction.name} != 'DESC'">
                     <a th:class="'dropdown-item' + (${createdAtAsc} ? ' active' : '')" th:aria-current="${createdAtAsc}"
-                       th:href="@{/articles(
+                       th:href="@{/articles/liked(
                        page=${articles.number},
                        sort='createdAt,ASC',
                        searchType=${param.searchType},
-                       searchValue=${param.searchValue})}">오래된순</a>
+                       searchValue=${param.searchValue})}">'좋아요' 오래된순</a>
                 </li>
                 <li th:with="titleAsc=${articles.sort.getOrderFor('title')} != null and ${articles.sort.getOrderFor('title').direction.name} != 'DESC'">
                     <a th:class="'dropdown-item' + (${titleAsc} ? ' active' : '')" th:aria-current="${titleAsc}"
-                       th:href="@{/articles(
+                       th:href="@{/articles/liked(
                        page=${articles.number},
                        sort='title,ASC',
                        searchType=${param.searchType},
@@ -147,21 +150,21 @@
             <ul class="pagination justify-content-center">
                 <li class="page-item">
                     <a th:text="'previous'"
-                       th:href="@{/articles(page=${articles.number - 1},
+                       th:href="@{/articles/liked(page=${articles.number - 1},
                        sort=${articles.sort.toString().replace(': ', ',')},
                        searchType=${param.searchType}, searchValue=${param.searchValue})}"
                        th:class="'page-link' + (${articles.number} <= 0 ? ' disabled' : '')">Previous</a>
                 </li>
                 <li class="page-item" th:each="pageNumber : ${paginationBar}">
                     <a th:text="${pageNumber + 1}"
-                       th:href="@{/articles(page=${pageNumber},
+                       th:href="@{/articles/liked(page=${pageNumber},
                        sort=${articles.sort.toString().replace(': ', ',')},
                        searchType=${param.searchType}, searchValue=${param.searchValue})}"
                        th:class="'page-link' + (${pageNumber} == ${articles.number} ? ' disabled' : '')">1</a>
                 </li>
                 <li class="page-item">
                     <a th:text="'next'"
-                       th:href="@{/articles(page=${articles.number + 1},
+                       th:href="@{/articles/liked(page=${articles.number + 1},
                        sort=${articles.sort.toString().replace(': ', ',')},
                        searchType=${param.searchType}, searchValue=${param.searchValue})}"
                        th:class="'page-link' + (${articles.number} >= ${articles.totalPages - 1} ? ' disabled' : '')">Next</a>
