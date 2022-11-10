@@ -138,7 +138,7 @@ class ArticleCommandServiceTest {
     @Test
     void givenArticleIdWithAuthorizedUsername_whenDelete_thenDeleteCommentsAndArticle() {
         // given
-        var articleId = 2L;
+        var articleId = 30L;
         var username = "userTest";
         var beforeDeleteCommentListSize = articleCommentRepository.findByArticleId(articleId).size();
 

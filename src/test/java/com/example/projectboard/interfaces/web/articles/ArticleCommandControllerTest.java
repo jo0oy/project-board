@@ -63,8 +63,8 @@ class ArticleCommandControllerTest {
                 .hashtagContent(hashtag)
                 .build();
 
-        given(articleCommandService.registerArticle(anyString(), any(ArticleCommand.RegisterReq.class)))
-                .willReturn(any(ArticleInfo.MainInfo.class));
+        given(articleCommandService.registerArticleWithValidHashtags(anyString(), any(ArticleCommand.RegisterReq.class)))
+                .willReturn(ArticleInfo.MainInfo.builder().build());
 
         //when & then
         mvc.perform(post("/articles/new")
@@ -75,7 +75,7 @@ class ArticleCommandControllerTest {
                 .andExpect(redirectedUrl("/articles"))
                 .andExpect(view().name("redirect:/articles"));
 
-        then(articleCommandService).should().registerArticle(anyString(), any(ArticleCommand.RegisterReq.class));
+        then(articleCommandService).should().registerArticleWithValidHashtags(anyString(), any(ArticleCommand.RegisterReq.class));
     }
 
     @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)

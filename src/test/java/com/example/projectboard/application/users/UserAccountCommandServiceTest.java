@@ -32,10 +32,10 @@ class UserAccountCommandServiceTest {
         //given
         var req = UserAccountCommand.RegisterReq
                 .builder()
-                .username("userTest4")
-                .password("userTest4@!")
-                .name("테스트유저4")
-                .email("userTest4@naver.com")
+                .username("newUser")
+                .password("newUser@!")
+                .name("새로운 테스트 유저")
+                .email("newUser@naver.com")
                 .phoneNumber("010-9999-9999")
                 .role(UserAccount.RoleType.USER)
                 .build();
@@ -154,7 +154,7 @@ class UserAccountCommandServiceTest {
     @Test
     void givenUserAccountId_whenDelete_thenWorksFine() {
         //given
-        var userId = 1L;
+        var userId = 4L;
         var principalUsername = "adminTest";
         var beforeDelete = userAccountRepository.count();
 
