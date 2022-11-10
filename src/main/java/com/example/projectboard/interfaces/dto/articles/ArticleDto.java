@@ -92,7 +92,7 @@ public class ArticleDto {
 
             LocalDateTime date = null;
 
-            if (Objects.nonNull(createdAt)) {
+            if (StringUtils.hasText(createdAt)) {
                 date = LocalDate.parse(createdAt).atStartOfDay();
             }
 
@@ -102,6 +102,17 @@ public class ArticleDto {
                     .createdAt(date)
                     .createdBy(createdBy)
                     .build();
+        }
+
+        public static SearchCondition of(String title,
+                                         String createdAt) {
+            return of(title, null, createdAt, null);
+        }
+
+        public static SearchCondition of(String title,
+                                         String createdAt,
+                                         String createdBy) {
+            return of(title, null, createdAt, createdBy);
         }
 
         public static SearchCondition of(SearchType searchType, String searchValue) {

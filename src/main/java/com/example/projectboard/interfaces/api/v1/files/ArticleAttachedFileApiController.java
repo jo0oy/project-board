@@ -1,7 +1,6 @@
 package com.example.projectboard.interfaces.api.v1.files;
 
 import com.example.projectboard.application.FileStorageService;
-import com.example.projectboard.common.response.ResultResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -26,16 +25,18 @@ public class ArticleAttachedFileApiController {
     @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @PostMapping("")
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) throws IllegalAccessException {
+
         log.info("{} {}", HttpMethod.POST, "/api/v1/files");
         var uploadedFilename = fileStorageService.upload(file);
 
         return ResponseEntity.ok()
-                .body(ResultResponse.success("파일 업로드 성공", "/api/v1/files/" + uploadedFilename));
+                .body("/api/v1/files/" + uploadedFilename);
     }
 
     @GetMapping("/{filename}")
     public ResponseEntity<?> downloadFile(@PathVariable("filename") String filename,
                                           HttpServletRequest request) throws IOException {
+
         log.info("{} {}", HttpMethod.GET, "/api/v1/files/" + filename);
 
         var resource = fileStorageService.downloadFile(filename);
@@ -58,10 +59,11 @@ public class ArticleAttachedFileApiController {
     @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @DeleteMapping("/{filename}")
     public ResponseEntity<?> deleteFile(@PathVariable("filename") String filename) {
+
         log.info("{} {}", HttpMethod.DELETE, "/api/v1/files/" + filename);
         fileStorageService.delete(filename);
 
         return ResponseEntity.ok()
-                .body(ResultResponse.success("파일 삭제 성공"));
+                .body("파일 삭제 성공");
     }
 }

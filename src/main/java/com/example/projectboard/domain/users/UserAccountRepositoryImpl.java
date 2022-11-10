@@ -11,7 +11,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 import static com.example.projectboard.domain.users.QUserAccount.userAccount;
 
@@ -32,7 +34,9 @@ public class UserAccountRepositoryImpl implements UserAccountRepositoryCustom {
         var content = queryFactory.selectFrom(userAccount)
                 .where(containsUsername(condition.getUsername()),
                         containsEmail(condition.getEmail()),
-                        eqPhoneNumber(condition.getPhoneNumber()))
+                        eqPhoneNumber(condition.getPhoneNumber()),
+                        eqCreatedAt(condition.getCreatedAt())
+                )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(getSort(pageable))
@@ -56,7 +60,9 @@ public class UserAccountRepositoryImpl implements UserAccountRepositoryCustom {
         return queryFactory.selectFrom(userAccount)
                 .where(containsUsername(condition.getUsername()),
                         containsEmail(condition.getEmail()),
-                        eqPhoneNumber(condition.getPhoneNumber()))
+                        eqPhoneNumber(condition.getPhoneNumber()),
+                        eqCreatedAt(condition.getCreatedAt())
+                )
                 .orderBy(userAccount.username.asc())
                 .fetch();
     }
@@ -71,6 +77,18 @@ public class UserAccountRepositoryImpl implements UserAccountRepositoryCustom {
 
     private BooleanExpression eqPhoneNumber(String phoneNumber) {
         return (StringUtils.hasText(phoneNumber)) ? userAccount.phoneNumber.eq(phoneNumber) : null;
+    }
+
+    private BooleanExpression eqCreatedAt(LocalDateTime createdAt) {
+        return Objects.nonNull(createdAt) ? Objects.requireNonNull(goeCreatedAt(createdAt)).and(ltCreatedAt(createdAt)) : null;
+    }
+
+    private BooleanExpression goeCreatedAt(LocalDateTime createdAt) {
+        return Objects.nonNull(createdAt) ? userAccount.createdAt.goe(createdAt) : null;
+    }
+
+    private BooleanExpression ltCreatedAt(LocalDateTime createdAt) {
+        return Objects.nonNull(createdAt) ? userAccount.createdAt.lt(createdAt.plusDays(1)) : null;
     }
 
     // 정렬 조건 구하는 메서드

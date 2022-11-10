@@ -12,5 +12,6 @@ public class HashtagDto {
     public static class MainInfoResponse {
         private Long hashtagId;
         private String hashtagName;
+        private Integer totalCount;
     }
 }
