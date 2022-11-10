@@ -27,8 +27,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
         return queryFactory.selectFrom(article)
                 .where(containsTitle(condition.getTitle()),
                         containsCreatedBy(condition.getCreatedBy()),
-                        goeCreatedAt(condition.getCreatedAt()),
-                        ltCreatedAt(condition.getCreatedAt())
+                        eqCreatedAt(condition.getCreatedAt())
                 )
                 .orderBy(article.createdAt.desc())
                 .fetch();
@@ -41,8 +40,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
                 = queryFactory.selectFrom(article)
                 .where(containsTitle(condition.getTitle()),
                         containsCreatedBy(condition.getCreatedBy()),
-                        goeCreatedAt(condition.getCreatedAt()),
-                        ltCreatedAt(condition.getCreatedAt())
+                        eqCreatedAt(condition.getCreatedAt())
                 ).offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(getSort(pageable))
@@ -52,9 +50,29 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
                 = queryFactory.selectFrom(article)
                 .where(containsTitle(condition.getTitle()),
                         containsCreatedBy(condition.getCreatedBy()),
-                        goeCreatedAt(condition.getCreatedAt()),
-                        ltCreatedAt(condition.getCreatedAt())
+                        eqCreatedAt(condition.getCreatedAt())
                 );
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
+    }
+
+    @Override
+    public Page<Article> findAllByUserId(Long userId, ArticleSearchCondition condition, Pageable pageable) {
+        var content
+                = queryFactory.selectFrom(article)
+                .where(containsTitle(condition.getTitle()),
+                        eqCreatedAt(condition.getCreatedAt()),
+                        eqUserId(userId)
+                ).offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(getSort(pageable))
+                .fetch();
+
+        var countQuery
+                = queryFactory.selectFrom(article)
+                .where(containsTitle(condition.getTitle()),
+                        eqCreatedAt(condition.getCreatedAt()),
+                        eqUserId(userId));
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
     }
@@ -66,6 +84,14 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 
     private BooleanExpression containsTitle(String title) {
         return StringUtils.hasText(title) ? article.title.containsIgnoreCase(title) : null;
+    }
+
+    private BooleanExpression eqUserId(Long userId) {
+        return Objects.nonNull(userId) ? article.userId.eq(userId) : null;
+    }
+
+    private BooleanExpression eqCreatedAt(LocalDateTime createdAt) {
+        return Objects.nonNull(createdAt) ? Objects.requireNonNull(goeCreatedAt(createdAt)).and(ltCreatedAt(createdAt)) : null;
     }
 
     private BooleanExpression goeCreatedAt(LocalDateTime createdAt) {
@@ -94,6 +120,8 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
                         return new OrderSpecifier<>(direction, article.createdBy);
                     case "createdAt":
                         return new OrderSpecifier<>(direction, article.createdAt);
+                    case "userId":
+                        return new OrderSpecifier<>(direction, article.userId);
                 }
             }
         }

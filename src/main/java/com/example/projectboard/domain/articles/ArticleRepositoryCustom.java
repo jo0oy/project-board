@@ -9,4 +9,6 @@ public interface ArticleRepositoryCustom {
     List<Article> findAll(ArticleSearchCondition condition);
 
     Page<Article> findAll(ArticleSearchCondition condition, Pageable pageable);
+
+    Page<Article> findAllByUserId(Long userId, ArticleSearchCondition condition, Pageable pageable);
 }
