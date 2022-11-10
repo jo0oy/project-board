@@ -3,6 +3,7 @@ package com.example.projectboard.interfaces.dto.articles;
 import com.example.projectboard.domain.articlecomments.ArticleCommentInfo;
 import com.example.projectboard.domain.articles.ArticleCommand;
 import com.example.projectboard.domain.articles.ArticleInfo;
+import com.example.projectboard.domain.likes.ArticleLikeCommand;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -31,6 +32,8 @@ public interface ArticleDtoMapper {
     ArticleCommand.UpdateReq toCommand(ArticleDto.UpdateForm form, List<String> hashtagNames);
 
     ArticleCommand.SearchCondition toCommand(ArticleDto.SearchCondition req);
+
+    ArticleLikeCommand.SearchCondition toArticleLikeCommand(ArticleDto.SearchCondition req);
 
     // INFO -> DTO
     ArticleDto.MainInfoResponse toDto(ArticleInfo.MainInfo info);

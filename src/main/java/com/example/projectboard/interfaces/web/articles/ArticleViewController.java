@@ -2,6 +2,7 @@ package com.example.projectboard.interfaces.web.articles;
 
 import com.example.projectboard.application.PaginationService;
 import com.example.projectboard.application.articles.ArticleQueryService;
+import com.example.projectboard.application.likes.ArticleLikeQueryService;
 import com.example.projectboard.domain.articles.SearchType;
 import com.example.projectboard.interfaces.dto.articlecomments.ArticleCommentDto;
 import com.example.projectboard.interfaces.dto.articles.ArticleDto;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 @SessionAttributes("article")
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 public class ArticleViewController {
 
     private final ArticleQueryService articleQueryService;
+    private final ArticleLikeQueryService articleLikeQueryService;
     private final PaginationService paginationService;
     private final ArticleDtoMapper articleDtoMapper;
 
@@ -54,6 +58,50 @@ public class ArticleViewController {
         model.addAttribute("searchTypes", SearchType.values());
 
         return "articles/index";
+    }
+
+    // 현재 로그인된 사용자가 작성한 게시글 리스트 페이징 조회: 검색 기능, 페이징/정렬 기능 포함.
+    @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    @GetMapping("/by-me")
+    public String articlesWrittenByLoggInUser(@RequestParam(name = "searchType", required = false) SearchType searchType,
+                                              @RequestParam(name = "searchValue", required = false) String searchValue,
+                                              @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+                                              @AuthenticationPrincipal PrincipalUserAccount principalUserAccount,
+                                              Model model) {
+
+        var condition = articleDtoMapper.toCommand(ArticleDto.SearchCondition.of(searchType, searchValue));
+        var articles = articleQueryService.articlesWrittenBy(principalUserAccount.getUsername(), condition, pageable)
+                .map(articleDtoMapper::toDto);
+        var barNumbers = paginationService.getPaginationBarNumbers(pageable.getPageNumber(), articles.getTotalPages());
+
+        model.addAttribute("articles", articles);
+        model.addAttribute("paginationBar", barNumbers);
+        var searchTypes = List.of(SearchType.TITLE, SearchType.CREATED_AT);
+        model.addAttribute("searchTypes", searchTypes);
+
+        return "articles/written-by-me";
+    }
+
+    // 현재 로그인된 사용자가 '좋아요'를 누른 게시글 리스트 페이징 조회: 검색 기능, 페이징/정렬 기능 포함.
+    @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    @GetMapping("/liked")
+    public String articlesLikedByLoggInUser(@RequestParam(name = "searchType", required = false) SearchType searchType,
+                                            @RequestParam(name = "searchValue", required = false) String searchValue,
+                                            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+                                            @AuthenticationPrincipal PrincipalUserAccount principalUserAccount,
+                                            Model model) {
+
+        var condition = articleDtoMapper.toArticleLikeCommand(ArticleDto.SearchCondition.of(searchType, searchValue));
+        var articles = articleLikeQueryService.articlesLiked(principalUserAccount.getUsername(), condition, pageable)
+                .map(articleDtoMapper::toDto);
+        var barNumbers = paginationService.getPaginationBarNumbers(pageable.getPageNumber(), articles.getTotalPages());
+
+        model.addAttribute("articles", articles);
+        model.addAttribute("paginationBar", barNumbers);
+        var searchTypes = List.of(SearchType.TITLE, SearchType.CREATED_AT, SearchType.CREATED_BY);
+        model.addAttribute("searchTypes", searchTypes);
+
+        return "articles/liked";
     }
 
     @GetMapping("/hashtag-search/{hashtagId}")
