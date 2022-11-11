@@ -1,6 +1,7 @@
 package com.example.projectboard.interfaces.web.articles;
 
 import com.example.projectboard.application.PaginationService;
+import com.example.projectboard.application.articles.ArticleCommandService;
 import com.example.projectboard.application.articles.ArticleQueryService;
 import com.example.projectboard.application.likes.ArticleLikeQueryService;
 import com.example.projectboard.config.TestSecurityConfig;
@@ -50,6 +51,9 @@ public class ArticleViewControllerTest {
 
     @MockBean
     private ArticleQueryService articleQueryService;
+
+    @MockBean
+    private ArticleCommandService articleCommandService;
 
     @MockBean
     private ArticleLikeQueryService articleLikeQueryService;
