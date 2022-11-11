@@ -23,6 +23,7 @@ public class ArticleInfo {
         private Long userId;
         private String title;
         private String content;
+        private Integer viewCount;
         private Set<HashtagInfo> hashtagInfos;
         private String createdBy;
         private LocalDateTime createdAt;
@@ -32,6 +33,7 @@ public class ArticleInfo {
             this.userId = entity.getUserId();
             this.title = entity.getTitle();
             this.content = entity.getContent();
+            this.viewCount = entity.getViewCount();
             this.createdBy = entity.getCreatedBy();
             this.createdAt = entity.getCreatedAt();
             this.hashtagInfos = entity.getHashtags().stream()
@@ -44,6 +46,7 @@ public class ArticleInfo {
             this.userId = entity.getUserId();
             this.title = entity.getTitle();
             this.content = entity.getContent();
+            this.viewCount = entity.getViewCount();
             this.createdBy = entity.getCreatedBy();
             this.createdAt = entity.getCreatedAt();
             this.hashtagInfos = hashtags.stream()
@@ -68,6 +71,7 @@ public class ArticleInfo {
         private Long userId;
         private String title;
         private String content;
+        private Integer viewCount;
         private List<HashtagInfo> hashtagInfos;
         private String createdBy;
         private LocalDateTime createdAt;
@@ -81,6 +85,7 @@ public class ArticleInfo {
             this.userId = entity.getUserId();
             this.title = entity.getTitle();
             this.content = entity.getContent();
+            this.viewCount = entity.getViewCount();
             this.createdBy = entity.getCreatedBy();
             this.createdAt = entity.getCreatedAt();
 

@@ -116,6 +116,8 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
                         return new OrderSpecifier<>(direction, article.id);
                     case "title":
                         return new OrderSpecifier<>(direction, article.title);
+                    case "viewCount":
+                        return new OrderSpecifier<>(direction, article.viewCount);
                     case "createdBy":
                         return new OrderSpecifier<>(direction, article.createdBy);
                     case "createdAt":
