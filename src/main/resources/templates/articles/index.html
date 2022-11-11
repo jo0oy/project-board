@@ -105,6 +105,14 @@
                        searchType=${param.searchType},
                        searchValue=${param.searchValue})}">제목 사전순</a>
                 </li>
+                <li th:with="viewCountDesc=${articles.sort.getOrderFor('viewCount')} != null and ${articles.sort.getOrderFor('viewCount').direction.name} == 'DESC'">
+                    <a th:class="'dropdown-item' + (${viewCountDesc} ? ' active' : '')" th:aria-current="${viewCountDesc}"
+                       th:href="@{/articles(
+                       page=${articles.number},
+                       sort='viewCount,DESC',
+                       searchType=${param.searchType},
+                       searchValue=${param.searchValue})}">조회수 높은순</a>
+                </li>
             </ul>
         </div>
     </div>
@@ -115,6 +123,7 @@
                 <th class="title col-6"><a>제목</a></th>
                 <th class="hashtag col-2"><a>해시태그</a></th>
                 <th class="user-id"><a>작성자</a></th>
+                <th class="viewCount"><a>조회수</a></th>
                 <th class="created-at"><a>작성일</a></th>
             </tr>
             </thead>
@@ -127,6 +136,7 @@
                        th:text="${hashtag.actualHashtagName}" th:href="@{/articles/hashtag-search/{hashtagId}(hashtagId=${hashtag.hashtagId})}">#java</a>
                 </td>
                 <td class="user-id" th:text="${article.createdBy}">Uno</td>
+                <td class="viewCount" th:text="${article.viewCount}">0</td>
                 <td class="created-at" th:datetime="${article.createdAt}"
                     th:text="*{#temporals.format(article.createdAt, 'yyyy-MM-dd')}">
                     <time>2022-01-01</time>

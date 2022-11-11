@@ -1,6 +1,7 @@
 package com.example.projectboard.interfaces.web.articles;
 
 import com.example.projectboard.application.PaginationService;
+import com.example.projectboard.application.articles.ArticleCommandService;
 import com.example.projectboard.application.articles.ArticleQueryService;
 import com.example.projectboard.application.likes.ArticleLikeQueryService;
 import com.example.projectboard.domain.articles.SearchType;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @Slf4j
@@ -29,6 +32,7 @@ import java.util.List;
 public class ArticleViewController {
 
     private final ArticleQueryService articleQueryService;
+    private final ArticleCommandService articleCommandService;
     private final ArticleLikeQueryService articleLikeQueryService;
     private final PaginationService paginationService;
     private final ArticleDtoMapper articleDtoMapper;
@@ -121,11 +125,16 @@ public class ArticleViewController {
     @GetMapping("/{id}")
     public String articleDetail(@PathVariable Long id,
                                 @AuthenticationPrincipal PrincipalUserAccount principalUserAccount,
+                                HttpServletRequest request,
+                                HttpServletResponse response,
                                 Model model) {
 
         var article
                 = articleDtoMapper.toDto(articleQueryService.getArticleWithComments(id, (principalUserAccount != null) ? principalUserAccount.getUsername() : null));
         var registerForm = ArticleCommentDto.RegisterForm.builder().parentArticleId(id).build();
+
+        // 모든 조회 로직 후 조회수 증가 로직 실행
+        articleCommandService.viewCountUp(id, request, response);
 
         model.addAttribute("article", article);
         model.addAttribute("registerForm", registerForm);
