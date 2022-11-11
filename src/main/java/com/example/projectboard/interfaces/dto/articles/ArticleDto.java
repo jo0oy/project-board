@@ -138,6 +138,7 @@ public class ArticleDto {
         private Long userId;
         private String title;
         private String content;
+        private Integer viewCount;
         private List<HashtagInfoResponse> hashtagInfos;
         private String createdBy;
         private LocalDateTime createdAt;
@@ -151,6 +152,7 @@ public class ArticleDto {
         private Long userId;
         private String title;
         private String content;
+        private Integer viewCount;
         private List<HashtagInfoResponse> hashtagInfos;
         private String createdBy;
         private LocalDateTime createdAt;

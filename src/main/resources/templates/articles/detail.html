@@ -32,6 +32,7 @@
                           th:text="*{#temporals.format(article.createdAt, 'yyyy-MM-dd HH:mm:ss')}">2022-01-01
                     </time>
                 </p>
+                <p><span>조회수</span>&nbsp;<span id="viewCount" th:text="${article.viewCount}">0</span></p>
                 <p>
                     <form th:method="post" th:action="@{/likes/{id}(id=${article.articleId})}">
                         <button th:if="${#authentication.isAuthenticated()} and ${#authorization.expression('hasRole(''ROLE_USER'')')} and ${article.likedArticle == true}"
