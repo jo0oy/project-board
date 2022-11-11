@@ -22,6 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,6 +40,8 @@ public class ArticleCommandServiceImpl implements ArticleCommandService {
     private final HashtagQueryService hashtagQueryService;
     private final HashtagRepository hashtagRepository;
     private final ArticleHashtagRepository articleHashtagRepository;
+
+    private static final String VIEW_COUNT_COOKIE_NAME = "articleViewed";
 
     /**
      * 새로운 Article 등록 메서드.
@@ -89,6 +94,45 @@ public class ArticleCommandServiceImpl implements ArticleCommandService {
         var hashtags = renewHashtagsFromList(command.getHashtagNames(), article);
 
         return new ArticleInfo.MainInfo(articleRepository.save(article), hashtags);
+    }
+
+    /**
+     * 게시글 조회수 증가 메서드
+     * @param articleId : 조회수 증가시킬 게시글 Id
+     * @param request : 요청받은 HttpServletRequest
+     * @param response : 응답할 HttpServletResponse
+     */
+    @Override
+    @Transactional
+    public void viewCountUp(Long articleId, HttpServletRequest request, HttpServletResponse response) {
+        log.info("{}:{}", getClass().getSimpleName(), "viewCountUp(Long, HttpServletRequest, HttpServletResponse)");
+
+        Cookie viewCookie = null;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(VIEW_COUNT_COOKIE_NAME)) {
+                    viewCookie = cookie;
+                }
+            }
+        }
+
+        if (viewCookie != null) {
+            if (!viewCookie.getValue().contains("[" + articleId.toString() + "]")) {
+                articleRepository.updateViewCount(articleId);
+                viewCookie.setValue(viewCookie.getValue() + "_[" + articleId + "]");
+                viewCookie.setMaxAge(60 * 60 * 12);
+                viewCookie.setHttpOnly(true);
+                response.addCookie(viewCookie);
+            }
+        } else {
+            articleRepository.updateViewCount(articleId);
+            Cookie newCookie = new Cookie(VIEW_COUNT_COOKIE_NAME,"[" + articleId + "]");
+            newCookie.setMaxAge(60 * 60 * 12); // 12시간
+            newCookie.setComment("조회수 중복 증가 방지 쿠키"); // 쿠키 용도 설명 기재
+            newCookie.setHttpOnly(true);
+            response.addCookie(newCookie);
+        }
     }
 
     /**
