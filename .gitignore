@@ -72,6 +72,6 @@ Temporary Items
 ### Querydsl ###
 src/main/generated
 
-### AWS S3 ###
-src/main/resources/application-aws-credentials.yml
-src/test/resources/application-aws-credentials.yml
+#### AWS S3 ###
+#src/main/resources/application-aws-credentials.yml
+#src/test/resources/application-aws-credentials.yml

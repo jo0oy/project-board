@@ -9,16 +9,18 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Slf4j
 @RequiredArgsConstructor
+@RequestMapping("/likes")
 @Controller
 public class LikeCommandController {
 
     private final LikeCommandService likeCommandService;
 
     @PreAuthorize("isAuthenticated() and hasAnyRole({'ROLE_USER', 'ROLE_ADMIN'})")
-    @PostMapping("/likes/{articleId}")
+    @PostMapping("/{articleId}")
     public String pushLike(@PathVariable Long articleId,
                            @AuthenticationPrincipal PrincipalUserAccount principalUserAccount) {
 

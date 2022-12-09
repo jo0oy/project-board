@@ -18,6 +18,7 @@ import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
+@RequestMapping("/articles")
 @Controller
 public class ArticleCommandController {
 
@@ -25,7 +26,7 @@ public class ArticleCommandController {
     private final ArticleDtoMapper articleDtoMapper;
 
     @PreAuthorize("hasAnyRole({'ROLE_USER', 'ROLE_ADMIN'})")
-    @PostMapping("/articles/new")
+    @PostMapping("/new")
     public String registerArticle(@AuthenticationPrincipal PrincipalUserAccount principalUserAccount,
                                   @Valid @ModelAttribute("registerForm") ArticleDto.RegisterForm form,
                                   BindingResult bindingResult) {
@@ -48,7 +49,7 @@ public class ArticleCommandController {
     }
 
     @PreAuthorize("hasAnyRole({'ROLE_USER', 'ROLE_ADMIN'})")
-    @PutMapping("/articles/{id}/edit")
+    @PutMapping("/{id}/edit")
     public String updateArticle(@PathVariable Long id,
                                 @AuthenticationPrincipal PrincipalUserAccount principalUserAccount,
                                 @Valid @ModelAttribute("updateForm") ArticleDto.UpdateForm updateForm,
@@ -71,7 +72,7 @@ public class ArticleCommandController {
     }
 
     @PreAuthorize("hasAnyRole({'ROLE_USER', 'ROLE_ADMIN'})")
-    @DeleteMapping("/articles/{id}")
+    @DeleteMapping("/{id}")
     public String deleteArticle(@PathVariable Long id,
                                 @AuthenticationPrincipal PrincipalUserAccount principalUserAccount) {
 

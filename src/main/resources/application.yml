@@ -18,9 +18,9 @@ spring:
       - aws-credentials
 
   datasource:
-    url: jdbc:mariadb://127.0.0.1:3306/board
-    username: boardUser
-    password: boardUserpw0987!#@
+    url: ${LOCAL_DB_URL}
+    username: ${LOCAL_DB_USERNAME}
+    password: ${LOCAL_DB_PASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
   jpa:
     defer-datasource-initialization: true
