@@ -20,13 +20,15 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 @SessionAttributes("article")
 @PreAuthorize("hasAnyRole({'ROLE_USER', 'ROLE_ADMIN'})") // 댓글 (등록/수정/삭제)는 인증된 'USER/ADMIN' 사용자만 요청 가능하다.
+@RequestMapping("/article-comments")
 @Controller
 public class CommentCommandController {
 
     private final ArticleCommentCommandService commentCommandService;
     private final ArticleCommentDtoMapper commentDtoMapper;
 
-    @PostMapping("/article-comments")
+
+    @PostMapping("")
     public String registerComment(@AuthenticationPrincipal PrincipalUserAccount userAccount,
                                   @ModelAttribute("article") ArticleDto.ArticleWithCommentsResponse article,
                                   @Valid @ModelAttribute("registerForm") ArticleCommentDto.RegisterForm registerForm,
@@ -43,7 +45,7 @@ public class CommentCommandController {
         return "redirect:/articles/" + registerForm.getParentArticleId();
     }
 
-    @PutMapping("/article-comments/{id}")
+    @PutMapping("/{id}")
     public String update(@PathVariable Long id,
                          @AuthenticationPrincipal PrincipalUserAccount userAccount,
                          ArticleCommentDto.UpdateForm updateForm) {
@@ -53,7 +55,7 @@ public class CommentCommandController {
         return "redirect:/articles/" + updateForm.getParentArticleId();
     }
 
-    @DeleteMapping("/article-comments/{id}")
+    @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id,
                          @AuthenticationPrincipal PrincipalUserAccount userAccount,
                          Long articleId) {

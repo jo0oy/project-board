@@ -12,9 +12,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Slf4j
 @RequiredArgsConstructor
+@RequestMapping("/accounts")
 @Controller
 public class UserAccountViewController {
 
@@ -22,7 +24,7 @@ public class UserAccountViewController {
     private final UserAccountDtoMapper userAccountDtoMapper;
 
     // 회원가입 페이지
-    @GetMapping("/accounts/sign-up")
+    @GetMapping("/sign-up")
     public String signUpPage(Model model) {
         var registerForm = UserAccountDto.RegisterForm.builder().build();
         model.addAttribute("registerForm", registerForm);
@@ -30,14 +32,14 @@ public class UserAccountViewController {
     }
 
     // 회원가입 성공 페이지
-    @GetMapping("/accounts/sign-up/success")
+    @GetMapping("/sign-up/success")
     public String signUpSuccessPage() {
         return "users/sign-up-success";
     }
 
     // myAccount 페이지
     @PreAuthorize("hasRole('ROLE_USER')")
-    @GetMapping("/accounts/me")
+    @GetMapping("/me")
     public String myAccountPage(@AuthenticationPrincipal PrincipalUserAccount principalUserAccount,
                                 Model model) {
 
@@ -49,7 +51,7 @@ public class UserAccountViewController {
 
     // {username}의 계정 정보 페이지 -> 본인 혹은 관리자 계정만 접근 가능
     @PreAuthorize("(hasRole('ROLE_USER') and (#username == authentication.principal.username)) or hasRole('ROLE_ADMIN')")
-    @GetMapping("/accounts/{username}")
+    @GetMapping("/{username}")
     public String userInfoPage(@PathVariable String username,
                                @AuthenticationPrincipal PrincipalUserAccount principalUserAccount,
                                Model model) {
@@ -62,7 +64,7 @@ public class UserAccountViewController {
 
     // myAccount 정보 수정 페이지
     @PreAuthorize("hasRole('ROLE_USER')")
-    @GetMapping("/accounts/me/edit")
+    @GetMapping("/me/edit")
     public String myAccountEditPage(@AuthenticationPrincipal PrincipalUserAccount principalUserAccount,
                                     Model model) {
 
@@ -76,7 +78,7 @@ public class UserAccountViewController {
 
     // {username}의 계정 정보 수정 페이지 -> 본인 혹은 관리자 계정만 접근 가능
     @PreAuthorize("(hasRole('ROLE_USER') and (#username == authentication.principal.username)) or hasRole('ROLE_ADMIN')")
-    @GetMapping("/accounts/{username}/edit")
+    @GetMapping("/{username}/edit")
     public String userInfoEditPage(@PathVariable String username,
                                    @AuthenticationPrincipal PrincipalUserAccount principalUserAccount,
                                    Model model) {

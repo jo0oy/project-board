@@ -16,13 +16,14 @@ import javax.validation.Valid;
 
 @Slf4j
 @RequiredArgsConstructor
+@RequestMapping("/accounts")
 @Controller
 public class UserAccountCommandController {
 
     private final UserAccountCommandService userAccountCommandService;
     private final UserAccountDtoMapper userAccountDtoMapper;
 
-    @PostMapping("/accounts/sign-up")
+    @PostMapping("/sign-up")
     public String registerUser(@Valid @ModelAttribute("registerForm") UserAccountDto.RegisterForm registerForm,
                                BindingResult bindingResult) {
         
@@ -49,7 +50,7 @@ public class UserAccountCommandController {
     }
 
     @PreAuthorize("hasAnyRole({'ROLE_USER', 'ROLE_ADMIN'})")
-    @PutMapping("/accounts/{id}/edit")
+    @PutMapping("/{id}/edit")
     public String updateUserInfo(@PathVariable Long id,
                                  @AuthenticationPrincipal PrincipalUserAccount principalUserAccount,
                                  @Valid @ModelAttribute("updateForm") UserAccountDto.UpdateForm updateForm,
@@ -73,7 +74,7 @@ public class UserAccountCommandController {
     }
 
     @PreAuthorize("hasAnyRole({'ROLE_USER', 'ROLE_ADMIN'})")
-    @DeleteMapping("/accounts/{id}")
+    @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id,
                          @AuthenticationPrincipal PrincipalUserAccount principalUserAccount) {
 
