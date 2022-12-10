@@ -3,6 +3,7 @@ package com.example.projectboard.application.users;
 import com.example.projectboard.common.exception.EntityNotFoundException;
 import com.example.projectboard.common.exception.NoAuthorityToReadException;
 import com.example.projectboard.common.exception.UsernameNotFoundException;
+import com.example.projectboard.common.util.PageRequestUtils;
 import com.example.projectboard.domain.users.UserAccount;
 import com.example.projectboard.domain.users.UserAccountCommand;
 import com.example.projectboard.domain.users.UserAccountInfo;
@@ -10,7 +11,6 @@ import com.example.projectboard.domain.users.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -111,7 +111,7 @@ public class UserAccountQueryServiceImpl implements UserAccountQueryService {
     public Page<UserAccountInfo> userAccounts(UserAccountCommand.SearchCondition condition, Pageable pageable) {
         log.info("{}: {}", getClass().getSimpleName(), "userAccounts(UserAccountCommand.SearchCondition, Pageable)");
 
-        return userAccountRepository.findAllBySearchCondition(condition.toSearchCondition(), getPageRequest(pageable))
+        return userAccountRepository.findAllBySearchCondition(condition.toSearchCondition(), PageRequestUtils.of(pageable))
                 .map(UserAccountInfo::of);
     }
 
@@ -128,14 +128,5 @@ public class UserAccountQueryServiceImpl implements UserAccountQueryService {
                 .stream()
                 .map(UserAccountInfo::of)
                 .collect(Collectors.toList());
-    }
-
-    private PageRequest getPageRequest(Pageable pageable) {
-
-        if(pageable.getPageNumber() < 0) {
-            log.error("IllegalArgumentException. Invalid PageNumber!!");
-            throw new IllegalArgumentException("페이지 번호는 0보다 작을 수 없습니다. 올바른 페이지 번호를 입력하세요.");
-        }
-        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
     }
 }
