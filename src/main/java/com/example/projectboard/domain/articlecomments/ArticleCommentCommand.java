@@ -18,11 +18,11 @@ public class ArticleCommentCommand {
         private String commentBody;
 
         public ArticleComment toEntity(Article article, Long userId) {
-            return ArticleComment.builder()
-                    .article(article)
-                    .commentBody(commentBody)
-                    .userId(userId)
-                    .build();
+            return ArticleComment.of(commentBody, article, userId);
+        }
+
+        public ArticleComment toEntity(Article article, Long userId, ArticleComment parent) {
+            return ArticleComment.of(commentBody, article, userId, parent);
         }
     }
 
