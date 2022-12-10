@@ -2,6 +2,7 @@ package com.example.projectboard.application.articles;
 
 import com.example.projectboard.common.exception.EntityNotFoundException;
 import com.example.projectboard.common.exception.UsernameNotFoundException;
+import com.example.projectboard.common.util.PageRequestUtils;
 import com.example.projectboard.domain.articlecomments.ArticleCommentInfo;
 import com.example.projectboard.domain.articlecomments.ArticleCommentRepository;
 import com.example.projectboard.domain.articles.ArticleCommand;
@@ -14,7 +15,6 @@ import com.example.projectboard.domain.users.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,12 +88,12 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
 
         // 해시태그 검색 조회 하는 경우
         if (StringUtils.hasText(condition.getHashtag())) {
-            return articleHashtagRepository.findByHashtagNameIgnoreCase(condition.getHashtag(), getPageRequest(pageable))
+            return articleHashtagRepository.findByHashtagNameIgnoreCase(condition.getHashtag(), PageRequestUtils.of(pageable))
                     .map(ArticleHashtag::getArticle)
                     .map(ArticleInfo.MainInfo::new);
         }
 
-        return articleRepository.findAll(condition.toSearchCondition(), getPageRequest(pageable))
+        return articleRepository.findAll(condition.toSearchCondition(), PageRequestUtils.of(pageable))
                 .map(ArticleInfo.MainInfo::new);
     }
 
@@ -130,20 +130,20 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
                 .orElseThrow(() -> new UsernameNotFoundException("유저를 찾을 수 없습니다. username=" + principalUsername));
 
         return articleRepository
-                .findAllByUserId(userAccount.getId(), condition.toSearchCondition(), getPageRequest(pageable))
+                .findAllByUserId(userAccount.getId(), condition.toSearchCondition(), PageRequestUtils.of(pageable))
                 .map(ArticleInfo.MainInfo::new);
     }
 
     @Override
     public Page<ArticleInfo.MainInfo> articlesByHashtagId(Long hashtagId, Pageable pageable) {
-        return articleHashtagRepository.findByHashtagId(hashtagId, getPageRequest(pageable))
+        return articleHashtagRepository.findByHashtagId(hashtagId, PageRequestUtils.of(pageable))
                 .map(ArticleHashtag::getArticle)
                 .map(ArticleInfo.MainInfo::new);
     }
 
     @Override
     public Page<ArticleInfo.MainInfo> articlesByHashtagName(String hashtagName, Pageable pageable) {
-        return articleHashtagRepository.findByHashtagNameIgnoreCase(hashtagName, getPageRequest(pageable))
+        return articleHashtagRepository.findByHashtagNameIgnoreCase(hashtagName, PageRequestUtils.of(pageable))
                 .map(ArticleHashtag::getArticle)
                 .map(ArticleInfo.MainInfo::new);
     }
@@ -155,14 +155,5 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
     @Override
     public long articleCount() {
         return articleRepository.count();
-    }
-
-    private PageRequest getPageRequest(Pageable pageable) {
-
-        if(pageable.getPageNumber() < 0) {
-            log.error("IllegalArgumentException. Invalid PageNumber!!");
-            throw new IllegalArgumentException("페이지 번호는 0보다 작을 수 없습니다. 올바른 페이지 번호를 입력하세요.");
-        }
-        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
     }
 }
