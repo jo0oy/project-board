@@ -32,7 +32,7 @@ public class Article extends JpaAuditingFields {
     @Column(nullable = false, length = 10000)
     private String content; // 본문
 
-    @Column(columnDefinition = "integer default 0", nullable = false)
+    @Column(columnDefinition = "integer default 0")
     private Integer viewCount;
 
     @Column(nullable = false, updatable = false)
