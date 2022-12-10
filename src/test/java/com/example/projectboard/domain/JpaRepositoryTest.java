@@ -1,7 +1,7 @@
 package com.example.projectboard.domain;
 
-import com.example.projectboard.config.JpaConfig;
 import com.example.projectboard.config.QuerydslConfig;
+import com.example.projectboard.domain.articlecomments.ArticleComment;
 import com.example.projectboard.domain.articlecomments.ArticleCommentRepository;
 import com.example.projectboard.domain.articles.Article;
 import com.example.projectboard.domain.articles.ArticleRepository;
@@ -19,6 +19,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.COLLECTION;
 
 @DisplayName("JPA 연결 테스트")
 @Import({JpaRepositoryTest.JpaConfig.class, QuerydslConfig.class})
@@ -101,6 +102,73 @@ public class JpaRepositoryTest {
                 .isEqualTo(previousCommentCnt - comments.size());
     }
 
+    @DisplayName("[성공] 대댓글 조회 테스트")
+    @Test
+    void givenParentId_whenSelecting_thenReturnsChildComments() {
+        //given
+        var parentId = 1L;
+
+        //when
+        var parentComment = articleCommentRepository.findById(parentId);
+
+        //then
+        assertThat(parentComment).get()
+                .hasFieldOrPropertyWithValue("parent", null)
+                .extracting("childs", COLLECTION)
+                        .hasSize(4);
+    }
+
+    @DisplayName("[성공] 댓글에 대댓글 삽입 테스트")
+    @Test
+    void givenParentComment_whenSaving_thenInsertsChildComment() {
+        // Given
+        var parentComment = articleCommentRepository.getReferenceById(1L);
+        var childComment = ArticleComment.of(
+                "new CommentBody",
+                parentComment.getArticle(),
+                parentComment.getUserId()
+        );
+
+        // When
+        parentComment.addChild(childComment);
+        articleCommentRepository.flush();
+
+        // Then
+        assertThat(articleCommentRepository.findById(1L)).get()
+                .hasFieldOrPropertyWithValue("parent", null)
+                .extracting("childs", COLLECTION)
+                .hasSize(5);
+    }
+
+    @DisplayName("댓글 삭제와 대댓글 전체 연동 삭제 테스트: 기본 JPA 삭제 메서드 사용")
+    @Test
+    void givenArticleCommentHavingChildComments_whenDeletingParentComment_thenDeletesEveryComment() {
+        // Given
+        var parentComment = articleCommentRepository.getReferenceById(1L);
+        long previousArticleCommentCount = articleCommentRepository.count();
+
+        // When
+        articleCommentRepository.delete(parentComment);
+
+        // Then
+        assertThat(articleCommentRepository.count()).isEqualTo(previousArticleCommentCount - 5); // 테스트 댓글 + 대댓글 4개
+    }
+
+    @DisplayName("[성공] 댓글 삭제와 대댓글 전체 연동 삭제 테스트 - 댓글 ID, 벌크 삭제")
+    @Test
+    void givenArticleCommentIdHavingChildComments_whenDeletingParentComment_thenDeletesEveryComment() {
+        // Given
+        long previousArticleCommentCount = articleCommentRepository.count();
+
+        // When
+        articleCommentRepository.deleteByParentId(1L);
+        articleCommentRepository.deleteById(1L);
+
+        // Then
+        assertThat(articleCommentRepository.count()).isEqualTo(previousArticleCommentCount - 5); // 테스트 댓글 + 대댓글 4개
+    }
+
+
     @EnableJpaAuditing
     @TestConfiguration
     public static class JpaConfig {
@@ -110,7 +178,4 @@ public class JpaRepositoryTest {
             return () -> Optional.of("testUser");
         }
     }
-
 }
-
-
