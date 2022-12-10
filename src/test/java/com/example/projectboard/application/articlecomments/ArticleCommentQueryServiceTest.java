@@ -42,7 +42,7 @@ class ArticleCommentQueryServiceTest {
     void givenArticleIdAndPageable_whenCommentsByArticleId_thenWorksFine() {
         // given
         var articleId = 2L;
-        var articleCommentsTotal = 3;
+        var articleCommentsTotal = 7;
         var pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "id"));
 
         // when
@@ -120,6 +120,6 @@ class ArticleCommentQueryServiceTest {
 
         // then
         assertThat(result.size()).isEqualTo(30);
-        assertThat(result.get(2L).size()).isEqualTo(3);
+        assertThat(result.get(2L).size()).isEqualTo(7);
     }
 }
