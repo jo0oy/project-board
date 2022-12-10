@@ -10,12 +10,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("JPA 연결 테스트")
-@Import({JpaConfig.class, QuerydslConfig.class})
+@Import({JpaRepositoryTest.JpaConfig.class, QuerydslConfig.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
 public class JpaRepositoryTest {
@@ -37,7 +43,7 @@ public class JpaRepositoryTest {
         //then
         assertThat(articles)
                 .isNotNull()
-                .hasSize(200);
+                .hasSize(30);
     }
 
     @Test
@@ -63,15 +69,15 @@ public class JpaRepositoryTest {
     void givenTestData_whenUpdating_thenWorksFine() {
         //given
         var article = articleRepository.findById(1L).orElseThrow();
-        var updateHashtag = "#springboot";
-        article.update(null, null);
+        var updateContent = "수정된 게시글 내용입니다.";
+        article.update(null, updateContent);
 
         //when
         var updatedArticle = articleRepository.saveAndFlush(article);
 
         //then
-        assertThat(updatedArticle)
-                .hasFieldOrPropertyWithValue("hashtag", updateHashtag);
+        assertThat(updatedArticle.getContent())
+                .isEqualTo(updateContent);
     }
 
     @Test
@@ -94,6 +100,17 @@ public class JpaRepositoryTest {
         assertThat(articleCommentRepository.count())
                 .isEqualTo(previousCommentCnt - comments.size());
     }
+
+    @EnableJpaAuditing
+    @TestConfiguration
+    public static class JpaConfig {
+        @Bean
+        public AuditorAware<String> auditorAware() {
+
+            return () -> Optional.of("testUser");
+        }
+    }
+
 }
 
 
