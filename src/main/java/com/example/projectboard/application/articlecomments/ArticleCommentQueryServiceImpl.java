@@ -1,13 +1,13 @@
 package com.example.projectboard.application.articlecomments;
 
 import com.example.projectboard.common.exception.EntityNotFoundException;
+import com.example.projectboard.common.util.PageRequestUtils;
 import com.example.projectboard.domain.articlecomments.ArticleCommentCommand;
 import com.example.projectboard.domain.articlecomments.ArticleCommentInfo;
 import com.example.projectboard.domain.articlecomments.ArticleCommentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +47,7 @@ public class ArticleCommentQueryServiceImpl implements ArticleCommentQueryServic
                                                                    Pageable pageable) {
         log.info("{}:{}", getClass().getSimpleName(), "commentsByArticleId(Long, Pageable)");
 
-        return articleCommentRepository.findByArticleId(articleId, getPageRequest(pageable))
+        return articleCommentRepository.findByArticleId(articleId, PageRequestUtils.of(pageable))
                 .map(ArticleCommentInfo.SimpleInfo::new);
     }
 
@@ -62,7 +62,7 @@ public class ArticleCommentQueryServiceImpl implements ArticleCommentQueryServic
                                                       Pageable pageable) {
         log.info("{}:{}", getClass().getSimpleName(), "comments(ArticleCommentCommand.SearchCondition, Pageable)");
 
-        return articleCommentRepository.findAllWithArticleId(condition.toSearchCondition(), getPageRequest(pageable));
+        return articleCommentRepository.findAllWithArticleId(condition.toSearchCondition(), PageRequestUtils.of(pageable));
     }
 
     /**
@@ -87,10 +87,5 @@ public class ArticleCommentQueryServiceImpl implements ArticleCommentQueryServic
 
         return articleCommentRepository.findAllWithArticleId().stream()
                 .collect(Collectors.groupingBy(ArticleCommentInfo.MainInfo::getArticleId));
-    }
-
-    private PageRequest getPageRequest(Pageable pageable) {
-        int page = (pageable.getPageNumber() <= 0) ? 0 : pageable.getPageNumber() - 1;
-        return PageRequest.of(page, pageable.getPageSize(), pageable.getSort());
     }
 }
