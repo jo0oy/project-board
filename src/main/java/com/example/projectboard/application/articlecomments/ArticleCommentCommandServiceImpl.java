@@ -3,6 +3,7 @@ package com.example.projectboard.application.articlecomments;
 import com.example.projectboard.common.exception.EntityNotFoundException;
 import com.example.projectboard.common.exception.NoAuthorityToUpdateDeleteException;
 import com.example.projectboard.common.exception.UsernameNotFoundException;
+import com.example.projectboard.domain.articlecomments.ArticleComment;
 import com.example.projectboard.domain.articlecomments.ArticleCommentCommand;
 import com.example.projectboard.domain.articlecomments.ArticleCommentInfo;
 import com.example.projectboard.domain.articlecomments.ArticleCommentRepository;
@@ -13,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -42,14 +45,24 @@ public class ArticleCommentCommandServiceImpl implements ArticleCommentCommandSe
         var userAccount = userAccountRepository.findByUsername(writer).orElseThrow(() ->
                 new UsernameNotFoundException("유저를 찾을 수 없습니다. username=" + writer));
 
+        // 부모 댓글 존재 여부 확인 후, ArticleComment 엔티티 변경
+        ArticleComment comment;
+        if (Objects.nonNull(command.getParentId())) { // 부모 댓글 존재함
+            var parent = articleCommentRepository.getReferenceById(command.getParentId());
+            comment = command.toEntity(article, userAccount.getId(), parent);
+        } else {
+            comment = command.toEntity(article, userAccount.getId());
+        }
+
         // 댓글 등록
-        var savedComment = articleCommentRepository.save(command.toEntity(article, userAccount.getId()));
-        return new ArticleCommentInfo.MainInfo(savedComment, command.getArticleId());
+        var savedComment = articleCommentRepository.save(comment);
+
+        return new ArticleCommentInfo.MainInfo(savedComment, command.getArticleId(), command.getParentId());
     }
 
     /**
      * ArticleComment 내용 수정 메서드.
-     * @param commentId : 수정하려는 ArticleComment의 id (Long)
+     * @param commentId : 수정하려는 ArticleComment 의 id (Long)
      * @param principalUsername : 현재 인증 객체(Security Context)에 담겨 있는 사용자 정보에서의 username (String) -> 수정 요청 권한 확인을 위해
      * @param command : ArticleComment 수정을 위한 데이터가 담긴 객체 (ArticleCommentCommand.UpdateReq)
      */
@@ -88,8 +101,14 @@ public class ArticleCommentCommandServiceImpl implements ArticleCommentCommandSe
 
         // 삭제 권한 확인
         if (validateAuthorityToCommand(comment.getUserId(), principalUsername)) {
+
+            if (comment.hasChilds()) { // 자식 댓글 존재 여부 확인 후, 자식 댓글을 먼저 모두 삭제한다.
+                articleCommentRepository.deleteByParentId(commentId);
+            }
+
             // 댓글 삭제
-            articleCommentRepository.delete(comment);
+            articleCommentRepository.deleteById(commentId);
+
         } else {
             log.error("삭제 권한이 없는 사용자입니다. username={}", principalUsername);
             throw new NoAuthorityToUpdateDeleteException();

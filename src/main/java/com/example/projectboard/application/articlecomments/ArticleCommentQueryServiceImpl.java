@@ -55,7 +55,7 @@ public class ArticleCommentQueryServiceImpl implements ArticleCommentQueryServic
      * 검색 조건에 따른 ArticleComment 리스트 페이징 조회 메서드.
      * @param condition : ArticleComment 검색조건 (ArticleCommentCommand.SearchCondition)
      * @param pageable : 페이징을 위한 페이징 정보 (Pageable)
-     * @return Page<ArticleCommentInfo.MainInfo> : 댓글 리스트 페이징 조회 결과를 ArticleCommentInfo.MainInfo에 감싸서 반환.
+     * @return Page<ArticleCommentInfo.MainInfo> : 댓글 리스트 페이징 조회 결과를 ArticleCommentInfo.MainInfo 에 감싸서 반환.
      */
     @Override
     public Page<ArticleCommentInfo.MainInfo> comments(ArticleCommentCommand.SearchCondition condition,
@@ -68,7 +68,7 @@ public class ArticleCommentQueryServiceImpl implements ArticleCommentQueryServic
     /**
      * 검색 조건에 따른 ArticleComment 리스트 조회 메서드.
      * @param condition : ArticleComment 검색조건 (ArticleCommentCommand.SearchCondition)
-     * @return List<ArticleCommentInfo.MainInfo> : 댓글 리스트 조회 결과를 ArticleCommentInfo.MainInfo에 감싸서 반환.
+     * @return List<ArticleCommentInfo.MainInfo> : 댓글 리스트 조회 결과를 ArticleCommentInfo.MainInfo 에 감싸서 반환.
      */
     @Override
     public List<ArticleCommentInfo.MainInfo> comments(ArticleCommentCommand.SearchCondition condition) {
