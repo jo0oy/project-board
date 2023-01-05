@@ -11,6 +11,7 @@ import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 
 public class ArticleCommentDto {
@@ -24,6 +25,8 @@ public class ArticleCommentDto {
 
         @NotBlank @Size(min = 5, max = 500)
         private String commentBody;
+
+        private Long parentId;
     }
 
     @Getter
@@ -44,6 +47,21 @@ public class ArticleCommentDto {
 
         @NotBlank @Size(min = 5, max = 500)
         private String commentBody;
+
+        private Long parentId;
+    }
+
+    @Getter
+    @ToString
+    @Builder
+    public static class RegisterChildForm {
+        @NotNull
+        private Long articleId;
+
+        @NotBlank @Size(min = 5, max = 500)
+        private String childCommentBody;
+
+        private Long parentCommentId;
     }
 
     @Getter
@@ -101,6 +119,20 @@ public class ArticleCommentDto {
         private String commentBody;
         private String createdBy;
         private LocalDateTime createdAt;
+    }
+
+    @ToString
+    @Getter
+    @Builder
+    public static class WithChildCommentsInfoResponse {
+        private Long commentId;
+        private Long articleId;
+        private Long userId;
+        private Long parentId;
+        private String commentBody;
+        private String createdBy;
+        private LocalDateTime createdAt;
+        private Set<WithChildCommentsInfoResponse> childComments;
     }
 
     @ToString

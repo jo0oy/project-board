@@ -2,10 +2,7 @@ package com.example.projectboard.interfaces.dto.articlecomments;
 
 import com.example.projectboard.domain.articlecomments.ArticleCommentCommand;
 import com.example.projectboard.domain.articlecomments.ArticleCommentInfo;
-import org.mapstruct.InjectionStrategy;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 
 import java.util.List;
 
@@ -24,6 +21,13 @@ public interface ArticleCommentDtoMapper {
     @Mapping(target = "articleId", source = "parentArticleId")
     ArticleCommentCommand.RegisterReq toCommand(ArticleCommentDto.RegisterForm form);
 
+    @Mappings({
+            @Mapping(target = "articleId", source = "articleId"),
+            @Mapping(target = "commentBody", source = "childCommentBody"),
+            @Mapping(target = "parentId", source = "parentCommentId")
+    })
+    ArticleCommentCommand.RegisterReq toCommand(ArticleCommentDto.RegisterChildForm form);
+
     @Mapping(target = "commentBody", source = "updateCommentBody")
     ArticleCommentCommand.UpdateReq toCommand(ArticleCommentDto.UpdateForm form);
 
@@ -33,6 +37,8 @@ public interface ArticleCommentDtoMapper {
     ArticleCommentDto.MainInfoResponse toDto(ArticleCommentInfo.MainInfo info);
 
     ArticleCommentDto.SimpleInfoResponse toDto(ArticleCommentInfo.SimpleInfo info);
+
+    ArticleCommentDto.WithChildCommentsInfoResponse toDto(ArticleCommentInfo.WithChildCommentsInfo info);
 
     ArticleCommentDto.GroupByArticleInfoResponse toDto(Long articleId, List<ArticleCommentInfo.MainInfo> comments);
 }

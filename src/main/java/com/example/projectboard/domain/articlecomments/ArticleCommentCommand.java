@@ -17,6 +17,8 @@ public class ArticleCommentCommand {
         private Long articleId;
         private String commentBody;
 
+        private Long parentId;
+
         public ArticleComment toEntity(Article article, Long userId) {
             return ArticleComment.of(commentBody, article, userId);
         }

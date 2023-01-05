@@ -8,9 +8,8 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ArticleInfo {
@@ -75,10 +74,10 @@ public class ArticleInfo {
         private List<HashtagInfo> hashtagInfos;
         private String createdBy;
         private LocalDateTime createdAt;
-        private List<ArticleCommentInfo.SimpleInfo> comments;
+        private Set<ArticleCommentInfo.WithChildCommentsInfo> comments;
         private boolean likedArticle;
         public ArticleWithCommentsInfo(Article entity,
-                                       List<ArticleCommentInfo.SimpleInfo> comments,
+                                       Set<ArticleCommentInfo.WithChildCommentsInfo> comments,
                                        boolean likedArticle) {
 
             this.articleId = entity.getId();
@@ -93,12 +92,31 @@ public class ArticleInfo {
                     .map(HashtagInfo::new)
                     .collect(Collectors.toUnmodifiableList());
 
-            this.comments = new ArrayList<>();
-            if (comments != null && comments.size() > 0) {
-                this.comments.addAll(comments);
-            }
+            this.comments = organizeChildComments(comments); // 대댓글 구조로 재정렬
 
             this.likedArticle = likedArticle;
+        }
+
+        private static Set<ArticleCommentInfo.WithChildCommentsInfo> organizeChildComments(Set<ArticleCommentInfo.WithChildCommentsInfo> infos) {
+            var map = infos.stream()
+                    .collect(Collectors.toMap(ArticleCommentInfo.WithChildCommentsInfo::getCommentId, Function.identity()));
+
+            map.values().stream()
+                    .filter(ArticleCommentInfo.WithChildCommentsInfo::hasParent)
+                    .forEach(comment -> {
+                        var parentComment = map.get(comment.getParentId());
+                        parentComment.getChildComments().add(comment);
+                    });
+
+            return map.values().stream()
+                    .filter(comment -> !comment.hasParent())
+                    .collect(Collectors.toCollection(() ->
+                            new TreeSet<>(Comparator
+                                    .comparing(ArticleCommentInfo.WithChildCommentsInfo::getCreatedAt)
+                                    .reversed()
+                                    .thenComparingLong(ArticleCommentInfo.WithChildCommentsInfo::getCommentId)
+                            )
+                    ));
         }
     }
 
