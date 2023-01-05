@@ -7,7 +7,6 @@ import com.example.projectboard.common.exception.UsernameNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -26,7 +25,10 @@ public class CommonExceptionHandler {
     public String entityNotFoundException(Model model,Exception exception) {
         log.error("handling {}: {}", exception.getClass().getSimpleName(), exception.getMessage());
 
-        model.addAttribute("exception", exception.getMessage());
+        var exceptionMessage = (exception instanceof EntityNotFoundException) ?
+                exception.getMessage() : "존재하지 않는 정보입니다.";
+
+        model.addAttribute("exception", exceptionMessage);
 
         return "error/error-page";
     }
