@@ -64,16 +64,16 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
                 .orElseThrow(() -> {throw new EntityNotFoundException("존재하지 않는 게시글입니다.");});
 
         // 게시글 댓글 리스트 조회
-        var commentList = articleCommentRepository.findByArticleId(articleId).stream()
-                .map(ArticleCommentInfo.SimpleInfo::new)
-                .collect(Collectors.toList());
+        var commentSet = articleCommentRepository.findByArticleId(articleId).stream()
+                .map(ArticleCommentInfo.WithChildCommentsInfo::new)
+                .collect(Collectors.toSet());
 
         // 로그인한 사용자가 '좋아요'한 게시글인지 체크
         var likedArticle = false; // null 이거나 empty 문자열인 경우 -> false
         if(StringUtils.hasText(principalUsername))
             likedArticle = likeRepository.existsByArticle_IdAndUserAccount_Username(articleId, principalUsername);
 
-        return new ArticleInfo.ArticleWithCommentsInfo(article, commentList, likedArticle);
+        return new ArticleInfo.ArticleWithCommentsInfo(article, commentSet, likedArticle);
     }
 
     /**
