@@ -1,7 +1,7 @@
 plugins {
-    id 'org.springframework.boot' version '2.7.3'
-    id 'io.spring.dependency-management' version '1.0.13.RELEASE'
     id 'java'
+    id 'org.springframework.boot' version '2.7.7'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
 
 group = 'com.example'
@@ -26,10 +26,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
-    compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
     // Querydsl 설정
     implementation 'com.querydsl:querydsl-jpa'
@@ -50,7 +50,7 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
 
     // AWS S3 설정
-    implementation platform('com.amazonaws:aws-java-sdk-bom:1.12.338')
+    implementation platform('com.amazonaws:aws-java-sdk-bom:1.12.376')
     implementation 'com.amazonaws:aws-java-sdk-s3'
     implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.2'
 }
