@@ -39,7 +39,7 @@ public class ArticleComment extends JpaAuditingFields {
     private ArticleComment parent;
 
     @ToString.Exclude
-    @OrderBy("createdAt ASC") // 대댓글은 최신순으로 정렬한다.
+    @OrderBy("createdAt ASC") // 대댓글은 시간순으로 정렬한다.
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private Set<ArticleComment> childs = new LinkedHashSet<>();
 
@@ -80,6 +80,10 @@ public class ArticleComment extends JpaAuditingFields {
 
     public void update(String content) {
         if (StringUtils.hasText(content)) this.commentBody = content;
+    }
+
+    public boolean hasChilds() {
+        return !this.getChilds().isEmpty();
     }
 
     // equals & hashcode override
