@@ -32,6 +32,7 @@ public class ArticleCommentRepositoryImpl implements ArticleCommentRepositoryCus
                                 articleComment.id.as("commentId"),
                                 articleComment.article.id.as("articleId"),
                                 articleComment.userId,
+                                articleComment.parent.id.as("parentId"),
                                 articleComment.commentBody,
                                 articleComment.createdBy,
                                 articleComment.createdAt))
@@ -65,6 +66,7 @@ public class ArticleCommentRepositoryImpl implements ArticleCommentRepositoryCus
                 articleComment.id.as("commentId"),
                 articleComment.article.id.as("articleId"),
                 articleComment.userId,
+                articleComment.parent.id.as("parentId"),
                 articleComment.commentBody,
                 articleComment.createdBy,
                 articleComment.createdAt)
@@ -82,6 +84,7 @@ public class ArticleCommentRepositoryImpl implements ArticleCommentRepositoryCus
                         articleComment.id.as("commentId"),
                         articleComment.article.id.as("articleId"),
                         articleComment.userId,
+                        articleComment.parent.id.as("parentId"),
                         articleComment.commentBody,
                         articleComment.createdBy,
                         articleComment.createdAt)
@@ -104,6 +107,7 @@ public class ArticleCommentRepositoryImpl implements ArticleCommentRepositoryCus
                                 articleComment.id.as("commentId"),
                                 articleComment.article.id.as("articleId"),
                                 articleComment.userId,
+                                articleComment.parent.id.as("parentId"),
                                 articleComment.commentBody,
                                 articleComment.createdBy,
                                 articleComment.createdAt)
@@ -124,6 +128,7 @@ public class ArticleCommentRepositoryImpl implements ArticleCommentRepositoryCus
                                 articleComment.id.as("commentId"),
                                 articleComment.article.id.as("articleId"),
                                 articleComment.userId,
+                                articleComment.parent.id.as("parentId"),
                                 articleComment.commentBody,
                                 articleComment.createdBy,
                                 articleComment.createdAt)

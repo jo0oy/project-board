@@ -40,7 +40,7 @@ public interface ArticleDtoMapper {
 
     ArticleDto.HashtagInfoResponse toDto(ArticleInfo.HashtagInfo info);
 
-    ArticleDto.CommentInfoResponse toDto(ArticleCommentInfo.SimpleInfo info);
+    ArticleDto.CommentInfoResponse toDto(ArticleCommentInfo.WithChildCommentsInfo info);
 
     ArticleDto.ArticleWithCommentsResponse toDto(ArticleInfo.ArticleWithCommentsInfo info);
 
