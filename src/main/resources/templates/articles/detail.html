@@ -91,7 +91,7 @@
 
             <ul id="article-comments" class="row col-md-10 col-lg-8 pt-3 mt-2" th:each="comment : ${article.comments}">
                 <li>
-                    <form class="comment-form" th:action="@{/article-comments/{id}(id=${comment.commentId})}"
+                    <form class="comment-delete-form" th:action="@{/article-comments/{id}(id=${comment.commentId})}"
                           th:method="post">
                         <input type="hidden" name="_method" value="delete"/>
                         <input type="hidden" class="article-id" name="articleId" th:value="${article.articleId}">
@@ -109,12 +109,69 @@
                                 </p>
                             </div>
                             <div class="col-2 mb-3 align-self-center"
-                                 th:if="(${#authorization.expression('isAuthenticated()')} and ${comment.createdBy} == ${#authentication.name}) or (${#authorization.expression('hasRole(''ROLE_ADMIN'')')})">
-                                <button type="submit" class="badge text-bg-secondary" id="delete-comment-button">삭제
+                                 th:if="(${#authorization.expression('isAuthenticated()')} and ${comment.createdBy} == ${#authentication.name})
+                                 or (${#authorization.expression('hasRole(''ROLE_ADMIN'')')})">
+                                <button type="submit" class="badge text-bg-secondary">삭제
                                 </button>
                             </div>
                         </div>
                     </form>
+
+                    <ul class="row me-0" th:if="${!comment.getChildComments().isEmpty()}" th:each="childComment : ${comment.getChildComments()}">
+                        <li class="child-comment">
+                            <form class="comment-delete-form" th:action="@{/article-comments/{id}(id=${childComment.commentId})}"
+                                  th:method="post">
+                                <input type="hidden" name="_method" value="delete"/>
+                                <input type="hidden" class="article-id" name="articleId" th:value="${article.articleId}">
+                                <div class="row">
+                                    <div class="col-md-10 col-lg-9">
+                                        <strong th:text="${childComment.createdBy}">작성자</strong>
+                                        <small th:with="date=${childComment.createdAt}">
+                                            <time th:datetime="${childComment.createdAt}"
+                                                  th:text="*{#temporals.format(childComment.createdAt, 'yyyy-MM-dd HH:mm:ss')}">
+                                                2022-01-01
+                                            </time>
+                                        </small>
+                                        <p th:text="${childComment.commentBody}">
+                                            댓글 내용
+                                        </p>
+                                    </div>
+                                    <div class="col-2 mb-3 align-self-center"
+                                         th:if="(${#authorization.expression('isAuthenticated()')} and ${childComment.createdBy} == ${#authentication.name})
+                                         or (${#authorization.expression('hasRole(''ROLE_ADMIN'')')})">
+                                        <button type="submit" class="badge text-bg-secondary">삭제</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </li>
+                    </ul>
+
+                    <div class="row">
+                        <details class="col-md-10 col-lg-9 mb-4">
+                            <summary>댓글 달기</summary>
+                            <form class="comment-child-form" th:action="@{/article-comments/child}" th:method="post"
+                                  th:object="${registerChildForm}">
+                                <input type="hidden" class="article-id" name="articleId" th:field="*{articleId}">
+                                <input type="hidden" class="parent-comment-id" name="parentCommentId" th:value="${comment.getCommentId()}">
+                                <div class="col-md-9 col-lg-8 mt-2">
+                                    <label for="child-comment-textbox" hidden>댓글</label>
+                                    <textarea class="form-control" id="child-comment-textbox" th:field="*{childCommentBody}" placeholder="댓글 쓰기.."
+                                              rows="3" required></textarea>
+                                </div>
+                                <div class="col-md-9 col-lg-8 mt-2">
+                                    <label for="comment-textbox" hidden></label>
+                                    <div class="error-message text-small text-danger" th:errors="*{childCommentBody}">
+                                        검증 오류
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-lg-4 mt-1">
+                                    <label for="child-comment-submit" hidden>댓글 쓰기</label>
+                                    <button class="btn btn-sm btn-primary" id="child-comment-submit" type="submit">작성완료</button>
+                                </div>
+                            </form>
+                        </details>
+                    </div>
+
                 </li>
             </ul>
 
