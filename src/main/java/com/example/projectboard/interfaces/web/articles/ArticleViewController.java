@@ -132,12 +132,14 @@ public class ArticleViewController {
         var article
                 = articleDtoMapper.toDto(articleQueryService.getArticleWithComments(id, (principalUserAccount != null) ? principalUserAccount.getUsername() : null));
         var registerForm = ArticleCommentDto.RegisterForm.builder().parentArticleId(id).build();
+        var registerChildForm = ArticleCommentDto.RegisterChildForm.builder().articleId(id).build();
 
         // 모든 조회 로직 후 조회수 증가 로직 실행
         articleCommandService.viewCountUp(id, request, response);
 
         model.addAttribute("article", article);
         model.addAttribute("registerForm", registerForm);
+        model.addAttribute("registerChildForm", registerChildForm);
 
         return "articles/detail";
     }
