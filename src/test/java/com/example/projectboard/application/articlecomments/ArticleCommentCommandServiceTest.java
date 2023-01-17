@@ -29,7 +29,7 @@ class ArticleCommentCommandServiceTest {
     @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[성공][service] 게시글 댓글 등록 테스트")
     @Test
-    void givenRegisterReq_WhenRegisterComment_WorksFine() {
+    void givenRegisterReqWithNullParent_WhenRegisterComment_WorksFine() {
         // given
         var articleId = 1L;
         var content = "새로운 댓글 등록 테스트입니다.";
@@ -46,6 +46,31 @@ class ArticleCommentCommandServiceTest {
         // then
         assertThat(result.getArticleId()).isEqualTo(articleId);
         assertThat(result.getCommentBody()).isEqualTo(content);
+    }
+
+    @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @DisplayName("[성공][service] 게시글 대댓글 등록 테스트")
+    @Test
+    void givenRegisterReqWithParent_WhenRegisterComment_WorksFine() {
+        // given
+        var articleId = 4L;
+        var parentId = 3L;
+        var content = "대댓글 등록 테스트입니다.";
+        var username = "userTest";
+        var req = ArticleCommentCommand.RegisterReq
+                .builder()
+                .articleId(articleId)
+                .commentBody(content)
+                .parentId(parentId)
+                .build();
+
+        // when
+        var result = sut.registerComment(username, req);
+
+        // then
+        assertThat(result.getArticleId()).isEqualTo(articleId);
+        assertThat(result.getCommentBody()).isEqualTo(content);
+        assertThat(result.getParentId()).isNotNull().isEqualTo(parentId);
     }
 
     @DisplayName("[실패][service] 게시글 댓글 등록 테스트 - 존재하지 않는 유저")
@@ -120,7 +145,7 @@ class ArticleCommentCommandServiceTest {
                 .hasMessage("수정/삭제 권한이 없는 사용자입니다.");
     }
 
-    @DisplayName("[성공][service] 게시글 댓글 삭제 테스트 - 삭제 권한 있는 사용자")
+    @DisplayName("[성공][service] 게시글 부모 댓글 삭제 테스트 - 삭제 권한 있는 사용자")
     @Test
     void givenCommentIdWithAuthorizedUsername_WhenDelete_WorksFine() {
         // given

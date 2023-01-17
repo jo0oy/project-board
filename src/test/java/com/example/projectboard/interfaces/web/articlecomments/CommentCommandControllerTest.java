@@ -83,7 +83,7 @@ class CommentCommandControllerTest {
         //given
         var articleId = 1L;
         var content = "새로운 댓글 내용입니다.";
-        var registerReq = getRegisterReq(articleId, content);
+        var registerReq = getRegisterReq(articleId, content, null);
 
         //when & then
         mvc.perform(post("/article-comments")
@@ -92,6 +92,33 @@ class CommentCommandControllerTest {
                 .with(csrf())
         ).andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrlPattern("**/login"));
+    }
+
+    @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @DisplayName("[성공][controller][POST] 대댓글 등록 테스트 - 인증된 사용자")
+    @Test
+    void givenRegisterChildForm_WhenPostMapping_ThenRedirectToDetailPage() throws Exception {
+        //given
+        var articleId = 4L;
+        var parentId = 3L;
+        var content = "대댓글 등록 내용입니다.";
+        var article = ArticleDto.ArticleWithCommentsResponse.builder().build();
+        var registerForm = getRegisterChildForm(articleId, content, parentId);
+
+        given(commentCommandService.registerComment(anyString(), any(ArticleCommentCommand.RegisterReq.class)))
+                .willReturn(any(ArticleCommentInfo.MainInfo.class));
+
+        //when & then
+        mvc.perform(post("/article-comments/child")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .sessionAttr("article", article)
+                        .content(encoder.encode(registerForm))
+                        .with(csrf())
+                ).andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/articles/" + articleId))
+                .andExpect(view().name("redirect:/articles/" + articleId));
+
+        then(commentCommandService).should().registerComment(anyString(), any(ArticleCommentCommand.RegisterReq.class));
     }
 
     @WithUserDetails(value = "userTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
@@ -310,10 +337,11 @@ class CommentCommandControllerTest {
         then(commentCommandService).should().delete(anyLong(), anyString());
     }
 
-    private static ArticleCommentDto.RegisterReq getRegisterReq(long articleId, String content) {
+    private static ArticleCommentDto.RegisterReq getRegisterReq(Long articleId, String content, Long parentId) {
         return ArticleCommentDto.RegisterReq.builder()
                 .articleId(articleId)
                 .commentBody(content)
+                .parentId(parentId)
                 .build();
     }
 
@@ -321,6 +349,14 @@ class CommentCommandControllerTest {
         return ArticleCommentDto.RegisterForm.builder()
                 .parentArticleId(articleId)
                 .commentBody(content)
+                .build();
+    }
+
+    private static ArticleCommentDto.RegisterChildForm getRegisterChildForm(Long articleId, String content, Long parentId) {
+        return ArticleCommentDto.RegisterChildForm.builder()
+                .articleId(articleId)
+                .childCommentBody(content)
+                .parentCommentId(parentId)
                 .build();
     }
 
