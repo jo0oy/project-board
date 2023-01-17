@@ -31,6 +31,7 @@ public class CommentCommandController {
     @PostMapping("")
     public String registerComment(@AuthenticationPrincipal PrincipalUserAccount userAccount,
                                   @ModelAttribute("article") ArticleDto.ArticleWithCommentsResponse article,
+                                  @ModelAttribute("registerChildForm") ArticleCommentDto.RegisterChildForm registerChildForm,
                                   @Valid @ModelAttribute("registerForm") ArticleCommentDto.RegisterForm registerForm,
                                   BindingResult bindingResult,
                                   SessionStatus sessionStatus) {
@@ -43,6 +44,24 @@ public class CommentCommandController {
         commentCommandService.registerComment(userAccount.getUsername(), commentDtoMapper.toCommand(registerForm));
         sessionStatus.setComplete(); // 세션에 저장된 "article" 입력 정보 초기화.
         return "redirect:/articles/" + registerForm.getParentArticleId();
+    }
+
+    @PostMapping("/child")
+    public String registerChildComment(@AuthenticationPrincipal PrincipalUserAccount userAccount,
+                                       @ModelAttribute("article") ArticleDto.ArticleWithCommentsResponse article,
+                                       @ModelAttribute("registerForm") ArticleCommentDto.RegisterForm registerForm,
+                                       @Valid @ModelAttribute("registerChildForm") ArticleCommentDto.RegisterChildForm registerChildForm,
+                                       BindingResult bindingResult,
+                                       SessionStatus sessionStatus) {
+
+        if (bindingResult.hasErrors()) {
+            log.debug("errors={}", bindingResult);
+            return "articles/detail";
+        }
+
+        commentCommandService.registerComment(userAccount.getUsername(), commentDtoMapper.toCommand(registerChildForm));
+        sessionStatus.setComplete(); // 세션에 저장된 "article" 입력 정보 초기화.
+        return "redirect:/articles/" + registerChildForm.getArticleId();
     }
 
     @PutMapping("/{id}")
