@@ -15,6 +15,7 @@ import com.example.projectboard.domain.articles.articlehashtags.ArticleHashtag;
 import com.example.projectboard.domain.hashtags.Hashtag;
 import com.example.projectboard.domain.articles.articlehashtags.ArticleHashtagRepository;
 import com.example.projectboard.domain.hashtags.HashtagRepository;
+import com.example.projectboard.domain.likes.LikeRepository;
 import com.example.projectboard.domain.users.UserAccount;
 import com.example.projectboard.domain.users.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,7 @@ public class ArticleCommandServiceImpl implements ArticleCommandService {
     private final HashtagQueryService hashtagQueryService;
     private final HashtagRepository hashtagRepository;
     private final ArticleHashtagRepository articleHashtagRepository;
+    private final LikeRepository likeRepository;
 
     private static final String VIEW_COUNT_COOKIE_NAME = "articleViewed";
 
@@ -189,6 +191,9 @@ public class ArticleCommandServiceImpl implements ArticleCommandService {
 
         // 게시글에 연결된 ArticleHashtag 리스트 삭제: bulk delete
         articleHashtagRepository.bulkDeleteByArticle_Id(articleId);
+
+        // 게시글과 연결된 Like 엔티티 bulk delete
+        likeRepository.deleteByArticleId(articleId);
 
         // 게시글 삭제 진행
         articleRepository.delete(article);

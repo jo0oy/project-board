@@ -33,7 +33,7 @@ public class Article extends JpaAuditingFields {
     private String content; // 본문
 
     @Column(columnDefinition = "integer default 0")
-    private Integer viewCount;
+    private int viewCount;
 
     @Column(nullable = false, updatable = false)
     private Long userId; // 연관관계 매핑: UserAccount id
