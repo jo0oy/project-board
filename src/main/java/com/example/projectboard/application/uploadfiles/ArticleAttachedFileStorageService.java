@@ -1,4 +1,4 @@
-package com.example.projectboard.application;
+package com.example.projectboard.application.uploadfiles;
 
 import com.example.projectboard.infra.storage.ResourceStorage;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,9 @@ public class ArticleAttachedFileStorageService implements FileStorageService {
         log.info("uploading multipartFile.... filename: {}", multipartFile.getOriginalFilename());
 
         validateFileExists(multipartFile);
-        return storage.upload(multipartFile, createStoreFilename(multipartFile.getOriginalFilename()));
+        var storeFilename = createStoreFilename(multipartFile.getOriginalFilename());
+
+        return storage.upload(multipartFile, storeFilename);
     }
 
     @Override

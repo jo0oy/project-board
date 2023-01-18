@@ -1,10 +1,12 @@
 package com.example.projectboard.application.articles;
 
 import com.example.projectboard.application.hashtags.HashtagQueryService;
+import com.example.projectboard.application.uploadfiles.FileStorageService;
 import com.example.projectboard.common.exception.EntityNotFoundException;
 import com.example.projectboard.common.exception.InvalidContentException;
 import com.example.projectboard.common.exception.NoAuthorityToUpdateDeleteException;
 import com.example.projectboard.common.exception.UsernameNotFoundException;
+import com.example.projectboard.common.util.FilenameExtractUtils;
 import com.example.projectboard.common.util.HashtagContentUtils;
 import com.example.projectboard.domain.articlecomments.ArticleCommentRepository;
 import com.example.projectboard.domain.articles.Article;
@@ -42,6 +44,7 @@ public class ArticleCommandServiceImpl implements ArticleCommandService {
     private final HashtagRepository hashtagRepository;
     private final ArticleHashtagRepository articleHashtagRepository;
     private final LikeRepository likeRepository;
+    private final FileStorageService fileStorageService;
 
     private static final String VIEW_COUNT_COOKIE_NAME = "articleViewed";
 
@@ -150,7 +153,7 @@ public class ArticleCommandServiceImpl implements ArticleCommandService {
         log.info("{}:{}", getClass().getSimpleName(), "update(Long, String, ArticleCommand.UpdateReq)");
 
         // 기존 ArticleHashtag 모두 삭제
-        articleHashtagRepository.bulkDeleteByArticle_Id(articleId);
+        articleHashtagRepository.bulkDeleteByArticleId(articleId);
 
         // update 할 Article 엔티티 조회 후 모든 해시태그 삭제
         var article = articleRepository.findById(articleId)
@@ -187,13 +190,22 @@ public class ArticleCommandServiceImpl implements ArticleCommandService {
         validateAuthorityToCommand(article.getUserId(), principalUsername);
 
         // 게시글 댓글 리스트 bulk delete
-        articleCommentRepository.deleteByArticleId(articleId);
+        articleCommentRepository.bulkDeleteByArticleId(articleId);
 
         // 게시글에 연결된 ArticleHashtag 리스트 삭제: bulk delete
-        articleHashtagRepository.bulkDeleteByArticle_Id(articleId);
+        articleHashtagRepository.bulkDeleteByArticleId(articleId);
 
         // 게시글과 연결된 Like 엔티티 bulk delete
-        likeRepository.deleteByArticleId(articleId);
+        likeRepository.bulkDeleteByArticleId(articleId);
+
+        // 게시글에 업로드된 파일 삭제 로직
+        var files = FilenameExtractUtils.extract(article.getContent());
+
+        log.info("image filename list = {}", files);
+        for (String filename : files) {
+            log.info("deleting filename: {}", filename);
+            fileStorageService.delete(filename);
+        }
 
         // 게시글 삭제 진행
         articleRepository.delete(article);
