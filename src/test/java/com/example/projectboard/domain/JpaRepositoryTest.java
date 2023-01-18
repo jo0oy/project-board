@@ -161,7 +161,7 @@ public class JpaRepositoryTest {
         long previousArticleCommentCount = articleCommentRepository.count();
 
         // When
-        articleCommentRepository.deleteByParentId(1L);
+        articleCommentRepository.bulkDeleteByParentId(1L);
         articleCommentRepository.deleteById(1L);
 
         // Then

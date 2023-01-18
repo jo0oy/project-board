@@ -17,7 +17,7 @@ function sendFile(file, el) {
         data: form_data,
         success: function (response) {
             $(el).summernote('insertImage', response, function ($image) {
-                $image.css('width', '30%');
+                $image.css('width', '25%');
             });
         }
     });

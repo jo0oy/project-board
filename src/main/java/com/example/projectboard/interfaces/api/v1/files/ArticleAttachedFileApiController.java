@@ -1,6 +1,6 @@
 package com.example.projectboard.interfaces.api.v1.files;
 
-import com.example.projectboard.application.FileStorageService;
+import com.example.projectboard.application.uploadfiles.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;

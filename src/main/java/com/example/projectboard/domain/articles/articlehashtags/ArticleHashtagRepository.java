@@ -1,6 +1,5 @@
 package com.example.projectboard.domain.articles.articlehashtags;
 
-import com.example.projectboard.domain.articles.articlehashtags.ArticleHashtag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,9 +20,9 @@ public interface ArticleHashtagRepository
 
     @Modifying(clearAutomatically = true)
     @Query("DELETE FROM ArticleHashtag ah WHERE ah.article.id = :articleId")
-    void bulkDeleteByArticle_Id(@Param("articleId") Long articleId);
+    void bulkDeleteByArticleId(@Param("articleId") Long articleId);
 
     @Modifying(clearAutomatically = true)
     @Query("DELETE FROM ArticleHashtag ah WHERE ah.hashtag.id = :hashtagId")
-    void bulkDeleteByHashtag_Id(@Param("hashtagId") Long hashtagId);
+    void bulkDeleteByHashtagId(@Param("hashtagId") Long hashtagId);
 }
