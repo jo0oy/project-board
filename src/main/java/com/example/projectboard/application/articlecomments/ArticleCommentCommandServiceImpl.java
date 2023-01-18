@@ -103,7 +103,7 @@ public class ArticleCommentCommandServiceImpl implements ArticleCommentCommandSe
         if (validateAuthorityToCommand(comment.getUserId(), principalUsername)) {
 
             if (comment.hasChilds()) { // 자식 댓글 존재 여부 확인 후, 자식 댓글을 먼저 모두 삭제한다.
-                articleCommentRepository.deleteByParentId(commentId);
+                articleCommentRepository.bulkDeleteByParentId(commentId);
             }
 
             // 댓글 삭제

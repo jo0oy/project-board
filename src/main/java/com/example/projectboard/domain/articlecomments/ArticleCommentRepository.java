@@ -19,13 +19,13 @@ public interface ArticleCommentRepository extends
 
     @Modifying(clearAutomatically = true)
     @Query("DELETE FROM ArticleComment ac WHERE ac.article.id = :articleId")
-    void deleteByArticleId(@Param("articleId") Long articleId);
+    void bulkDeleteByArticleId(@Param("articleId") Long articleId);
 
     @Modifying(clearAutomatically = true)
     @Query("DELETE FROM ArticleComment ac WHERE ac.userId = :userId")
-    void deleteByUserAccountId(@Param("userId") Long userId);
+    void bulkDeleteByUserAccountId(@Param("userId") Long userId);
 
     @Modifying(clearAutomatically = true)
     @Query("DELETE FROM ArticleComment ac WHERE ac.parent.id = :parentId")
-    void deleteByParentId(@Param("parentId") Long parentId);
+    void bulkDeleteByParentId(@Param("parentId") Long parentId);
 }

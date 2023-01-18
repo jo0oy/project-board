@@ -1,4 +1,4 @@
-package com.example.projectboard.application;
+package com.example.projectboard.application.uploadfiles;
 
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
