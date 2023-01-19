@@ -30,18 +30,35 @@ spring:
       max-request-size: 100MB
 
 debug: false
-management:
 
+# Actuator 보안 설정 샘플
+
+# Endpoint all disable
+management:
   endpoints:
+    enabled-by-default: false
+# Exclude all endpoint for JMX and Expose specific endpoints
+    jmx:
+      exposure:
+        exclude: "*"
     web:
       exposure:
-        include: "*"
+        include: "info, health"
+
+# Enable specific endpoints
+  endpoint:
+    info:
+      enabled: true
+    health:
+      enabled: true
+# Use other port for Actuator
+  server:
+    port: 7890
+
 logging:
   level:
     com.example.projectboard: debug
     org.springframework.web.servlet: debug
-
-    org.hibernate.type.descriptor.sql.BasicBinder: trace
 
 ---
 spring:
