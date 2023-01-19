@@ -19,6 +19,7 @@ public class ArticleAttachedFileStorageService implements FileStorageService {
 
     private final ResourceStorage storage;
 
+    // 게시글 첨부 파일 업로드 메서드
     @Override
     public String upload(MultipartFile multipartFile) throws IllegalAccessException {
         log.info("uploading multipartFile.... filename: {}", multipartFile.getOriginalFilename());
@@ -29,6 +30,7 @@ public class ArticleAttachedFileStorageService implements FileStorageService {
         return storage.upload(multipartFile, storeFilename);
     }
 
+    // 게시글 첨부 파일 다운로드 메서드
     @Override
     public Resource downloadFile(String storedFilename) throws IOException {
         log.info("downloading file.... filename: {}", storedFilename);
@@ -37,6 +39,16 @@ public class ArticleAttachedFileStorageService implements FileStorageService {
         return storage.download(storedFilename);
     }
 
+    // 게시글 첨부 파일 삭제 메서드
+    @Override
+    public void delete(String filename) {
+        log.info("deleting file.... filename: {}", filename);
+        validateFilename(filename);
+
+        storage.delete(filename);
+    }
+
+    // 파일명, 확장명 검증
     private void validateFilename(String storedFilename) {
         if (!StringUtils.hasText(storedFilename)) {
             log.error("파일명이 올바르지 않습니다. filename: {}", storedFilename);
@@ -59,14 +71,7 @@ public class ArticleAttachedFileStorageService implements FileStorageService {
         }
     }
 
-    @Override
-    public void delete(String filename) {
-        log.info("deleting file.... filename: {}", filename);
-        validateFilename(filename);
-
-        storage.delete(filename);
-    }
-
+    // 스토리지에 저장할 파일명 생성
     private String createStoreFilename(String filename) {
         String uuid = UUID.randomUUID().toString();
         String ext = extractExt(filename);
@@ -74,12 +79,14 @@ public class ArticleAttachedFileStorageService implements FileStorageService {
         return uuid + "." + ext;
     }
 
+    // 파일 확장명 추출
     private String extractExt(String filename) {
         int pos = filename.lastIndexOf(".");
         if(pos < 0) throw new IllegalArgumentException("파일 확장자가 존재하지 않습니다. filename: " + filename);
         return filename.substring(pos + 1);
     }
 
+    // 파일 존재여부 확인
     private void validateFileExists(MultipartFile multipartFile) {
         if (multipartFile.isEmpty()) {
             throw new IllegalArgumentException("파일이 존재하지 않습니다.");

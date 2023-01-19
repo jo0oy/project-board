@@ -26,9 +26,9 @@ public class AwsS3Storage implements ResourceStorage {
     private String bucketName;
 
     /**
-     * @description S3에 파일 업로드 로직 메서드
+     * S3에 파일 업로드 메서드
      * @param file : 업로드할 파일
-     * @param storeFilename : fileService 에서 생성한 저장될 파일명
+     * @param storeFilename : 스토리지에 저장될 파일명
      * @return storeFilename
      */
     @Override
@@ -47,7 +47,7 @@ public class AwsS3Storage implements ResourceStorage {
     }
 
     /**
-     * @description S3에 저장되어 있는 파일 다운로드 로직 메서드
+     * S3에 저장되어 있는 파일 다운로드 메서드
      * @param filename : 다운로드할 파일명
      * @return ByteArrayResource
      */
@@ -61,7 +61,7 @@ public class AwsS3Storage implements ResourceStorage {
     }
 
     /**
-     * @description S3에 저장되어 있는 파일 삭제 메서드
+     * S3에 저장되어 있는 파일 삭제 메서드
      * @param filename : 삭제할 파일명
      */
     @Override

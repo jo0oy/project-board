@@ -100,16 +100,19 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
         }
     }
 
+    // 중복 username 검증
     @Override
     public boolean verifyDuplicateUsername(String username) {
         return !userAccountRepository.existsByUsername(username);
     }
 
+    // 중복 이메일 검증
     @Override
     public boolean verifyDuplicateEmail(String email) {
         return !userAccountRepository.existsByEmail(email);
     }
 
+    // 중복 username, 이메일 동시 검증
     private void verifyDuplicateUsernameEmail(String username, String email) {
         log.info("아이디 & 이메일 중복 검증 로직 실행");
         if (userAccountRepository.existsByUsername(username)) {

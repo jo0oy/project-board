@@ -211,6 +211,7 @@ public class ArticleCommandServiceImpl implements ArticleCommandService {
         articleRepository.delete(article);
     }
 
+    // 수정/삭제 권한 검증 메서드
     private void validateAuthorityToCommand(Long articleUserId, String principalUsername) {
         log.info("수정/삭제 권한 확인 로직 실행");
         // 조회한 Article 엔티티의 연관 관계에 있는 UserAccount 엔티티 조회
@@ -227,6 +228,7 @@ public class ArticleCommandServiceImpl implements ArticleCommandService {
         }
     }
 
+    // 입력받은 해시태그 내용 검증 메서드
     private void validateHashtagContent(List<String> hashtagNames) {
         if (HashtagContentUtils.verifyFormat(hashtagNames)) {
             log.debug("올바르지 않은 해시태그 내용 값입니다. Format 문제 발생.");
@@ -240,6 +242,7 @@ public class ArticleCommandServiceImpl implements ArticleCommandService {
         }
     }
 
+    // 입력받은 해시태그 리스트를 토대로 저장할 ArticleHashtag Set 생성 메서드
     private Set<ArticleHashtag> renewHashtagsFromList(List<String> hashtagList, Article article) {
         log.info("저장할 ArticleHashtag Set 생성");
         var set = new LinkedHashSet<>(hashtagList);

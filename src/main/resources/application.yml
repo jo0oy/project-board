@@ -1,39 +1,22 @@
-debug: false
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-
-logging:
-  level:
-    com.example.projectboard: debug
-    org.springframework.web.servlet: debug
-    org.hibernate.type.descriptor.sql.BasicBinder: trace
-
 spring:
   profiles:
-    include:
-      - aws
-      - aws-credentials
+    active: local # default
+    group:
+      local:
+        - aws
+        - aws-credentials
+      heroku:
+        - aws
+        - aws-credentials
 
-  datasource:
-    url: ${LOCAL_DB_URL}
-    username: ${LOCAL_DB_USERNAME}
-    password: ${LOCAL_DB_PASSWORD}
-    driver-class-name: org.mariadb.jdbc.Driver
   jpa:
     defer-datasource-initialization: true
-    hibernate:
-      ddl-auto: create
     show-sql: true
     open-in-view: false
-
     properties:
       hibernate:
         format_sql: true
-        default_batch_fetch_size: 200
-
+        default_batch_fetch_size: 500
   sql:
     init:
       mode: always
@@ -41,10 +24,44 @@ spring:
     hiddenmethod:
       filter:
         enabled: true
-
   messages:
     basename: errors
   servlet:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
+
+debug: false
+management:
+
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+logging:
+  level:
+    com.example.projectboard: debug
+    org.springframework.web.servlet: debug
+
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    url: ${LOCAL_DB_URL}
+    username: ${LOCAL_DB_USERNAME}
+    password: ${LOCAL_DB_PASSWORD}
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+
+---
+spring:
+  config:
+    activate:
+      on-profile: heroku
