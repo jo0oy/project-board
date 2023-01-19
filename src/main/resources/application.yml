@@ -4,10 +4,8 @@ spring:
     group:
       local:
         - aws
-        - aws-credentials
       heroku:
         - aws
-        - aws-credentials
 
   jpa:
     defer-datasource-initialization: true
