@@ -22,6 +22,11 @@ public class LikeCommandServiceImpl implements LikeCommandService {
     private final ArticleRepository articleRepository;
     private final UserAccountRepository userAccountRepository;
 
+    /**
+     * '좋아요' push 메서드 ('좋아요' on/off)
+     * @param articleId : push 하려는 게시글 id (Long)
+     * @param principalUsername : push 하려는 유저(현재 로그인된 유저)의 username (String)
+     */
     @Transactional
     @Override
     public void pushLike(Long articleId, String principalUsername) {
@@ -47,6 +52,7 @@ public class LikeCommandServiceImpl implements LikeCommandService {
         }
     }
 
+    // 이미 push 된 '좋아요'인지 여부 확인 메서드
     private Optional<Like> alreadyPushedLike(Long articleId, Long userId) {
         log.info("이미 눌린 '좋아요'인지 체크하는 로직 실행");
         return likeRepository.findByArticle_IdAndUserAccount_Id(articleId, userId);

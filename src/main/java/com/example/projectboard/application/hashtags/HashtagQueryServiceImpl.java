@@ -24,11 +24,13 @@ public class HashtagQueryServiceImpl implements HashtagQueryService {
 
     private final HashtagRepository hashtagRepository;
 
+    // 해시태그 리스트 페이징 조회
     @Override
     public Page<HashtagInfo> hashtags(Pageable pageable) {
         return hashtagRepository.findAll(PageRequestUtils.of(pageable)).map(HashtagInfo::new);
     }
 
+    // 해시태그 리스트 페이징 조회 by 해시태그 이름
     @Override
     public Page<HashtagInfo> hashtags(String hashtagName, Pageable pageable) {
         if (!StringUtils.hasText(hashtagName)) {
@@ -38,6 +40,7 @@ public class HashtagQueryServiceImpl implements HashtagQueryService {
                 .map(HashtagInfo::new);
     }
 
+    // hashtagName in 쿼리 조회
     @Override
     public Set<Hashtag> hashtagListByHashtagNames(Set<String> hashtagNames) {
         return new HashSet<>(

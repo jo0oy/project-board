@@ -121,6 +121,13 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 로그인된 유저가 작성한 게시글 리스트 검색/페이징 조회 메서드.
+     * @param principalUsername : 인증 객체의 username (String)
+     * @param condition : Article 검색조건 (ArticleCommand.SearchCondition)
+     * @param pageable : 페이징 정보 (Pageable)
+     * @return Page<ArticleInfo.MainInfo>
+     */
     @Override
     public Page<ArticleInfo.MainInfo> articlesWrittenBy(String principalUsername, ArticleCommand.SearchCondition condition, Pageable pageable) {
         log.info("{}:{}", getClass().getSimpleName(), "articlesWrittenBy(String, ArticleCommand.SearchCondition, Pageable)");
@@ -134,6 +141,12 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
                 .map(ArticleInfo.MainInfo::new);
     }
 
+    /**
+     * 게시글 리스트 검색/페이징 조회 by hashtagId
+     * @param hashtagId : 검색하려는 해시태그 id (Long)
+     * @param pageable : 페이징 정보 (Pageable)
+     * @return Page<ArticleInfo.MainInfo>
+     */
     @Override
     public Page<ArticleInfo.MainInfo> articlesByHashtagId(Long hashtagId, Pageable pageable) {
         return articleHashtagRepository.findByHashtagId(hashtagId, PageRequestUtils.of(pageable))
@@ -141,6 +154,12 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
                 .map(ArticleInfo.MainInfo::new);
     }
 
+    /**
+     * 게시글 리스트 검색/페이징 조회 by hashtagName
+     * @param hashtagName : 검색하려는 해시태그명 (String)
+     * @param pageable : 페이징 정보 (Pageable)
+     * @return Page<ArticleInfo.MainInfo>
+     */
     @Override
     public Page<ArticleInfo.MainInfo> articlesByHashtagName(String hashtagName, Pageable pageable) {
         return articleHashtagRepository.findByHashtagNameIgnoreCase(hashtagName, PageRequestUtils.of(pageable))
