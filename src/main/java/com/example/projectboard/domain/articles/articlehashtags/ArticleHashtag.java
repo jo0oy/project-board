@@ -20,8 +20,8 @@ import java.util.Objects;
 @Entity
 public class ArticleHashtag extends JpaAuditingDateTimeFields {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "article_hashtag_id")
     private Long id;
 
     private String actualHashtagName;
