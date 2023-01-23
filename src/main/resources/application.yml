@@ -88,6 +88,3 @@ spring:
   sql:
     init:
       mode: always
-
-server:
-  port: $PORT
