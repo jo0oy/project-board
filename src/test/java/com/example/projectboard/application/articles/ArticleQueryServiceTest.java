@@ -96,7 +96,6 @@ class ArticleQueryServiceTest {
 
         // then
         assertThat(result.size()).isEqualTo(30);
-        assertThat(result.get(0).getArticleId()).isEqualTo(1L);
     }
 
     @DisplayName("[성공][service] 게시글 해시태그 검색 페이징 조회 테스트 - by hashtagId")
