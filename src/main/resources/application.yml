@@ -80,3 +80,12 @@ spring:
   config:
     activate:
       on-profile: heroku
+  datasource:
+    url: ${JAWSDB_MARIA_URL}
+  jpa:
+    hibernate:
+      ddl-auto: create
+  sql:
+    init:
+      mode: always
+      
