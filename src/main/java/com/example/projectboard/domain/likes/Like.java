@@ -16,6 +16,7 @@ import javax.persistence.*;
 public class Like extends JpaAuditingDateTimeFields {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "article_like_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
