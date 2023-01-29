@@ -88,3 +88,6 @@ spring:
   sql:
     init:
       mode: always
+
+  redis:
+    url: ${REDISCLOUD_URL}
