@@ -4,10 +4,7 @@ import com.example.projectboard.common.exception.EntityNotFoundException;
 import com.example.projectboard.common.exception.NoAuthorityToUpdateDeleteException;
 import com.example.projectboard.common.exception.UsernameNotFoundException;
 import com.example.projectboard.common.exception.VerifyDuplicateException;
-import com.example.projectboard.domain.users.UserAccount;
-import com.example.projectboard.domain.users.UserAccountCommand;
-import com.example.projectboard.domain.users.UserAccountInfo;
-import com.example.projectboard.domain.users.UserAccountRepository;
+import com.example.projectboard.domain.users.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserAccountCommandServiceImpl implements UserAccountCommandService {
 
     private final UserAccountRepository userAccountRepository;
+    private final UserAccountCacheRepository userAccountCacheRepository;
+    private final UserAccountInfoMapper userAccountInfoMapper;
     private final PasswordEncoder passwordEncoder;
 
     /**
@@ -40,7 +39,7 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
         // 인코딩된 패스워드로 update
         userAccount.updatePassword(passwordEncoder.encode(command.getPassword()));
 
-        return UserAccountInfo.of(userAccountRepository.save(userAccount));
+        return userAccountInfoMapper.toInfo(userAccountRepository.save(userAccount));
     }
 
     /**
@@ -59,13 +58,22 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 유저입니다."));
 
         // 현재 로그인된 사용자 엔티티 조회
-        var principal = userAccountRepository.findByUsername(principalUsername)
-                .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 유저입니다. username=" + principalUsername));
+        var principal = userAccountCacheRepository.get(principalUsername)
+                .orElseGet(() ->
+                        userAccountInfoMapper.toCacheDto(
+                                userAccountRepository.findByUsername(principalUsername)
+                                .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 유저입니다. username=" + principalUsername)))
+                );
 
         // 수정 권한 확인
-        if (userAccount.equals(principal) || principal.getRole() == UserAccount.RoleType.ADMIN) {
+        if (userAccount.validateAuthority(principal.getId(), principal.getUsername())
+                || principal.getRole() == UserAccount.RoleType.ADMIN) {
             // 유저 정보 업데이트
             userAccount.updateUserInfo(command.getEmail(), command.getPhoneNumber());
+
+            // redis 에 저장되어 있다면 user 삭제
+            userAccountCacheRepository.delete(userAccount.getUsername());
+
         } else {
             log.error("수정 권한이 없는 사용자입니다. username={}", principalUsername);
             throw new NoAuthorityToUpdateDeleteException();
@@ -87,13 +95,22 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 유저입니다."));
 
         // 현재 로그인된 사용자 엔티티 조회
-        var principal = userAccountRepository.findByUsername(principalUsername)
-                .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 유저입니다. username=" + principalUsername));
+        var principal = userAccountCacheRepository.get(principalUsername)
+                .orElseGet(() ->
+                        userAccountInfoMapper.toCacheDto(
+                                userAccountRepository.findByUsername(principalUsername)
+                                        .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 유저입니다. username=" + principalUsername)))
+                );
 
         // 삭제 권한 확인
-        if (userAccount.equals(principal) || principal.getRole() == UserAccount.RoleType.ADMIN) {
+        if (userAccount.validateAuthority(principal.getId(), principal.getUsername())
+                || principal.getRole() == UserAccount.RoleType.ADMIN) {
             // 유저 엔티티 삭제
             userAccountRepository.delete(userAccount);
+
+            // redis 에서 user 삭제
+            userAccountCacheRepository.delete(userAccount.getUsername());
+
         } else {
             log.error("삭제 권한이 없는 사용자입니다. username={}", principalUsername);
             throw new NoAuthorityToUpdateDeleteException();

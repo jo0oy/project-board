@@ -3,7 +3,6 @@ package com.example.projectboard.application.articles;
 import com.example.projectboard.application.hashtags.HashtagQueryService;
 import com.example.projectboard.application.uploadfiles.FileStorageService;
 import com.example.projectboard.common.exception.EntityNotFoundException;
-import com.example.projectboard.common.exception.InvalidContentException;
 import com.example.projectboard.common.exception.NoAuthorityToUpdateDeleteException;
 import com.example.projectboard.common.exception.UsernameNotFoundException;
 import com.example.projectboard.common.util.FilenameExtractUtils;
@@ -14,11 +13,13 @@ import com.example.projectboard.domain.articles.ArticleCommand;
 import com.example.projectboard.domain.articles.ArticleInfo;
 import com.example.projectboard.domain.articles.ArticleRepository;
 import com.example.projectboard.domain.articles.articlehashtags.ArticleHashtag;
-import com.example.projectboard.domain.hashtags.Hashtag;
 import com.example.projectboard.domain.articles.articlehashtags.ArticleHashtagRepository;
+import com.example.projectboard.domain.hashtags.Hashtag;
 import com.example.projectboard.domain.hashtags.HashtagRepository;
 import com.example.projectboard.domain.likes.LikeRepository;
 import com.example.projectboard.domain.users.UserAccount;
+import com.example.projectboard.domain.users.UserAccountCacheRepository;
+import com.example.projectboard.domain.users.UserAccountInfoMapper;
 import com.example.projectboard.domain.users.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +46,8 @@ public class ArticleCommandServiceImpl implements ArticleCommandService {
     private final ArticleHashtagRepository articleHashtagRepository;
     private final LikeRepository likeRepository;
     private final FileStorageService fileStorageService;
+    private final UserAccountCacheRepository userAccountCacheRepository;
+    private final UserAccountInfoMapper userAccountInfoMapper;
 
     private static final String VIEW_COUNT_COOKIE_NAME = "articleViewed";
 
@@ -68,7 +71,7 @@ public class ArticleCommandServiceImpl implements ArticleCommandService {
         var article = command.toEntity(userAccount.getId());
 
         // 전달받은 hashtagContent 검증
-        validateHashtagContent(command.getHashtagNames());
+        HashtagContentUtils.validateHashtagContent(command.getHashtagNames());
 
         // 저장할 hashtagSet 생성
         var hashtags = renewHashtagsFromList(command.getHashtagNames(), article);
@@ -214,31 +217,22 @@ public class ArticleCommandServiceImpl implements ArticleCommandService {
     // 수정/삭제 권한 검증 메서드
     private void validateAuthorityToCommand(Long articleUserId, String principalUsername) {
         log.info("수정/삭제 권한 확인 로직 실행");
-        // 조회한 Article 엔티티의 연관 관계에 있는 UserAccount 엔티티 조회
-        var writerUserAccount = userAccountRepository.findById(articleUserId)
+        // 게시글 작성자 엔티티 UserAccount 조회
+        var writer = userAccountRepository.findById(articleUserId)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 유저입니다. 요청 진행이 불가합니다."));
 
         // 수정 or 삭제 권한 확인하기 위한 UserAccount 엔티티 조회
-        var userAccount = userAccountRepository.findByUsername(principalUsername)
-                .orElseThrow(() -> new UsernameNotFoundException("유저가 존재하지 않습니다. username=" + principalUsername));
+        var userAccount = userAccountCacheRepository.get(principalUsername)
+                .orElseGet(() ->
+                        userAccountInfoMapper.toCacheDto(
+                                userAccountRepository.findByUsername(principalUsername)
+                                        .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 유저입니다. username=" + principalUsername)))
+                );
 
-        if (!writerUserAccount.equals(userAccount) && userAccount.getRole() != UserAccount.RoleType.ADMIN) {
+        if (!writer.validateAuthority(userAccount.getId(), userAccount.getUsername())
+                && userAccount.getRole() != UserAccount.RoleType.ADMIN) {
             log.error("수정/삭제 권한이 없는 사용자입니다. username={}", principalUsername);
             throw new NoAuthorityToUpdateDeleteException();
-        }
-    }
-
-    // 입력받은 해시태그 내용 검증 메서드
-    private void validateHashtagContent(List<String> hashtagNames) {
-        if (HashtagContentUtils.verifyFormat(hashtagNames)) {
-            log.debug("올바르지 않은 해시태그 내용 값입니다. Format 문제 발생.");
-            throw new InvalidContentException("해시태그는 '#'로 시작하는 공백이 없는 문자열이어야 합니다. " +
-                    "다수의 해시태그를 입력할 경우, 구분자는 ','와 '/'만 가능합니다.");
-        }
-
-        if (HashtagContentUtils.verifyHashtagSize(hashtagNames)) {
-            log.debug("올바르지 않은 해시태그 내용 값입니다. Size 문제 발생.");
-            throw new InvalidContentException("해시태그는 최대 10개까지 입력 가능합니다.");
         }
     }
 

@@ -4,10 +4,7 @@ import com.example.projectboard.common.exception.EntityNotFoundException;
 import com.example.projectboard.common.exception.NoAuthorityToReadException;
 import com.example.projectboard.common.exception.UsernameNotFoundException;
 import com.example.projectboard.common.util.PageRequestUtils;
-import com.example.projectboard.domain.users.UserAccount;
-import com.example.projectboard.domain.users.UserAccountCommand;
-import com.example.projectboard.domain.users.UserAccountInfo;
-import com.example.projectboard.domain.users.UserAccountRepository;
+import com.example.projectboard.domain.users.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,6 +22,8 @@ import java.util.stream.Collectors;
 public class UserAccountQueryServiceImpl implements UserAccountQueryService {
 
     private final UserAccountRepository userAccountRepository;
+    private final UserAccountCacheRepository userAccountCacheRepository;
+    private final UserAccountInfoMapper userAccountInfoMapper;
 
     /**
      * UserAccountInfo 를 단일 조회하는 메서드: 현재 로그인된 사용자 계정 조회하는 메서드
@@ -40,7 +39,7 @@ public class UserAccountQueryServiceImpl implements UserAccountQueryService {
         var userAccount = userAccountRepository.findByUsername(principalUsername)
                 .orElseThrow(UsernameNotFoundException::new);
 
-        return UserAccountInfo.of(userAccount);
+        return userAccountInfoMapper.toInfo(userAccount);
     }
 
     /**
@@ -59,17 +58,22 @@ public class UserAccountQueryServiceImpl implements UserAccountQueryService {
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 유저입니다."));
 
         // principalUsername userAccount 엔티티 조회
-        var principal = userAccountRepository.findByUsername(principalUsername)
-                .orElseThrow(UsernameNotFoundException::new);
+        var principal = userAccountCacheRepository.get(principalUsername)
+                .orElseGet(() ->
+                        userAccountInfoMapper.toCacheDto(
+                                userAccountRepository.findByUsername(principalUsername)
+                                        .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 유저입니다. username=" + principalUsername)))
+                );
 
         // 개인 정보 조회 권한 확인
-        if (!userAccount.equals(principal) && principal.getRole() != UserAccount.RoleType.ADMIN) {
+        if (!userAccount.validateAuthority(principal.getId(), principal.getUsername())
+                && principal.getRole() != UserAccount.RoleType.ADMIN) {
             // 본인이 아니고 관리자 권한이 아닌 경우 예외 발생!
             log.error("개인정보 조회 권한이 없는 사용자입니다. username={}", principalUsername);
             throw new NoAuthorityToReadException("개인정보 조회 권한이 없는 사용자입니다.");
         }
 
-        return UserAccountInfo.of(userAccount);
+        return userAccountInfoMapper.toInfo(userAccount);
     }
 
     /**
@@ -88,17 +92,22 @@ public class UserAccountQueryServiceImpl implements UserAccountQueryService {
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 유저입니다."));
 
         // principalUsername UserAccount 엔티티 조회
-        var principal = userAccountRepository.findByUsername(principalUsername)
-                .orElseThrow(UsernameNotFoundException::new);
+        var principal = userAccountCacheRepository.get(principalUsername)
+                .orElseGet(() ->
+                        userAccountInfoMapper.toCacheDto(
+                                userAccountRepository.findByUsername(principalUsername)
+                                        .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 유저입니다. username=" + principalUsername)))
+                );
 
         // 개인 정보 조회 권한 확인
-        if (!userAccount.equals(principal) && principal.getRole() != UserAccount.RoleType.ADMIN) {
+        if (!userAccount.validateAuthority(principal.getId(), principal.getUsername())
+                && principal.getRole() != UserAccount.RoleType.ADMIN) {
             // 본인이 아니고 관리자 권한이 아닌 경우 예외 발생!
             log.error("개인정보 조회 권한이 없는 사용자입니다. username={}", principalUsername);
             throw new NoAuthorityToReadException("개인정보 조회 권한이 없는 사용자입니다.");
         }
 
-        return UserAccountInfo.of(userAccount);
+        return userAccountInfoMapper.toInfo(userAccount);
     }
 
     /**
@@ -112,7 +121,7 @@ public class UserAccountQueryServiceImpl implements UserAccountQueryService {
         log.info("{}: {}", getClass().getSimpleName(), "userAccounts(UserAccountCommand.SearchCondition, Pageable)");
 
         return userAccountRepository.findAllBySearchCondition(condition.toSearchCondition(), PageRequestUtils.of(pageable))
-                .map(UserAccountInfo::of);
+                .map(userAccountInfoMapper::toInfo);
     }
 
     /**
@@ -126,7 +135,7 @@ public class UserAccountQueryServiceImpl implements UserAccountQueryService {
 
         return userAccountRepository.findAllBySearchCondition(condition.toSearchCondition())
                 .stream()
-                .map(UserAccountInfo::of)
+                .map(userAccountInfoMapper::toInfo)
                 .collect(Collectors.toList());
     }
 }

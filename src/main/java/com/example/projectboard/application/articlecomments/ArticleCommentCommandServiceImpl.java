@@ -9,6 +9,8 @@ import com.example.projectboard.domain.articlecomments.ArticleCommentInfo;
 import com.example.projectboard.domain.articlecomments.ArticleCommentRepository;
 import com.example.projectboard.domain.articles.ArticleRepository;
 import com.example.projectboard.domain.users.UserAccount;
+import com.example.projectboard.domain.users.UserAccountCacheRepository;
+import com.example.projectboard.domain.users.UserAccountInfoMapper;
 import com.example.projectboard.domain.users.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,8 @@ public class ArticleCommentCommandServiceImpl implements ArticleCommentCommandSe
     private final ArticleCommentRepository articleCommentRepository;
     private final ArticleRepository articleRepository;
     private final UserAccountRepository userAccountRepository;
+    private final UserAccountCacheRepository userAccountCacheRepository;
+    private final UserAccountInfoMapper userAccountInfoMapper;
 
     /**
      * 새로운 ArticleComment 등록 메서드.
@@ -116,14 +120,19 @@ public class ArticleCommentCommandServiceImpl implements ArticleCommentCommandSe
     }
 
     private boolean validateAuthorityToCommand(Long commentUserId, String principalUsername) {
-        // 조회한 Article 엔티티의 연관 관계에 있는 UserAccount 엔티티 조회
-        var writerUserAccount = userAccountRepository.findById(commentUserId)
+        // 댓글 작성자 UserAccount 엔티티 조회
+        var writer = userAccountRepository.findById(commentUserId)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 유저입니다. 요청 진행이 불가합니다."));
 
         // 수정 or 삭제 권한 확인하기 위한 UserAccount 엔티티 조회
-        var userAccount = userAccountRepository.findByUsername(principalUsername)
-                .orElseThrow(() -> new UsernameNotFoundException("유저가 존재하지 않습니다. username=" + principalUsername));
+        var userAccount = userAccountCacheRepository.get(principalUsername)
+                .orElseGet(() ->
+                        userAccountInfoMapper.toCacheDto(
+                                userAccountRepository.findByUsername(principalUsername)
+                                        .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 유저입니다. username=" + principalUsername)))
+                );
 
-        return writerUserAccount.equals(userAccount) || userAccount.getRole() == UserAccount.RoleType.ADMIN;
+        return writer.validateAuthority(userAccount.getId(), userAccount.getUsername())
+                || userAccount.getRole() == UserAccount.RoleType.ADMIN;
     }
 }

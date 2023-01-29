@@ -11,6 +11,8 @@ import com.example.projectboard.domain.articles.ArticleRepository;
 import com.example.projectboard.domain.articles.articlehashtags.ArticleHashtag;
 import com.example.projectboard.domain.articles.articlehashtags.ArticleHashtagRepository;
 import com.example.projectboard.domain.likes.LikeRepository;
+import com.example.projectboard.domain.users.UserAccountCacheRepository;
+import com.example.projectboard.domain.users.UserAccountInfoMapper;
 import com.example.projectboard.domain.users.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,8 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
     private final ArticleHashtagRepository articleHashtagRepository;
     private final LikeRepository likeRepository;
     private final UserAccountRepository userAccountRepository;
+    private final UserAccountCacheRepository userAccountCacheRepository;
+    private final UserAccountInfoMapper userAccountInfoMapper;
 
     /**
      * Article 단일 조회 메서드.
@@ -133,8 +137,13 @@ public class ArticleQueryServiceImpl implements ArticleQueryService {
         log.info("{}:{}", getClass().getSimpleName(), "articlesWrittenBy(String, ArticleCommand.SearchCondition, Pageable)");
 
         // 인증된 사용자 엔티티(UserAccount) 조회
-        var userAccount = userAccountRepository.findByUsername(principalUsername)
-                .orElseThrow(() -> new UsernameNotFoundException("유저를 찾을 수 없습니다. username=" + principalUsername));
+        var userAccount = userAccountCacheRepository.get(principalUsername)
+                .orElseGet(() ->
+                        userAccountInfoMapper.toCacheDto(
+                                userAccountRepository.findByUsername(principalUsername)
+                                .orElseThrow(() -> new UsernameNotFoundException("유저를 찾을 수 없습니다. username=" + principalUsername))
+                        )
+                );
 
         return articleRepository
                 .findAllByUserId(userAccount.getId(), condition.toSearchCondition(), PageRequestUtils.of(pageable))

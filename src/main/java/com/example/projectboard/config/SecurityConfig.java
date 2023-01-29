@@ -1,9 +1,10 @@
 package com.example.projectboard.config;
 
+import com.example.projectboard.domain.users.UserAccountCacheRepository;
+import com.example.projectboard.domain.users.UserAccountInfoMapper;
 import com.example.projectboard.domain.users.UserAccountRepository;
 import com.example.projectboard.security.PrincipalUserDetailsService;
 import com.example.projectboard.security.WebAccessDeniedHandler;
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +20,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
-@RequiredArgsConstructor
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @Configuration
@@ -43,8 +43,10 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(UserAccountRepository userAccountRepository) {
-        return new PrincipalUserDetailsService(userAccountRepository);
+    public UserDetailsService userDetailsService(UserAccountRepository userAccountRepository,
+                                                 UserAccountCacheRepository redisRepository,
+                                                 UserAccountInfoMapper mapper) {
+        return new PrincipalUserDetailsService(userAccountRepository, redisRepository, mapper);
     }
 
     @Bean
