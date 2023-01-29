@@ -153,4 +153,4 @@ insert into article_hashtags (actual_hashtag_name, article_id, hashtag_id, creat
 insert into article_hashtags (actual_hashtag_name, article_id, hashtag_id, created_at, modified_at) values ('#Yellow', 3, 5, '2022-06-15 10:45:48', '2022-06-17 10:45:48');
 
 -- Likes TABLE INSERT --
-insert into likes (article_id, user_id, created_at, modified_at) values (2L, 2L, '2022-10-24 10:45:48', '2022-10-24 10:45:48');
+insert into likes (article_id, user_id, created_at, modified_at) values (2, 2, '2022-10-24 10:45:48', '2022-10-24 10:45:48');

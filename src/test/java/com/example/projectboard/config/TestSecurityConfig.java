@@ -1,8 +1,9 @@
 package com.example.projectboard.config;
 
-import com.example.projectboard.domain.users.UserAccount;
-import com.example.projectboard.domain.users.UserAccountRepository;
+import com.example.projectboard.domain.users.*;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.event.annotation.BeforeTestMethod;
 
@@ -11,11 +12,18 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
+@ComponentScan(basePackageClasses = {UserAccountInfoMapper.class, UserAccountInfoMapperImpl.class})
 @Import(SecurityConfig.class)
 public class TestSecurityConfig {
 
     @MockBean
     private UserAccountRepository userAccountRepository;
+
+    @MockBean
+    private UserAccountCacheRepository userAccountCacheRepository;
+
+    @SpyBean
+    private UserAccountInfoMapper userAccountInfoMapper;
 
     @BeforeTestMethod
     public void securitySetUp() {
