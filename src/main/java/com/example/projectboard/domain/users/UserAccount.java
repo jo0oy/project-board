@@ -51,11 +51,11 @@ public class UserAccount extends JpaAuditingDateTimeFields {
     }
 
     private UserAccount(String username,
-                       String password,
-                       String name,
-                       String email,
-                       String phoneNumber,
-                       RoleType role) {
+                        String password,
+                        String name,
+                        String email,
+                        String phoneNumber,
+                        RoleType role) {
         this.username = username;
         this.password = password;
         this.name = name;
@@ -80,7 +80,7 @@ public class UserAccount extends JpaAuditingDateTimeFields {
                                  String email,
                                  String phoneNumber,
                                  RoleType role) {
-        if(role == null) role = RoleType.USER;
+        if (role == null) role = RoleType.USER;
         return new UserAccount(username, password, name, email, phoneNumber, role);
     }
 
@@ -89,8 +89,13 @@ public class UserAccount extends JpaAuditingDateTimeFields {
     }
 
     public void updateUserInfo(String email, String phoneNumber) {
-        if(StringUtils.hasText(email)) this.email = email;
-        if(StringUtils.hasText(phoneNumber)) this.phoneNumber = phoneNumber;
+        if (StringUtils.hasText(email)) this.email = email;
+        if (StringUtils.hasText(phoneNumber)) this.phoneNumber = phoneNumber;
+    }
+
+    public boolean validateAuthority(Long id, String username) {
+        return Objects.nonNull(id) && Objects.equals(this.getId(), id)
+                && StringUtils.hasText(username) && this.getUsername().equals(username);
     }
 
     @Override

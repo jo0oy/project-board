@@ -1,22 +1,24 @@
 package com.example.projectboard.domain.users;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @ToString
-@Getter
 @Builder
-public class UserAccountInfo {
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+public class UserAccountCacheDto {
 
-    private Long userId;
+    private Long id;
     private String username;
+    private String password;
     private String name;
     private String email;
     private String phoneNumber;
-    private String role;
+    private UserAccount.RoleType role;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 }
