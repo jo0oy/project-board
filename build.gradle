@@ -54,6 +54,16 @@ dependencies {
     implementation platform('com.amazonaws:aws-java-sdk-bom:1.12.376')
     implementation 'com.amazonaws:aws-java-sdk-s3'
     implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.2'
+
+    // Redis 설정
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // testcontainers
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+    testImplementation 'org.testcontainers:testcontainers:1.17.6'
+    testImplementation 'org.testcontainers:junit-jupiter:1.17.6'
+    testImplementation "org.testcontainers:mariadb:1.17.6"
+
 }
 
 tasks.named('test') {
