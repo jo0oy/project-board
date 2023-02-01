@@ -1,6 +1,6 @@
 # 게시판 서비스 project-board
 
-Spring Boot와 관련 기수들, JPA, Thymeleaf etc. 로 구현한 게시판 서비스
+Spring Boot와 관련 기술들, JPA, Thymeleaf etc. 로 구현한 게시판 서비스
 
 
 ## 요구사항 및 상세 기능 
