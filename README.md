@@ -52,6 +52,7 @@ Spring Boot
 * Lombok
 * Spring Boot DevTools
 * Spring Validation
+* JUnit5
 
 그 외 
 
@@ -60,6 +61,7 @@ Spring Boot
 * Mapstruct
 * AWS S3
 * Redis
+* Testcontainers
 
 ## ERD
 ![diagram_1](./project-board-entity-diagram.png)
